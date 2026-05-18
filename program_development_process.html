@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program development process</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 24px 16px;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    padding: 28px 32px 24px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .page-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: #1a1a1a;
+  }
+
+  .page-header p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+  }
+
+  .dots-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+
+  .dot-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .dot-item:last-child { flex: 0; }
+
+  .dot-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+
+  .dot-circle {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #d0d0d0;
+    transition: background 0.2s;
+  }
+
+  .dot-circle.active { background: #D85A30; }
+  .dot-circle.done   { background: #5DCAA5; }
+
+  .dot-label {
+    font-size: 9px;
+    white-space: nowrap;
+    color: #999;
+  }
+  .dot-label.active { color: #D85A30; font-weight: 500; }
+
+  .dot-line {
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 0 4px;
+    margin-bottom: 14px;
+  }
+
+  .step-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .step-counter { font-size: 12px; color: #888; }
+
+  .pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 20px;
+  }
+
+  .step-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: #1a1a1a;
+  }
+
+  .step-intro {
+    font-size: 14px;
+    color: #555;
+    margin: 0 0 18px;
+    line-height: 1.6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 7px;
+  }
+
+  .role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: #f5f5f5;
+    border: 1px solid #e8e8e8;
+    color: #555;
+    margin: 2px 2px 2px 0;
+  }
+
+  .activities {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.7;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .activities li::before { content: "· "; color: #D85A30; }
+
+  .deliverable {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-left: 3px solid #D85A30;
+    margin: 4px 0;
+    color: #555;
+    background: #fdf6f3;
+    border-radius: 0 5px 5px 0;
+  }
+
+  .miro-section { margin-bottom: 16px; }
+
+  .miro-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 2px solid #FFD02F;
+    background: #fffbf0;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+    transition: background 0.15s;
+  }
+
+  .miro-btn:hover { background: #fff3cc; }
+
+  .miro-btn .miro-text { flex: 1; }
+  .miro-btn .miro-title { font-size: 13px; font-weight: 600; color: #050038; display: block; }
+  .miro-btn .miro-sub   { font-size: 11px; color: #635e00; display: block; }
+
+  .parallel-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+    display: inline-block;
+    margin-left: 6px;
+  }
+
+  .parallel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .parallel-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .parallel-head {
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .parallel-body {
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.55;
+  }
+
+  .ref-group-note {
+    margin-top: 6px;
+    padding: 5px 8px;
+    background: #fffbeb;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #92400e;
+  }
+
+  .doc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    border: 1px solid #e8e8e8;
+    margin: 5px 0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+    color: inherit;
+  }
+
+  .doc-row:hover {
+    border-color: #93c5fd;
+    background: #f0f7ff;
+  }
+
+  .doc-icon { font-size: 16px; color: #3b82f6; flex-shrink: 0; }
+  .doc-label { font-size: 13px; color: #1a1a1a; flex: 1; }
+  .doc-sub   { font-size: 10px; color: #999; }
+  .doc-ext   { font-size: 12px; color: #ccc; }
+
+  .nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+
+  .nav-btn {
+    cursor: pointer;
+    padding: 8px 20px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 13px;
+    background: transparent;
+    color: #333;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .nav-btn:hover { background: #f5f5f5; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .pip-bar { display: flex; gap: 6px; align-items: center; }
+
+  .pip {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    cursor: pointer;
+    background: #d0d0d0;
+    border: none;
+    padding: 0;
+    transition: background 0.2s;
+  }
+
+  .pip.active { background: #D85A30; }
+
+  @media (max-width: 560px) {
+    .container { padding: 20px 16px; }
+    .two-col { grid-template-columns: 1fr; }
+    .parallel-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1>Development process for new programs</h1>
+    <p>Step-by-step guide from strategy to NOKUT accreditation &mdash; including documents and tools for each phase.</p>
+  </div>
+
+  <div class="dots-bar" id="dots-bar"></div>
+
+  <div class="step-meta">
+    <span class="step-counter" id="step-counter"></span>
+    <span id="step-badge"></span>
+  </div>
+
+  <h2 class="step-title" id="step-title"></h2>
+  <p class="step-intro" id="step-intro"></p>
+
+  <div class="two-col">
+    <div>
+      <div class="section-label">Who's involved</div>
+      <div id="step-roles"></div>
+    </div>
+    <div>
+      <div class="section-label">Key activities</div>
+      <ul class="activities" id="step-activities"></ul>
+    </div>
+  </div>
+
+  <div id="miro-section" class="miro-section" style="display:none">
+    <div class="section-label">Miro board</div>
+    <!-- REPLACE href with your actual Miro board URL -->
+    <a class="miro-btn" href="https://miro.com" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="4" fill="#FFD02F"/>
+        <path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/>
+      </svg>
+      <div class="miro-text">
+        <span class="miro-title">Open ideation board in Miro</span>
+        <span class="miro-sub">Strategy &amp; idea development workspace</span>
+      </div>
+      <i class="ti ti-external-link" style="font-size:14px;color:#635e00"></i>
+    </a>
+  </div>
+
+  <div id="parallel-section" style="display:none;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+      <div class="section-label" style="margin:0">Parallel tracks</div>
+      <span class="parallel-badge">Run simultaneously</span>
+    </div>
+    <div class="parallel-grid">
+      <div class="parallel-card">
+        <div class="parallel-head" style="background:#7a3018;color:#fff">6a &middot; Quality assurance</div>
+        <div class="parallel-body">
+          Quality control of program name, learning outcomes, course overview, industry integration and requirement specs for academic staff.
+          <div class="ref-group-note">Reference group gives feedback &middot; program adjusts</div>
+        </div>
+      </div>
+      <div class="parallel-card">
+        <div class="parallel-head" style="background:#f5f5f5;color:#333;border-bottom:1px solid #e0e0e0">6b &middot; Course development</div>
+        <div class="parallel-body">
+          Finalise study plan (learning outcomes, course descriptions) and learning design (topics/tema, learning activities, assessments).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <div class="section-label">Deliverables &amp; decision point</div>
+    <div id="step-deliverables"></div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div class="section-label">Documents &amp; templates</div>
+    <div id="step-docs"></div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" id="btn-prev" onclick="go(-1)">&#8592; Previous</button>
+    <div class="pip-bar" id="pip-bar"></div>
+    <button class="nav-btn" id="btn-next" onclick="go(1)">Next &#8594;</button>
+  </div>
+
+</div>
+
+<script>
+const steps = [
+  {
+    num: '1', title: 'Strategy',
+    badge: { label: 'Ideation', bg: '#e0e7ff', color: '#3730a3' },
+    intro: 'Set the overall ambition and develop ideas for new programs. This phase involves broad input from across the organisation and external stakeholders.',
+    roles: ['Program Manager', 'Curriculum Manager', 'Academic Environment SME', 'Marketing & Sales', 'Industry, reports & analysis', 'Board of Directors'],
+    activities: ['Define strategic direction for new programs', 'Identify and prioritise ideas', 'Develop high-level ambition and scope'],
+    deliverables: ['Strategy: overall direction', 'High-level development plan and ambition'],
+    docs: [
+      { icon: 'ti-file-text', label: 'Strategy template', sub: 'Word · Program development', href: '#' },
+      { icon: 'ti-chart-bar', label: 'Market analysis framework', sub: 'Excel · Industry data', href: '#' },
+    ],
+    miro: true
+  },
+  {
+    num: '2', title: 'Project design',
+    badge: { label: 'Planning', bg: '#dbeafe', color: '#1e40af' },
+    intro: 'Head of Development designs the project together with key internal and external experts. Prioritised ideas are brought to the VOC board for a formal decision.',
+    roles: ['Head of Development', 'Director of Strategy', 'Senior Advisor (Dev Dept)', 'Internal expert (e.g. Program/Curriculum Manager)', 'External expert (e.g. industry partners, consultants)'],
+    activities: ['Design project structure and scope', 'Identify key competencies needed', 'Prepare for VOC board decision'],
+    deliverables: ['Decision in the VOC board on prioritised ideas'],
+    docs: [
+      { icon: 'ti-file-text', label: 'Project design brief', sub: 'Word · Template', href: '#' },
+      { icon: 'ti-presentation', label: 'VOC board presentation template', sub: 'PowerPoint', href: '#' },
+      { icon: 'ti-list-check', label: 'Stakeholder map template', sub: 'Excel', href: '#' },
+    ]
+  },
+  {
+    num: '3', title: 'Project mandate',
+    badge: { label: 'Approval', bg: '#fef3c7', color: '#92400e' },
+    intro: 'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
+    roles: ['Head of Development', 'Project Manager'],
+    activities: ['Define purpose and milestones', 'Conduct risk assessment', 'Set development budget', 'Define project organisation'],
+    deliverables: ['Project mandate finalised and approved by Rector'],
+    docs: [
+      { icon: 'ti-file-text', label: 'Project mandate template', sub: 'Word · Required document', href: '#' },
+      { icon: 'ti-alert-triangle', label: 'Risk assessment template', sub: 'Excel', href: '#' },
+      { icon: 'ti-file-invoice', label: 'Budget template', sub: 'Excel', href: '#' },
+    ]
+  },
+  {
+    num: '4', title: 'Project plan',
+    badge: { label: 'Execution prep', bg: '#dbeafe', color: '#1e40af' },
+    intro: 'The project manager develops a detailed project plan with clear activities, timeline, responsibilities, and meeting structure for the project group.',
+    roles: ['Project Manager', 'Project group'],
+    activities: ['Define all project activities', 'Set timeline and milestones', 'Clarify responsibilities and expectations', 'Establish status meeting cadence'],
+    deliverables: ['Project plan approved by Head of Development'],
+    docs: [
+      { icon: 'ti-file-text', label: 'Project plan template', sub: 'Word · Required document', href: '#' },
+      { icon: 'ti-calendar', label: 'Timeline template', sub: 'Excel · Gantt', href: '#' },
+      { icon: 'ti-users', label: 'RACI matrix template', sub: 'Excel · Responsibilities', href: '#' },
+    ]
+  },
+  {
+    num: '5', title: 'Project delivery',
+    badge: { label: 'Build', bg: '#d1fae5', color: '#065f46' },
+    intro: 'Execute all project activities and finalise the overall study plan. This is the main production phase — workshops with industry partners, creating course overviews and learning outcomes.',
+    roles: ['Project Manager', 'Project group', 'Industry partners', 'Pedagogic advisor'],
+    activities: ['Workshop 1: program scope and outcomes', 'Workshop 2: course structure and design', 'Create course overview', 'Develop overall program learning outcomes', 'Collect approval from industry partners'],
+    deliverables: ['Overall study plan ready for quality assurance'],
+    docs: [
+      { icon: 'ti-file-text', label: 'Workshop 1 agenda template', sub: 'Word', href: '#' },
+      { icon: 'ti-file-text', label: 'Workshop 2 agenda template', sub: 'Word', href: '#' },
+      { icon: 'ti-file-text', label: 'Study plan template', sub: 'Word · Core document', href: '#' },
+      { icon: 'ti-file-text', label: 'Industry approval form', sub: 'Word', href: '#' },
+    ]
+  },
+  {
+    num: '6', title: 'Quality assurance & course development',
+    badge: { label: 'Parallel', bg: '#ffedd5', color: '#9a3412' },
+    intro: 'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development finalises the study plan and learning design.',
+    roles: ['Reference group', 'Head of Development', 'Course developers', 'Pedagogic advisor', 'Academic responsible (faglig ansvarlig)'],
+    activities: ['QA: review program name, outcomes, industry integration', 'QA: reference group feedback and adjustments', 'Course dev: finalise learning outcomes and course descriptions', 'Course dev: finalise topics, learning activities (LAA), assessments'],
+    deliverables: ['Study plan and learning design document ready for content development'],
+    docs: [
+      { icon: 'ti-file-text', label: 'QA checklist', sub: 'Word · Quality assurance', href: '#' },
+      { icon: 'ti-file-text', label: 'Course description template', sub: 'Word · Per course', href: '#' },
+      { icon: 'ti-file-text', label: 'Learning design template', sub: 'Word · LAA & assessments', href: '#' },
+      { icon: 'ti-message', label: 'Reference group feedback form', sub: 'Word', href: '#' },
+    ],
+    parallel: true
+  },
+  {
+    num: '7', title: 'LOKUT / NOKUT application',
+    badge: { label: 'Accreditation', bg: '#fce7f3', color: '#9d174d' },
+    intro: 'Assess the study plan in accordance with laws and regulations. Write a recommendation to the vocational school board, then submit the formal application to NOKUT.',
+    roles: ['Head of Development', 'Academic responsible', 'Legal/compliance advisor'],
+    activities: ['Assess study plan against laws and regulations', 'Write recommendation to vocational school board', 'Submit application to NOKUT'],
+    deliverables: ['Vocational school board makes final decision on accreditation'],
+    docs: [
+      { icon: 'ti-file-text', label: 'NOKUT application template', sub: 'Word · Regulatory submission', href: '#' },
+      { icon: 'ti-file-text', label: 'Vocational board recommendation template', sub: 'Word', href: '#' },
+      { icon: 'ti-external-link', label: 'NOKUT portal', sub: 'External · nokut.no', href: 'https://www.nokut.no' },
+    ]
+  }
+];
+
+let cur = 0;
+
+function render() {
+  const s = steps[cur];
+
+  document.getElementById('step-counter').textContent = 'Step ' + s.num + ' of 7';
+  document.getElementById('step-title').textContent = s.title;
+  document.getElementById('step-intro').textContent = s.intro;
+  document.getElementById('step-badge').innerHTML =
+    '<span class="pill" style="background:' + s.badge.bg + ';color:' + s.badge.color + '">' + s.badge.label + '</span>';
+
+  document.getElementById('step-roles').innerHTML =
+    s.roles.map(r => '<span class="role-chip"><i class="ti ti-user" style="font-size:11px"></i>' + r + '</span>').join('');
+
+  document.getElementById('step-activities').innerHTML =
+    s.activities.map(a => '<li>' + a + '</li>').join('');
+
+  document.getElementById('step-deliverables').innerHTML =
+    s.deliverables.map(d => '<div class="deliverable">' + d + '</div>').join('');
+
+  document.getElementById('step-docs').innerHTML =
+    s.docs.map(d =>
+      '<a class="doc-row" href="' + d.href + '" target="_blank" rel="noopener">' +
+      '<i class="ti ' + d.icon + ' doc-icon"></i>' +
+      '<div><div class="doc-label">' + d.label + '</div><div class="doc-sub">' + d.sub + '</div></div>' +
+      '<i class="ti ti-external-link doc-ext"></i>' +
+      '</a>'
+    ).join('');
+
+  document.getElementById('miro-section').style.display = s.miro ? 'block' : 'none';
+  document.getElementById('parallel-section').style.display = s.parallel ? 'block' : 'none';
+
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').disabled = cur === steps.length - 1;
+
+  document.getElementById('pip-bar').innerHTML = steps.map((_, i) =>
+    '<button class="pip' + (i === cur ? ' active' : '') + '" onclick="goto(' + i + ')" aria-label="Go to step ' + (i+1) + '"></button>'
+  ).join('');
+
+  document.getElementById('dots-bar').innerHTML = steps.map((st, i) => {
+    const isLast = i === steps.length - 1;
+    const active = i === cur;
+    const done   = i < cur;
+    const bg     = active ? '#D85A30' : done ? '#5DCAA5' : '#d0d0d0';
+    return '<div class="dot-item">' +
+      '<div class="dot-inner" onclick="goto(' + i + ')">' +
+        '<div class="dot-circle' + (active ? ' active' : done ? ' done' : '') + '"></div>' +
+        '<span class="dot-label' + (active ? ' active' : '') + '">' + st.title.split(' ')[0] + '</span>' +
+      '</div>' +
+      (!isLast ? '<div class="dot-line"></div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function go(d) { cur = Math.max(0, Math.min(steps.length - 1, cur + d)); render(); }
+function goto(i) { cur = i; render(); }
+
+render();
+</script>
+</body>
+</html>
