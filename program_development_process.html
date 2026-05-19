@@ -192,13 +192,7 @@
           <label class="tool-label">Miro board ID</label>
           <input type="text" id="t-board-id" class="tool-input" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
         </div>
-        <div class="tool-field">
-          <label class="tool-label">Anthropic API key</label>
-          <div class="tool-input-wrap">
-            <input type="password" id="t-api-key" class="tool-input" placeholder="sk-ant-...">
-            <button class="tool-show-btn" onclick="toggleTool('t-api-key',this)">show</button>
-          </div>
-        </div>
+
         <button class="tool-run-btn orange" id="summary-run-btn" onclick="runSummary()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Read Miro board and generate summary
@@ -238,14 +232,7 @@
         <div class="mandate-note" id="mandate-summary-note">
           Uses the summary generated in Step 1. Make sure you have run the summary generator first.
         </div>
-        <div class="tool-field">
-          <label class="tool-label">Anthropic API key</label>
-          <div class="tool-input-wrap">
-            <input type="password" id="m-api-key" class="tool-input" placeholder="sk-ant-...">
-            <button class="tool-show-btn" onclick="toggleTool('m-api-key',this)">show</button>
-          </div>
-          <div class="tool-hint">Same key as Step 1 — paste it again here</div>
-        </div>
+
         <div class="tool-field">
           <label class="tool-label">Program name</label>
           <input type="text" id="m-program-name" class="tool-input" placeholder="e.g. Film Production — Online Studies">
@@ -319,10 +306,7 @@ const steps = [
     roles:['Program Manager','Curriculum Manager','Academic Environment SME','Marketing & Sales','Industry, reports & analysis','Board of Directors'],
     activities:['Define strategic direction for new programs','Identify and prioritise ideas','Develop high-level ambition and scope'],
     deliverables:['Strategy: overall direction','High-level development plan and ambition'],
-    docs:[
-      {icon:'ti-file-text', label:'Strategy template', sub:'Word · Program development', href:'#'},
-      {icon:'ti-chart-bar', label:'Market analysis framework', sub:'Excel · Industry data', href:'#'},
-    ],
+    docs:[],
     miro:true, summaryTool:true
   },
   {
@@ -332,11 +316,7 @@ const steps = [
     roles:['Head of Development','Director of Strategy','Senior Advisor (Dev Dept)','Internal expert','External expert'],
     activities:['Design project structure and scope','Identify key competencies needed','Prepare for VOC board decision'],
     deliverables:['Decision in the VOC board on prioritised ideas'],
-    docs:[
-      {icon:'ti-file-text', label:'Project design brief', sub:'Word · Template', href:'#'},
-      {icon:'ti-presentation', label:'VOC board presentation template', sub:'PowerPoint', href:'#'},
-      {icon:'ti-list-check', label:'Stakeholder map template', sub:'Excel', href:'#'},
-    ]
+    docs:[]
   },
   {
     num:'3', title:'Project mandate',
@@ -345,11 +325,7 @@ const steps = [
     roles:['Head of Development','Project Manager'],
     activities:['Define purpose and milestones','Conduct risk assessment','Set development budget','Define project organisation'],
     deliverables:['Project mandate finalised and approved by Rector'],
-    docs:[
-      {icon:'ti-file-text', label:'Project mandate template', sub:'Word · Required document', href:'#'},
-      {icon:'ti-alert-triangle', label:'Risk assessment template', sub:'Excel', href:'#'},
-      {icon:'ti-file-invoice', label:'Budget template', sub:'Excel', href:'#'},
-    ],
+    docs:[],
     mandateTool:true
   },
   {
@@ -359,11 +335,7 @@ const steps = [
     roles:['Project Manager','Project group'],
     activities:['Define all project activities','Set timeline and milestones','Clarify responsibilities and expectations','Establish status meeting cadence'],
     deliverables:['Project plan approved by Head of Development'],
-    docs:[
-      {icon:'ti-file-text', label:'Project plan template', sub:'Word · Required document', href:'#'},
-      {icon:'ti-calendar', label:'Timeline template', sub:'Excel · Gantt', href:'#'},
-      {icon:'ti-users', label:'RACI matrix template', sub:'Excel · Responsibilities', href:'#'},
-    ]
+    docs:[]
   },
   {
     num:'5', title:'Project delivery',
@@ -372,12 +344,7 @@ const steps = [
     roles:['Project Manager','Project group','Industry partners','Pedagogic advisor'],
     activities:['Workshop 1: program scope and outcomes','Workshop 2: course structure and design','Create course overview','Develop overall program learning outcomes','Collect approval from industry partners'],
     deliverables:['Overall study plan ready for quality assurance'],
-    docs:[
-      {icon:'ti-file-text', label:'Workshop 1 agenda template', sub:'Word', href:'#'},
-      {icon:'ti-file-text', label:'Workshop 2 agenda template', sub:'Word', href:'#'},
-      {icon:'ti-file-text', label:'Study plan template', sub:'Word · Core document', href:'#'},
-      {icon:'ti-file-text', label:'Industry approval form', sub:'Word', href:'#'},
-    ]
+    docs:[]
   },
   {
     num:'6', title:'Quality assurance & course development',
@@ -386,12 +353,7 @@ const steps = [
     roles:['Reference group','Head of Development','Course developers','Pedagogic advisor','Academic responsible (faglig ansvarlig)'],
     activities:['QA: review program name, outcomes, industry integration','QA: reference group feedback and adjustments','Course dev: finalise learning outcomes and course descriptions','Course dev: finalise topics, learning activities (LAA), assessments'],
     deliverables:['Study plan and learning design document ready for content development'],
-    docs:[
-      {icon:'ti-file-text', label:'QA checklist', sub:'Word · Quality assurance', href:'#'},
-      {icon:'ti-file-text', label:'Course description template', sub:'Word · Per course', href:'#'},
-      {icon:'ti-file-text', label:'Learning design template', sub:'Word · LAA & assessments', href:'#'},
-      {icon:'ti-message', label:'Reference group feedback form', sub:'Word', href:'#'},
-    ],
+    docs:[],
     parallel:true
   },
   {
@@ -402,8 +364,6 @@ const steps = [
     activities:['Assess study plan against laws and regulations','Write recommendation to vocational school board','Submit application to NOKUT'],
     deliverables:['Vocational school board makes final decision on accreditation'],
     docs:[
-      {icon:'ti-file-text', label:'NOKUT application template', sub:'Word · Regulatory submission', href:'#'},
-      {icon:'ti-file-text', label:'Vocational board recommendation template', sub:'Word', href:'#'},
       {icon:'ti-external-link', label:'NOKUT portal', sub:'External · nokut.no', href:'https://www.nokut.no'},
     ]
   }
@@ -460,8 +420,8 @@ function toggleTool(id, btn) {
   btn.textContent = input.type === 'password' ? 'show' : 'hide';
 }
 
-async function callAI(apiKey, prompt, maxTokens = 2000) {
-  const proxyUrl = `${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}&apikey=${encodeURIComponent(apiKey)}`;
+async function callAI(prompt, maxTokens = 2000) {
+  const proxyUrl = `${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`;
   const res = await fetch(proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -479,7 +439,6 @@ async function callAI(apiKey, prompt, maxTokens = 2000) {
 async function runSummary() {
   const token = document.getElementById('t-miro-token').value.trim();
   const boardId = document.getElementById('t-board-id').value.trim();
-  const apiKey = document.getElementById('t-api-key').value.trim();
   const errEl = document.getElementById('summary-error');
   const statusEl = document.getElementById('summary-status');
   const statusText = document.getElementById('summary-status-text');
@@ -487,7 +446,6 @@ async function runSummary() {
 
   errEl.classList.remove('visible');
   if (!token) { errEl.textContent = 'Please enter your Miro access token.'; errEl.classList.add('visible'); return; }
-  if (!apiKey) { errEl.textContent = 'Please enter your Anthropic API key.'; errEl.classList.add('visible'); return; }
 
   btn.disabled = true;
   statusEl.classList.add('visible');
@@ -525,7 +483,7 @@ async function runSummary() {
     Object.values(sections).forEach(s => { if (s.title) boardContent += `\n[Section: ${s.title}]\n`; s.items.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); });
     if (loose.length) { boardContent += '\n[Ungrouped items]\n'; loose.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); }
 
-    const summary = await callAI(apiKey, `You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n${boardContent}\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section, missing info as "To be determined".`);
+    const summary = await callAI(`You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n${boardContent}\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section, missing info as "To be determined".`);
 
     generatedSummary = summary;
     const out = document.getElementById('summary-output');
@@ -553,7 +511,6 @@ function copySummary() {
 }
 
 async function runMandate() {
-  const apiKey = document.getElementById('m-api-key').value.trim();
   const programName = document.getElementById('m-program-name').value.trim() || 'New Program';
   const errEl = document.getElementById('mandate-error');
   const statusEl = document.getElementById('mandate-status');
@@ -562,7 +519,6 @@ async function runMandate() {
   errEl.classList.remove('visible');
   document.getElementById('mandate-success').classList.remove('visible');
 
-  if (!apiKey) { errEl.textContent = 'Please enter your Anthropic API key.'; errEl.classList.add('visible'); return; }
   if (!generatedSummary) { errEl.textContent = 'No summary found. Please run the summary generator in Step 1 first.'; errEl.classList.add('visible'); return; }
 
   btn.disabled = true;
@@ -570,7 +526,7 @@ async function runMandate() {
 
   try {
     const today = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-    const mandateHTML = await callAI(apiKey, `Generate a complete Project Mandate HTML document for Noroff (Norwegian vocational college).
+    const mandateHTML = await callAI(`Generate a complete Project Mandate HTML document for Noroff (Norwegian vocational college).
 
 PROGRAM: ${programName}
 TODAY: ${today}
