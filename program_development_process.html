@@ -580,7 +580,8 @@ Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
     const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate — ${programName}</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#2E75B6;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px 10px;text-align:left;border:1px solid #aaa;font-size:12px}td{padding:7px 10px;border:1px solid #ccc;vertical-align:top;font-size:12px}ul{padding-left:20px}li{margin-bottom:4px}p{margin:6px 0 10px;line-height:1.6}@media print{body{margin:20px}}</style></head><body>${mandateHTML}</body></html>`;
 
     const editor = document.getElementById('mandate-editor');
-    editor.innerHTML = mandateHTML;
+    const cleanHTML = mandateHTML.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
+    editor.innerHTML = cleanHTML;
     document.getElementById('mandate-doc-section').classList.add('visible');
     editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
