@@ -8,302 +8,64 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #f4f1eb;
-    --surface: #fff;
-    --border: #e0dbd0;
-    --text: #1a1814;
-    --muted: #7a7670;
-    --accent: #D85A30;
-    --accent-light: #fdf0eb;
-    --green: #1D9E75;
-    --green-light: #e8f7f2;
-    --mono: 'DM Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
+    --bg: #f4f1eb; --surface: #fff; --border: #e0dbd0; --text: #1a1814;
+    --muted: #7a7670; --accent: #D85A30; --green: #1D9E75;
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
   }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 40px 16px 60px;
-  }
-
-  .shell {
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  header {
-    margin-bottom: 32px;
-  }
-
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 8px;
-  }
-
-  h1 {
-    font-size: 26px;
-    font-weight: 300;
-    line-height: 1.2;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 16px 60px; }
+  .shell { max-width: 680px; margin: 0 auto; }
+  header { margin-bottom: 32px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  h1 { font-size: 26px; font-weight: 300; line-height: 1.2; color: var(--text); margin-bottom: 8px; }
   h1 strong { font-weight: 500; }
-
-  .sub {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 16px;
-  }
-
-  .card-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-
-  .hint {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-
-  input, textarea {
-    width: 100%;
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color .15s;
-  }
-
+  .sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card-label { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .hint { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  input, textarea { width: 100%; font-family: var(--mono); font-size: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); outline: none; transition: border-color .15s; }
   input:focus, textarea:focus { border-color: var(--accent); }
-
   textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
-
   .field { margin-bottom: 16px; }
   .field:last-child { margin-bottom: 0; }
-
   .token-wrap { position: relative; }
   .token-wrap input { padding-right: 80px; }
-  .token-toggle {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 11px;
-    font-family: var(--mono);
-    color: var(--muted);
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 4px 6px;
-  }
+  .token-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; font-family: var(--mono); color: var(--muted); cursor: pointer; background: none; border: none; padding: 4px 6px; }
   .token-toggle:hover { color: var(--accent); }
-
-  .warning {
-    background: #fffbf0;
-    border: 1px solid #f0d090;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: #7a5c10;
-    line-height: 1.5;
-    margin-bottom: 16px;
-  }
-
-  .run-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background .15s, transform .1s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
+  .warning { background: #fffbf0; border: 1px solid #f0d090; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #7a5c10; line-height: 1.5; margin-bottom: 16px; }
+  .run-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .run-btn:hover { background: #c04d24; }
   .run-btn:active { transform: scale(.99); }
   .run-btn:disabled { background: #d0c8be; cursor: not-allowed; transform: none; }
-
-  .status {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted);
-    padding: 12px 0;
-  }
-
+  .status { display: none; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); padding: 12px 0; }
   .status.visible { display: flex; }
-
-  .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    flex-shrink: 0;
-  }
-
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .output-section { display: none; }
   .output-section.visible { display: block; }
-
-  .output-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .output-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--green);
-  }
-
-  .copy-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all .15s;
-  }
-
+  .output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .output-title { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--green); }
+  .copy-btn { font-family: var(--mono); font-size: 11px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--muted); cursor: pointer; transition: all .15s; }
   .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .output-box {
-    background: var(--surface);
-    border: 1px solid var(--green);
-    border-radius: 12px;
-    padding: 24px;
-    font-size: 14px;
-    line-height: 1.75;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .output-box h2 {
-    font-size: 18px;
-    font-weight: 500;
-    margin: 20px 0 6px;
-    color: var(--text);
-  }
-
+  .output-box { background: var(--surface); border: 1px solid var(--green); border-radius: 12px; padding: 24px; font-size: 14px; line-height: 1.75; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+  .output-box h2 { font-size: 18px; font-weight: 500; margin: 20px 0 6px; color: var(--text); }
   .output-box h2:first-child { margin-top: 0; }
-
-  .output-box h3 {
-    font-size: 14px;
-    font-weight: 500;
-    margin: 14px 0 4px;
-    color: var(--accent);
-    font-family: var(--mono);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    font-size: 11px;
-  }
-
+  .output-box h3 { font-weight: 500; margin: 14px 0 4px; color: var(--accent); font-family: var(--mono); text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
   .output-box p { margin-bottom: 10px; }
   .output-box ul { padding-left: 18px; margin-bottom: 10px; }
   .output-box li { margin-bottom: 4px; }
-
-  .error-box {
-    background: #fff5f5;
-    border: 1px solid #fca5a5;
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 13px;
-    color: #7f1d1d;
-    line-height: 1.6;
-    margin-top: 12px;
-  }
-
-  .miro-items-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 24px 0;
-  }
-
-  .step-indicator {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 20px;
-  }
-
-  .step {
-    height: 3px;
-    flex: 1;
-    border-radius: 2px;
-    background: var(--border);
-    transition: background .3s;
-  }
-
+  .error-box { background: #fff5f5; border: 1px solid #fca5a5; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #7f1d1d; line-height: 1.6; margin-top: 12px; }
+  .miro-items-count { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 8px; margin-bottom: 12px; }
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+  .step-indicator { display: flex; gap: 6px; margin-bottom: 20px; }
+  .step { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background .3s; }
   .step.active { background: var(--accent); }
   .step.done { background: var(--green); }
 </style>
 </head>
 <body>
-
 <div class="shell">
-
   <header>
     <div class="eyebrow">Program development pipeline</div>
     <h1>Miro board → <strong>summary generator</strong></h1>
@@ -317,7 +79,7 @@
   </div>
 
   <div class="warning">
-    Your Miro token is used directly in your browser and never stored or sent anywhere except to the Miro and Anthropic APIs. Keep this page private.
+    Your tokens are used directly in your browser and never stored anywhere. Keep this page private — do not share the URL with others.
   </div>
 
   <div class="card">
@@ -328,7 +90,7 @@
       <p class="hint">From miro.com → Profile → Your apps → Process guide connector</p>
       <div class="token-wrap">
         <input type="password" id="miro-token" placeholder="eyJtaXJvLm9...">
-        <button class="token-toggle" onclick="toggleToken()">show</button>
+        <button class="token-toggle" onclick="toggleField('miro-token', this)">show</button>
       </div>
     </div>
 
@@ -336,6 +98,15 @@
       <label for="board-id">Miro board ID</label>
       <p class="hint">From the board URL: miro.com/app/board/<strong>THIS-PART</strong>/</p>
       <input type="text" id="board-id" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
+    </div>
+
+    <div class="field">
+      <label for="anthropic-key">Anthropic API key</label>
+      <p class="hint">From console.anthropic.com → API Keys. Starts with sk-ant- — never share this publicly.</p>
+      <div class="token-wrap">
+        <input type="password" id="anthropic-key" placeholder="sk-ant-...">
+        <button class="token-toggle" onclick="toggleField('anthropic-key', this)">show</button>
+      </div>
     </div>
   </div>
 
@@ -374,15 +145,13 @@
     <div class="miro-items-count" id="items-count"></div>
     <div class="output-box" id="output-box"></div>
   </div>
-
 </div>
 
 <script>
 let outputText = '';
 
-function toggleToken() {
-  const input = document.getElementById('miro-token');
-  const btn = document.querySelector('.token-toggle');
+function toggleField(id, btn) {
+  const input = document.getElementById(id);
   if (input.type === 'password') {
     input.type = 'text';
     btn.textContent = 'hide';
@@ -401,26 +170,23 @@ function setStep(n) {
   }
 }
 
-function setStatus(text) {
-  document.getElementById('status-text').textContent = text;
-}
+function setStatus(text) { document.getElementById('status-text').textContent = text; }
 
 function showError(msg) {
-  document.getElementById('error-container').innerHTML =
-    '<div class="error-box">' + msg + '</div>';
+  document.getElementById('error-container').innerHTML = '<div class="error-box">' + msg + '</div>';
 }
 
-function clearError() {
-  document.getElementById('error-container').innerHTML = '';
-}
+function clearError() { document.getElementById('error-container').innerHTML = ''; }
 
 async function runConnector() {
   const token = document.getElementById('miro-token').value.trim();
   const boardId = document.getElementById('board-id').value.trim();
+  const apiKey = document.getElementById('anthropic-key').value.trim();
   const fields = document.getElementById('output-fields').value.trim();
 
   if (!token) { showError('Please enter your Miro access token.'); return; }
   if (!boardId) { showError('Please enter your Miro board ID.'); return; }
+  if (!apiKey) { showError('Please enter your Anthropic API key.'); return; }
 
   clearError();
   document.getElementById('run-btn').disabled = true;
@@ -430,8 +196,6 @@ async function runConnector() {
 
   try {
     setStatus('Reading Miro board...');
-    setStep(1);
-
     const items = await fetchAllMiroItems(token, boardId);
 
     if (!items || items.length === 0) {
@@ -440,22 +204,17 @@ async function runConnector() {
 
     setStatus(`Found ${items.length} items — extracting content...`);
     setStep(2);
-
     const boardContent = extractContent(items);
 
     setStatus('Sending to AI — generating summary...');
     setStep(3);
-
-    const summary = await generateSummary(boardContent, fields);
+    const summary = await generateSummary(boardContent, fields, apiKey);
 
     outputText = summary;
-    document.getElementById('items-count').textContent =
-      `Based on ${items.length} items read from Miro board`;
+    document.getElementById('items-count').textContent = `Based on ${items.length} items read from Miro board`;
     renderOutput(summary);
-
     document.getElementById('output-section').classList.add('visible');
     document.getElementById('status').classList.remove('visible');
-    setStep(3);
 
   } catch (err) {
     document.getElementById('status').classList.remove('visible');
@@ -478,16 +237,13 @@ async function fetchAllMiroItems(token, boardId) {
     const proxyUrl = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent(miroUrl)}`;
 
     const res = await fetch(proxyUrl, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/json'
-      }
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     });
 
     if (!res.ok) {
       const errText = await res.text();
-      if (res.status === 401) throw new Error('Invalid Miro token. Please check your access token and try again.');
-      if (res.status === 403) throw new Error('Access denied. Make sure your token has "boards:read" permission and you have access to this board.');
+      if (res.status === 401) throw new Error('Invalid Miro token. Please check your access token.');
+      if (res.status === 403) throw new Error('Access denied. Make sure your token has boards:read permission.');
       if (res.status === 404) throw new Error('Board not found. Please check your board ID.');
       throw new Error(`Miro API error (${res.status}): ${errText}`);
     }
@@ -508,7 +264,6 @@ function extractContent(items) {
   items.forEach(item => {
     const text = extractText(item);
     if (!text) return;
-
     const frameId = item.parent?.id;
     if (frameId) {
       if (!sections[frameId]) sections[frameId] = { title: '', items: [] };
@@ -522,38 +277,26 @@ function extractContent(items) {
   });
 
   let output = '';
-
-  if (Object.keys(sections).length > 0) {
-    Object.values(sections).forEach(section => {
-      if (section.title) output += `\n[Section: ${section.title}]\n`;
-      section.items.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
-    });
-  }
-
+  Object.values(sections).forEach(section => {
+    if (section.title) output += `\n[Section: ${section.title}]\n`;
+    section.items.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
+  });
   if (loose.length > 0) {
     output += '\n[Ungrouped items]\n';
     loose.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
   }
-
   return output.trim();
 }
 
 function extractText(item) {
-  if (item.data?.content) {
-    return item.data.content.replace(/<[^>]*>/g, '').trim();
-  }
+  if (item.data?.content) return item.data.content.replace(/<[^>]*>/g, '').trim();
   if (item.data?.title) return item.data.title.trim();
-  if (item.data?.body) {
-    return item.data.body.replace(/<[^>]*>/g, '').trim();
-  }
-  if (item.data?.shape === 'rectangle' && item.data?.content) {
-    return item.data.content.replace(/<[^>]*>/g, '').trim();
-  }
+  if (item.data?.body) return item.data.body.replace(/<[^>]*>/g, '').trim();
   return null;
 }
 
-async function generateSummary(boardContent, fields) {
-  const prompt = `You are helping a Norwegian vocational college (Noroff) develop new study programs. 
+async function generateSummary(boardContent, fields, apiKey) {
+  const prompt = `You are helping a Norwegian vocational college (Noroff) develop new study programs.
 
 Below is the content extracted from a Miro ideation board where staff and stakeholders have been brainstorming ideas for potential new programs.
 
@@ -566,20 +309,21 @@ ${fields}
 Guidelines:
 - Write in clear, professional English
 - Be concise but substantive — each section should be 2-5 sentences or bullet points
-- Where information is missing or unclear from the board, note it as "To be determined" or flag it as an open question
+- Where information is missing or unclear from the board, note it as "To be determined"
 - Format each section with a clear heading
 - The tone should be suitable for sharing with a board of directors`;
 
-  const anthropicProxy = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`;
+  const proxyUrl = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`;
 
-  const res = await fetch(anthropicProxy, {
+  const res = await fetch(proxyUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'x-api-key': apiKey,
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 1500,
       messages: [{ role: 'user', content: prompt }]
     })
@@ -587,6 +331,7 @@ Guidelines:
 
   if (!res.ok) {
     const err = await res.text();
+    if (res.status === 401) throw new Error('Invalid Anthropic API key. Please check your key at console.anthropic.com.');
     throw new Error('AI generation failed: ' + err);
   }
 
