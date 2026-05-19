@@ -178,20 +178,10 @@
     <div class="tool-section">
       <div class="tool-header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <div><div class="tool-header-title">Miro → Program summary</div><div class="tool-header-sub">Reads your Miro board and generates a structured summary</div></div>
+        <div><div class="tool-header-title">Miro → Program summary</div><div class="tool-header-sub">Reads your Miro ideation board and generates a structured summary</div></div>
       </div>
       <div class="tool-body">
-        <div class="tool-field">
-          <label class="tool-label">Miro access token</label>
-          <div class="tool-input-wrap">
-            <input type="password" id="t-miro-token" class="tool-input" placeholder="eyJtaXJvLm9...">
-            <button class="tool-show-btn" onclick="toggleTool('t-miro-token',this)">show</button>
-          </div>
-        </div>
-        <div class="tool-field">
-          <label class="tool-label">Miro board ID</label>
-          <input type="text" id="t-board-id" class="tool-input" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
-        </div>
+
 
         <button class="tool-run-btn orange" id="summary-run-btn" onclick="runSummary()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -437,15 +427,13 @@ async function callAI(prompt, maxTokens = 2000) {
 }
 
 async function runSummary() {
-  const token = document.getElementById('t-miro-token').value.trim();
-  const boardId = document.getElementById('t-board-id').value.trim();
+  const boardId = 'uXjVHRH9-Rw=';
   const errEl = document.getElementById('summary-error');
   const statusEl = document.getElementById('summary-status');
   const statusText = document.getElementById('summary-status-text');
   const btn = document.getElementById('summary-run-btn');
 
   errEl.classList.remove('visible');
-  if (!token) { errEl.textContent = 'Please enter your Miro access token.'; errEl.classList.add('visible'); return; }
 
   btn.disabled = true;
   statusEl.classList.add('visible');
@@ -456,7 +444,7 @@ async function runSummary() {
     let allItems = [], cursor = null;
     do {
       const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
-      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}&auth=${encodeURIComponent(token)}`);
+      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}`);
       if (!res.ok) throw new Error(res.status === 401 ? 'Invalid Miro token.' : res.status === 404 ? 'Board not found.' : 'Miro error ' + res.status);
       const data = await res.json();
       allItems = allItems.concat(data.data || []);
@@ -580,7 +568,7 @@ function downloadMandate() {
 }
 
 function addSummaryToDocuments() {
-  const programName = document.getElementById('t-board-id').value.trim() || 'Program Summary';
+  const programName = 'Program Summary';
   const editor = document.getElementById('summary-editor');
   const today = new Date().toLocaleDateString('en-GB');
   const container = document.getElementById('generated-docs');
@@ -600,7 +588,14 @@ function addSummaryToDocuments() {
       <div class="generated-doc-sub" style="color:#0F6E56">Generated from Miro board · Draft summary</div>
     </div>
     <button class="generated-doc-download" style="border-color:#0F6E56;color:#0F6E56" onclick="event.stopPropagation(); downloadFromCard('${url}', 'Program_Summary')">Download</button>`;
-  card.onclick = () => document.getElementById('summary-editor').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('summary-doc-section').classList.remove('visible');
+  card.onclick = () => {
+    const sec = document.getElementById('summary-doc-section');
+    sec.classList.toggle('visible');
+    if (sec.classList.contains('visible')) {
+      document.getElementById('summary-editor').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  };
   container.appendChild(card);
   card.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -625,7 +620,14 @@ function addToDocuments() {
       <div class="generated-doc-sub">Generated ${today} · Draft — ready for editing</div>
     </div>
     <button class="generated-doc-download" onclick="event.stopPropagation(); downloadFromCard('${url}', '${programName}')">Download</button>`;
-  card.onclick = () => document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('mandate-doc-section').classList.remove('visible');
+  card.onclick = () => {
+    const sec = document.getElementById('mandate-doc-section');
+    sec.classList.toggle('visible');
+    if (sec.classList.contains('visible')) {
+      document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  };
   container.appendChild(card);
   card.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
