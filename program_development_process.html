@@ -122,6 +122,10 @@
   .generated-doc-sub { font-size: 10px; color: #1a56a0; }
   .generated-doc-download { font-size: 11px; padding: 3px 8px; border: 1px solid #1a56a0; border-radius: 4px; background: transparent; color: #1a56a0; cursor: pointer; font-family: inherit; }
   .generated-doc-download:hover { background: #1a56a0; color: #fff; }
+  .summary-doc-section { display: none; margin-top: 12px; }
+  .summary-doc-section.visible { display: block; }
+  .summary-editor { width: 100%; min-height: 200px; border: 1px solid #1D9E75; border-radius: 8px; padding: 14px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; line-height: 1.7; color: #1a1a1a; background: #fff; outline: none; overflow-y: auto; box-sizing: border-box; }
+  .summary-editor:focus { border-color: #0F6E56; }
   .mandate-note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #1e40af; margin: 10px 0; line-height: 1.5; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -207,6 +211,16 @@
             <button class="tool-copy-btn" onclick="copySummary()">Copy</button>
           </div>
           <div class="tool-output" id="summary-output"></div>
+        </div>
+        <div class="summary-doc-section" id="summary-doc-section">
+          <div class="mandate-doc-header" style="margin-top:10px">
+            <span class="mandate-doc-title" style="color:#0F6E56">Editable summary</span>
+            <div class="mandate-doc-actions">
+              <button class="mandate-action-btn" onclick="addSummaryToDocuments()">Add to Documents</button>
+            </div>
+          </div>
+          <div class="summary-editor" id="summary-editor" contenteditable="true"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit before saving to Documents.</p>
         </div>
       </div>
     </div>
@@ -518,6 +532,9 @@ async function runSummary() {
     let html = summary.replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^\*\*(.+)\*\*$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
     out.innerHTML = '<p>' + html + '</p>';
     document.getElementById('summary-result').classList.add('visible');
+    const editor = document.getElementById('summary-editor');
+    editor.innerHTML = '<p>' + html + '</p>';
+    document.getElementById('summary-doc-section').classList.add('visible');
 
   } catch(err) {
     errEl.textContent = err.message;
@@ -604,6 +621,32 @@ function downloadMandate() {
   a.download = programName.replace(/\s+/g,'_') + '.html';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function addSummaryToDocuments() {
+  const programName = document.getElementById('t-board-id').value.trim() || 'Program Summary';
+  const editor = document.getElementById('summary-editor');
+  const today = new Date().toLocaleDateString('en-GB');
+  const container = document.getElementById('generated-docs');
+  const label = 'Program Summary — ' + today;
+  const existing = container.querySelector('[data-name="summary"]');
+  if (existing) existing.remove();
+  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Program Summary</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h2{color:#1F3864;font-size:18px;margin:20px 0 6px;border-bottom:1px solid #e0e0e0;padding-bottom:4px}h3{color:#0F6E56;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 4px}p{margin:6px 0 10px;line-height:1.6}ul{padding-left:20px}li{margin-bottom:4px}</style></head><body>${editor.innerHTML}</body></html>`;
+  const blob = new Blob([fullHTML], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const card = document.createElement('div');
+  card.className = 'generated-doc-card';
+  card.setAttribute('data-name', 'summary');
+  card.innerHTML = `
+    <i class="ti ti-file-description generated-doc-icon" style="color:#0F6E56"></i>
+    <div style="flex:1">
+      <div class="generated-doc-label">${label}</div>
+      <div class="generated-doc-sub" style="color:#0F6E56">Generated from Miro board · Draft summary</div>
+    </div>
+    <button class="generated-doc-download" style="border-color:#0F6E56;color:#0F6E56" onclick="event.stopPropagation(); downloadFromCard('${url}', 'Program_Summary')">Download</button>`;
+  card.onclick = () => document.getElementById('summary-editor').scrollIntoView({behavior:'smooth', block:'start'});
+  container.appendChild(card);
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function addToDocuments() {
