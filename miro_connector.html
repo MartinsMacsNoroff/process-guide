@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miro → Summary generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f1eb;
+    --surface: #fff;
+    --border: #e0dbd0;
+    --text: #1a1814;
+    --muted: #7a7670;
+    --accent: #D85A30;
+    --accent-light: #fdf0eb;
+    --green: #1D9E75;
+    --green-light: #e8f7f2;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 16px 60px;
+  }
+
+  .shell {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 32px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  h1 strong { font-weight: 500; }
+
+  .sub {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  input, textarea {
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  input:focus, textarea:focus { border-color: var(--accent); }
+
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .token-wrap { position: relative; }
+  .token-wrap input { padding-right: 80px; }
+  .token-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+  }
+  .token-toggle:hover { color: var(--accent); }
+
+  .warning {
+    background: #fffbf0;
+    border: 1px solid #f0d090;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #7a5c10;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .run-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .run-btn:hover { background: #c04d24; }
+  .run-btn:active { transform: scale(.99); }
+  .run-btn:disabled { background: #d0c8be; cursor: not-allowed; transform: none; }
+
+  .status {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 12px 0;
+  }
+
+  .status.visible { display: flex; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .output-section { display: none; }
+  .output-section.visible { display: block; }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .output-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .output-box {
+    background: var(--surface);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .output-box h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 20px 0 6px;
+    color: var(--text);
+  }
+
+  .output-box h2:first-child { margin-top: 0; }
+
+  .output-box h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 14px 0 4px;
+    color: var(--accent);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 11px;
+  }
+
+  .output-box p { margin-bottom: 10px; }
+  .output-box ul { padding-left: 18px; margin-bottom: 10px; }
+  .output-box li { margin-bottom: 4px; }
+
+  .error-box {
+    background: #fff5f5;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #7f1d1d;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+
+  .miro-items-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  .step-indicator {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .step {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background .3s;
+  }
+
+  .step.active { background: var(--accent); }
+  .step.done { background: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header>
+    <div class="eyebrow">Program development pipeline</div>
+    <h1>Miro board → <strong>summary generator</strong></h1>
+    <p class="sub">Reads your Miro ideation board and uses AI to generate a structured program summary document — ready for human review.</p>
+  </header>
+
+  <div class="step-indicator">
+    <div class="step" id="s1"></div>
+    <div class="step" id="s2"></div>
+    <div class="step" id="s3"></div>
+  </div>
+
+  <div class="warning">
+    Your Miro token is used directly in your browser and never stored or sent anywhere except to the Miro and Anthropic APIs. Keep this page private.
+  </div>
+
+  <div class="card">
+    <div class="card-label">Step 1 · Credentials</div>
+
+    <div class="field">
+      <label for="miro-token">Miro access token</label>
+      <p class="hint">From miro.com → Profile → Your apps → Process guide connector</p>
+      <div class="token-wrap">
+        <input type="password" id="miro-token" placeholder="eyJtaXJvLm9...">
+        <button class="token-toggle" onclick="toggleToken()">show</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="board-id">Miro board ID</label>
+      <p class="hint">From the board URL: miro.com/app/board/<strong>THIS-PART</strong>/</p>
+      <input type="text" id="board-id" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Step 2 · Output fields</div>
+    <div class="field">
+      <label for="output-fields">What should the summary include?</label>
+      <p class="hint">Edit or add fields as needed.</p>
+      <textarea id="output-fields">- Program name / working title
+- Strategic rationale (why this program)
+- Target audience
+- Industry relevance
+- Rough scope and duration
+- Key open questions or risks</textarea>
+    </div>
+  </div>
+
+  <button class="run-btn" id="run-btn" onclick="runConnector()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Read Miro board and generate summary
+  </button>
+
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span id="status-text">Connecting to Miro...</span>
+  </div>
+
+  <div id="error-container"></div>
+
+  <div class="output-section" id="output-section">
+    <div class="divider"></div>
+    <div class="output-header">
+      <span class="output-title">Generated summary</span>
+      <button class="copy-btn" onclick="copyOutput()">Copy</button>
+    </div>
+    <div class="miro-items-count" id="items-count"></div>
+    <div class="output-box" id="output-box"></div>
+  </div>
+
+</div>
+
+<script>
+let outputText = '';
+
+function toggleToken() {
+  const input = document.getElementById('miro-token');
+  const btn = document.querySelector('.token-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'show';
+  }
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('s' + i);
+    if (i < n) el.className = 'step done';
+    else if (i === n) el.className = 'step active';
+    else el.className = 'step';
+  }
+}
+
+function setStatus(text) {
+  document.getElementById('status-text').textContent = text;
+}
+
+function showError(msg) {
+  document.getElementById('error-container').innerHTML =
+    '<div class="error-box">' + msg + '</div>';
+}
+
+function clearError() {
+  document.getElementById('error-container').innerHTML = '';
+}
+
+async function runConnector() {
+  const token = document.getElementById('miro-token').value.trim();
+  const boardId = document.getElementById('board-id').value.trim();
+  const fields = document.getElementById('output-fields').value.trim();
+
+  if (!token) { showError('Please enter your Miro access token.'); return; }
+  if (!boardId) { showError('Please enter your Miro board ID.'); return; }
+
+  clearError();
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('status').classList.add('visible');
+  document.getElementById('output-section').classList.remove('visible');
+  setStep(1);
+
+  try {
+    setStatus('Reading Miro board...');
+    setStep(1);
+
+    const items = await fetchAllMiroItems(token, boardId);
+
+    if (!items || items.length === 0) {
+      throw new Error('No items found on this Miro board. Make sure the board has content and your token has access to it.');
+    }
+
+    setStatus(`Found ${items.length} items — extracting content...`);
+    setStep(2);
+
+    const boardContent = extractContent(items);
+
+    setStatus('Sending to AI — generating summary...');
+    setStep(3);
+
+    const summary = await generateSummary(boardContent, fields);
+
+    outputText = summary;
+    document.getElementById('items-count').textContent =
+      `Based on ${items.length} items read from Miro board`;
+    renderOutput(summary);
+
+    document.getElementById('output-section').classList.add('visible');
+    document.getElementById('status').classList.remove('visible');
+    setStep(3);
+
+  } catch (err) {
+    document.getElementById('status').classList.remove('visible');
+    showError('<strong>Error:</strong> ' + err.message);
+    setStep(1);
+  }
+
+  document.getElementById('run-btn').disabled = false;
+}
+
+async function fetchAllMiroItems(token, boardId) {
+  let allItems = [];
+  let cursor = null;
+
+  do {
+    const url = cursor
+      ? `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50&cursor=${cursor}`
+      : `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50`;
+
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      if (res.status === 401) throw new Error('Invalid Miro token. Please check your access token and try again.');
+      if (res.status === 403) throw new Error('Access denied. Make sure your token has "boards:read" permission and you have access to this board.');
+      if (res.status === 404) throw new Error('Board not found. Please check your board ID.');
+      throw new Error(`Miro API error (${res.status}): ${errText}`);
+    }
+
+    const data = await res.json();
+    allItems = allItems.concat(data.data || []);
+    cursor = data.cursor || null;
+
+  } while (cursor);
+
+  return allItems;
+}
+
+function extractContent(items) {
+  const sections = {};
+  const loose = [];
+
+  items.forEach(item => {
+    const text = extractText(item);
+    if (!text) return;
+
+    const frameId = item.parent?.id;
+    if (frameId) {
+      if (!sections[frameId]) sections[frameId] = { title: '', items: [] };
+      sections[frameId].items.push({ type: item.type, text });
+    } else if (item.type === 'frame') {
+      if (!sections[item.id]) sections[item.id] = { title: '', items: [] };
+      sections[item.id].title = text;
+    } else {
+      loose.push({ type: item.type, text });
+    }
+  });
+
+  let output = '';
+
+  if (Object.keys(sections).length > 0) {
+    Object.values(sections).forEach(section => {
+      if (section.title) output += `\n[Section: ${section.title}]\n`;
+      section.items.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
+    });
+  }
+
+  if (loose.length > 0) {
+    output += '\n[Ungrouped items]\n';
+    loose.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
+  }
+
+  return output.trim();
+}
+
+function extractText(item) {
+  if (item.data?.content) {
+    return item.data.content.replace(/<[^>]*>/g, '').trim();
+  }
+  if (item.data?.title) return item.data.title.trim();
+  if (item.data?.body) {
+    return item.data.body.replace(/<[^>]*>/g, '').trim();
+  }
+  if (item.data?.shape === 'rectangle' && item.data?.content) {
+    return item.data.content.replace(/<[^>]*>/g, '').trim();
+  }
+  return null;
+}
+
+async function generateSummary(boardContent, fields) {
+  const prompt = `You are helping a Norwegian vocational college (Noroff) develop new study programs. 
+
+Below is the content extracted from a Miro ideation board where staff and stakeholders have been brainstorming ideas for potential new programs.
+
+MIRO BOARD CONTENT:
+${boardContent}
+
+Based on this content, write a structured program summary document with the following sections:
+${fields}
+
+Guidelines:
+- Write in clear, professional English
+- Be concise but substantive — each section should be 2-5 sentences or bullet points
+- Where information is missing or unclear from the board, note it as "To be determined" or flag it as an open question
+- Format each section with a clear heading
+- The tone should be suitable for sharing with a board of directors`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('AI generation failed: ' + err);
+  }
+
+  const data = await res.json();
+  return data.content?.[0]?.text || 'No response generated.';
+}
+
+function renderOutput(text) {
+  const box = document.getElementById('output-box');
+  let html = text
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^\*\*(.+)\*\*$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  box.innerHTML = '<p>' + html + '</p>';
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(outputText).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>
