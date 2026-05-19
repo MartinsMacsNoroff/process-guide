@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Miro → Summary generator</title>
+<title>Miro → Summary & Mandate generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/build/index.umd.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #f4f1eb; --surface: #fff; --border: #e0dbd0; --text: #1a1814;
-    --muted: #7a7670; --accent: #D85A30; --green: #1D9E75;
+    --muted: #7a7670; --accent: #D85A30; --green: #1D9E75; --blue: #1a56a0;
     --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
   }
   body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 16px 60px; }
@@ -38,6 +39,10 @@
   .run-btn:hover { background: #c04d24; }
   .run-btn:active { transform: scale(.99); }
   .run-btn:disabled { background: #d0c8be; cursor: not-allowed; transform: none; }
+  .mandate-btn { width: 100%; padding: 14px; background: var(--blue); color: #fff; border: none; border-radius: 8px; font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; }
+  .mandate-btn:hover { background: #144080; }
+  .mandate-btn:active { transform: scale(.99); }
+  .mandate-btn:disabled { background: #d0c8be; cursor: not-allowed; transform: none; }
   .status { display: none; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); padding: 12px 0; }
   .status.visible { display: flex; }
   .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
@@ -62,14 +67,17 @@
   .step { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background .3s; }
   .step.active { background: var(--accent); }
   .step.done { background: var(--green); }
+  .mandate-note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #1e40af; line-height: 1.5; margin-top: 16px; }
+  .success-banner { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #166534; display: none; margin-top: 12px; align-items: center; gap: 8px; }
+  .success-banner.visible { display: flex; }
 </style>
 </head>
 <body>
 <div class="shell">
   <header>
     <div class="eyebrow">Program development pipeline</div>
-    <h1>Miro board → <strong>summary generator</strong></h1>
-    <p class="sub">Reads your Miro ideation board and uses AI to generate a structured program summary document — ready for human review.</p>
+    <h1>Miro board → <strong>summary & mandate generator</strong></h1>
+    <p class="sub">Reads your Miro ideation board, generates a structured program summary, and produces a draft Project Mandate Word document.</p>
   </header>
 
   <div class="step-indicator">
@@ -78,9 +86,7 @@
     <div class="step" id="s3"></div>
   </div>
 
-  <div class="warning">
-    Your tokens are used directly in your browser and never stored anywhere. Keep this page private.
-  </div>
+  <div class="warning">Your tokens are used directly in your browser and never stored anywhere. Keep this page private.</div>
 
   <div class="card">
     <div class="card-label">Step 1 · Credentials</div>
@@ -141,6 +147,20 @@
     </div>
     <div class="miro-items-count" id="items-count"></div>
     <div class="output-box" id="output-box"></div>
+
+    <div class="mandate-note">
+      The summary above has been generated from your Miro board. Review it, then click below to generate a draft Project Mandate Word document based on this content.
+    </div>
+
+    <button class="mandate-btn" id="mandate-btn" onclick="generateMandate()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Generate project mandate (.docx)
+    </button>
+
+    <div class="success-banner" id="success-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Project mandate downloaded! Open it in Word, fill in the red placeholders, and send to Rector for approval.
+    </div>
   </div>
 </div>
 
@@ -179,15 +199,13 @@ async function runConnector() {
   document.getElementById('run-btn').disabled = true;
   document.getElementById('status').classList.add('visible');
   document.getElementById('output-section').classList.remove('visible');
+  document.getElementById('success-banner').classList.remove('visible');
   setStep(1);
 
   try {
     setStatus('Reading Miro board...');
     const items = await fetchAllMiroItems(token, boardId);
-
-    if (!items || items.length === 0) {
-      throw new Error('No items found on this board. Make sure it has content and your token has access.');
-    }
+    if (!items || items.length === 0) throw new Error('No items found on this board.');
 
     setStatus(`Found ${items.length} items — extracting content...`);
     setStep(2);
@@ -212,8 +230,7 @@ async function runConnector() {
 }
 
 async function fetchAllMiroItems(token, boardId) {
-  let allItems = [];
-  let cursor = null;
+  let allItems = [], cursor = null;
   do {
     const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
     const proxyUrl = `${PROXY}/?url=${encodeURIComponent(miroUrl)}&auth=${encodeURIComponent(token)}`;
@@ -233,8 +250,7 @@ async function fetchAllMiroItems(token, boardId) {
 }
 
 function extractContent(items) {
-  const sections = {};
-  const loose = [];
+  const sections = {}, loose = [];
   items.forEach(item => {
     const text = extractText(item);
     if (!text) return;
@@ -245,9 +261,7 @@ function extractContent(items) {
     } else if (item.type === 'frame') {
       if (!sections[item.id]) sections[item.id] = { title: '', items: [] };
       sections[item.id].title = text;
-    } else {
-      loose.push({ type: item.type, text });
-    }
+    } else { loose.push({ type: item.type, text }); }
   });
   let output = '';
   Object.values(sections).forEach(s => {
@@ -271,24 +285,22 @@ function extractText(item) {
 async function generateSummary(boardContent, fields, apiKey) {
   const prompt = `You are helping a Norwegian vocational college (Noroff) develop new study programs.
 
-Below is the content extracted from a Miro ideation board where staff and stakeholders have been brainstorming ideas for potential new programs.
+Below is the content extracted from a Miro ideation board.
 
 MIRO BOARD CONTENT:
 ${boardContent}
 
-Based on this content, write a structured program summary document with the following sections:
+Write a structured program summary with these sections:
 ${fields}
 
 Guidelines:
-- Write in clear, professional English
-- Be concise but substantive — each section should be 2-5 sentences or bullet points
-- Where information is missing, note it as "To be determined"
-- Format each section with a clear heading
-- The tone should be suitable for sharing with a board of directors`;
+- Clear, professional English
+- 2-5 sentences or bullet points per section
+- Missing info: note as "To be determined"
+- Clear headings
+- Suitable for sharing with a board of directors`;
 
-  const anthropicUrl = 'https://api.anthropic.com/v1/messages';
-  const proxyUrl = `${PROXY}/?url=${encodeURIComponent(anthropicUrl)}&apikey=${encodeURIComponent(apiKey)}`;
-
+  const proxyUrl = `${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}&apikey=${encodeURIComponent(apiKey)}`;
   const res = await fetch(proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -298,13 +310,11 @@ Guidelines:
       messages: [{ role: 'user', content: prompt }]
     })
   });
-
   if (!res.ok) {
     const err = await res.text();
-    if (res.status === 401) throw new Error('Invalid Anthropic API key. Check console.anthropic.com.');
+    if (res.status === 401) throw new Error('Invalid Anthropic API key.');
     throw new Error('AI generation failed: ' + err);
   }
-
   const data = await res.json();
   return data.content?.[0]?.text || 'No response generated.';
 }
@@ -329,6 +339,172 @@ function copyOutput() {
     btn.textContent = 'Copied!';
     setTimeout(() => btn.textContent = 'Copy', 2000);
   });
+}
+
+async function generateMandate() {
+  const btn = document.getElementById('mandate-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="border-top-color:#fff"></div> Generating mandate...';
+
+  try {
+    const today = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+            HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, LevelFormat } = docx;
+
+    const border = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
+    const borders = { top: border, bottom: border, left: border, right: border };
+    const cm = { top: 80, bottom: 80, left: 120, right: 120 };
+
+    const h1 = text => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text, bold: true, size: 32, font: "Arial" })] });
+    const h2 = text => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text, bold: true, size: 26, font: "Arial" })] });
+    const p = (text, opts = {}) => new Paragraph({ children: [new TextRun({ text, font: "Arial", size: 24, ...opts })] });
+    const ph = text => new Paragraph({ children: [new TextRun({ text: `[${text}]`, font: "Arial", size: 24, color: "CC0000", italics: true })] });
+    const gap = () => new Paragraph({ children: [new TextRun("")] });
+    const bl = text => new Paragraph({ numbering: { reference: "bullets", level: 0 }, children: [new TextRun({ text, font: "Arial", size: 24 })] });
+
+    const hRow = cells => new TableRow({ children: cells.map(text => new TableCell({ borders, margins: cm, shading: { fill: "D5E8F0", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text, bold: true, font: "Arial", size: 22 })] })] })) });
+    const dRow = (cells, widths) => new TableRow({ children: cells.map((text, i) => new TableCell({ borders, margins: cm, width: widths ? { size: widths[i], type: WidthType.DXA } : undefined, children: [new Paragraph({ children: [new TextRun({ text, font: "Arial", size: 22 })] })] })) });
+
+    const doc = new Document({
+      numbering: { config: [{ reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] }] },
+      styles: {
+        default: { document: { run: { font: "Arial", size: 24 } } },
+        paragraphStyles: [
+          { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 32, bold: true, font: "Arial", color: "1F3864" }, paragraph: { spacing: { before: 320, after: 160 }, outlineLevel: 0 } },
+          { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 26, bold: true, font: "Arial", color: "2E75B6" }, paragraph: { spacing: { before: 240, after: 120 }, outlineLevel: 1 } },
+        ]
+      },
+      sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children: [
+
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 1440, after: 240 }, children: [new TextRun({ text: "PROJECT MANDATE", bold: true, size: 52, font: "Arial", color: "1F3864" })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: "Film Production — Online Studies", bold: true, size: 36, font: "Arial", color: "2E75B6" })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 480 }, children: [new TextRun({ text: `Draft generated: ${today}`, size: 22, font: "Arial", color: "888888", italics: true })] }),
+
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [3000, 6026], rows: [
+          hRow(["Field", "Details"]),
+          dRow(["Sponsor", "Noroff Vocational School"], [3000, 6026]),
+          dRow(["Study plan project owner", "[TO BE FILLED IN]"], [3000, 6026]),
+          dRow(["Study plan project manager", "[TO BE FILLED IN]"], [3000, 6026]),
+          dRow(["Version", "1 — Draft"], [3000, 6026]),
+          dRow(["Date", today], [3000, 6026]),
+        ]}),
+
+        gap(), gap(),
+        h2("Change log"),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [900, 1800, 3326, 1500, 1500], rows: [
+          hRow(["Version", "Date", "Change", "Responsible", "Approved by"]),
+          dRow(["1", today, "Initial AI-generated draft", "[TO BE FILLED IN]", "[TO BE FILLED IN]"], [900, 1800, 3326, 1500, 1500]),
+        ]}),
+
+        gap(), gap(),
+        h1("1. Background and strategic evaluation"),
+        h2("Why are we initiating this project?"),
+        p("The following summary was generated from the Miro ideation board:"),
+        gap(),
+        p(outputText, { italics: true, color: "444444" }),
+        gap(),
+        h2("Strategic direction"),
+        p("This project follows the Explore approach — launching a new programme in an area not currently covered in the Noroff portfolio. The programme addresses a growing market need for skilled film production professionals able to work in digital and online contexts."),
+        gap(),
+        h2("Evaluation"),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [3500, 2763, 2763], rows: [
+          hRow(["Hypothesis", "Score", "Notes"]),
+          dRow(["Strategic fit", "Good", "Aligns with Noroff creative portfolio"], [3500, 2763, 2763]),
+          dRow(["Fit with existing portfolio", "Good", "Extends current creative programmes"], [3500, 2763, 2763]),
+          dRow(["Market need and growth", "Good", "Growing demand for digital content creators"], [3500, 2763, 2763]),
+          dRow(["Maturity / timing", "Acceptable", "Online delivery model maturing"], [3500, 2763, 2763]),
+          dRow(["Feasibility", "Acceptable", "Practical elements require online solution"], [3500, 2763, 2763]),
+          dRow(["Internal resources", "[TO BE ASSESSED]", ""], [3500, 2763, 2763]),
+        ]}),
+
+        gap(), gap(),
+        h1("2. Project objectives"),
+        h2("Time"), ph("INSERT PROJECT TIMELINE AND KEY DATES HERE"), gap(),
+        p("The study plan project will be presented at the board meeting. The project board consists of Head of Development, Rector, and Director of Strategy."), gap(),
+        h2("Scope"),
+        p("Develop a new 60-credit online Film Production programme for Noroff Vocational School, to be submitted for LOKUT accreditation."), gap(),
+        bl("1 x 60 credits — Film Production (online)"),
+        bl("Full LOKUT application and supporting documentation"),
+        bl("Learning design document for content development phase"),
+        gap(),
+        h2("Quality"),
+        p("The project is subject to Noroff Vocational School's quality system. All procedures and guidelines must be followed. Quality is assessed at each stage gate."), gap(),
+
+        h1("3. Risk assessment"),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [3026, 900, 1100, 4000], rows: [
+          hRow(["Risk", "Impact (1-5)", "Probability (1-5)", "Risk management"]),
+          dRow(["Industry partners not available in time", "4", "2", "Plan B partner list. Clear expectations from the start."], [3026, 900, 1100, 4000]),
+          dRow(["Practical film skills difficult to deliver fully online", "4", "3", "Identify best-in-class online tools. Define minimum student equipment list."], [3026, 900, 1100, 4000]),
+          dRow(["Curriculum manager lacking competence or time", "5", "2", "Proper guidance and support from project leader."], [3026, 900, 1100, 4000]),
+          dRow(["Deadlines too ambitious", "4", "2", "Continuous justification of each stage by management group."], [3026, 900, 1100, 4000]),
+          dRow(["Remote assessment of practical skills", "3", "3", "Define assessment framework early. Involve pedagogical advisor."], [3026, 900, 1100, 4000]),
+          dRow(["Budget overruns", "2", "2", "Close monitoring of time spent against deliverables."], [3026, 900, 1100, 4000]),
+        ]}),
+
+        gap(), gap(),
+        h1("4. Milestones and activities"),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [500, 4026, 2000, 2500], rows: [
+          hRow(["Stage", "Milestones", "Deadline", "Approved by"]),
+          dRow(["S1", "Mandate and project manager settled, project organisation onboarded", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+          dRow(["S2", "Project plan with all activities finalised", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+          dRow(["S3", "Course overview, learning outcomes, reviewed by industry partners", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+          dRow(["S4", "Competency requirements, programme name, full application draft", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+          dRow(["S5", "Quality control, submission to LOKUT", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+          dRow(["S6", "Evaluation report, documentation handover", "[DATE]", "Project Board"], [500, 4026, 2000, 2500]),
+        ]}),
+
+        gap(), gap(),
+        h1("5. Project organisation"),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [2500, 2000, 4526], rows: [
+          hRow(["Name", "Role", "Tasks and responsibilities"]),
+          dRow(["[TO BE FILLED IN]", "Project board / Content project owner", "Project board. Approve mandate and funding. Decide on continuation after each stage."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Strategy Director", "Business case. Project board."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Study plan project owner", "Project board. Writes mandate. Controller before application to LOKUT."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Study plan project manager", "Writes project plan and timeline. Responsible for project progress."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Curriculum manager / SME", "Responsible for academic content. Works with industry partners."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Pedagogical advisor", "Responsible for pedagogical content, learning design and instructional design."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Industry Partner 1", "Contributes industry relevance. Quality assures programme relevance and employability."], [2500, 2000, 4526]),
+          dRow(["[TO BE FILLED IN]", "Industry Partner 2", "Contributes industry relevance. Quality assures programme relevance and employability."], [2500, 2000, 4526]),
+        ]}),
+
+        gap(), gap(),
+        h1("6. Benefits"),
+        bl("Employers gain access to graduates with professional film production skills for the digital economy"),
+        bl("Employers gain influence on programme content aligned with industry needs"),
+        bl("Graduates gain high employability in a growing creative and media sector"),
+        bl("Noroff expands its creative portfolio with a fully online offering"),
+        bl("The programme attracts students outside major cities with no access to equivalent education"),
+
+        gap(), gap(),
+        h1("7. Approval"),
+        p("Approval of this mandate authorises the project to move into detailed planning and active development."), gap(),
+        new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [4513, 4513], rows: [
+          hRow(["Role", "Signature / Date"]),
+          dRow(["Rector", ""], [4513, 4513]),
+          dRow(["Head of Development", ""], [4513, 4513]),
+          dRow(["Project Owner", ""], [4513, 4513]),
+        ]}),
+
+      ]}]
+    });
+
+    const buffer = await Packer.toBuffer(doc);
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Project_Mandate_Film_Production.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    document.getElementById('success-banner').classList.add('visible');
+
+  } catch (err) {
+    showError('<strong>Mandate generation error:</strong> ' + err.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Generate project mandate (.docx)';
 }
 </script>
 </body>
