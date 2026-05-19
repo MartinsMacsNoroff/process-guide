@@ -189,13 +189,7 @@
         </button>
         <div class="tool-status" id="summary-status"><div class="tool-spinner"></div><span id="summary-status-text">Connecting...</span></div>
         <div class="tool-error" id="summary-error"></div>
-        <div class="tool-result" id="summary-result">
-          <div class="tool-result-header">
-            <span class="tool-result-label">Generated summary</span>
-            <button class="tool-copy-btn" onclick="copySummary()">Copy</button>
-          </div>
-          <div class="tool-output" id="summary-output"></div>
-        </div>
+<div id="summary-result" style="display:none"><div id="summary-output"></div></div>
         <div class="summary-doc-section" id="summary-doc-section">
           <div class="mandate-doc-header" style="margin-top:10px">
             <span class="mandate-doc-title" style="color:#0F6E56">Editable summary</span>
@@ -544,6 +538,8 @@ Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
     const cleanHTML = mandateHTML.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
     editor.innerHTML = cleanHTML;
     document.getElementById('mandate-doc-section').classList.add('visible');
+    document.getElementById('mandate-run-btn').style.display = 'none';
+    document.getElementById('mandate-summary-note').style.display = 'none';
     editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch(err) {
