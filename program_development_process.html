@@ -7,319 +7,110 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 24px 16px;
-    color: #1a1a1a;
-    min-height: 100vh;
-  }
-
-  .container {
-    max-width: 780px;
-    margin: 0 auto;
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    padding: 28px 32px 24px;
-  }
-
-  .page-header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .page-header h1 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 4px;
-    color: #1a1a1a;
-  }
-
-  .page-header p {
-    font-size: 13px;
-    color: #666;
-    margin: 0;
-  }
-
-  .dots-bar {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin-bottom: 20px;
-  }
-
-  .dot-item {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
-
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; margin: 0; padding: 24px 16px; color: #1a1a1a; min-height: 100vh; }
+  .container { max-width: 780px; margin: 0 auto; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; padding: 28px 32px 24px; }
+  .page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
+  .page-header h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
+  .page-header p { font-size: 13px; color: #666; margin: 0; }
+  .dots-bar { display: flex; align-items: center; margin-bottom: 20px; }
+  .dot-item { display: flex; align-items: center; flex: 1; }
   .dot-item:last-child { flex: 0; }
-
-  .dot-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-  }
-
-  .dot-circle {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: #d0d0d0;
-    transition: background 0.2s;
-  }
-
+  .dot-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+  .dot-circle { width: 11px; height: 11px; border-radius: 50%; background: #d0d0d0; transition: background 0.2s; }
   .dot-circle.active { background: #D85A30; }
-  .dot-circle.done   { background: #5DCAA5; }
-
-  .dot-label {
-    font-size: 9px;
-    white-space: nowrap;
-    color: #999;
-  }
+  .dot-circle.done { background: #5DCAA5; }
+  .dot-label { font-size: 9px; white-space: nowrap; color: #999; }
   .dot-label.active { color: #D85A30; font-weight: 500; }
-
-  .dot-line {
-    flex: 1;
-    height: 1px;
-    background: #e0e0e0;
-    margin: 0 4px;
-    margin-bottom: 14px;
-  }
-
-  .step-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-
+  .dot-line { flex: 1; height: 1px; background: #e0e0e0; margin: 0 4px 14px; }
+  .step-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .step-counter { font-size: 12px; color: #888; }
-
-  .pill {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 10px;
-    border-radius: 20px;
-  }
-
-  .step-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 0 0 6px;
-    color: #1a1a1a;
-  }
-
-  .step-intro {
-    font-size: 14px;
-    color: #555;
-    margin: 0 0 18px;
-    line-height: 1.6;
-  }
-
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 16px;
-  }
-
-  .section-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 0 0 7px;
-  }
-
-  .role-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 20px;
-    background: #f5f5f5;
-    border: 1px solid #e8e8e8;
-    color: #555;
-    margin: 2px 2px 2px 0;
-  }
-
-  .activities {
-    font-size: 12px;
-    color: #555;
-    line-height: 1.7;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
+  .pill { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 10px; border-radius: 20px; }
+  .step-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+  .step-intro { font-size: 14px; color: #555; margin: 0 0 18px; line-height: 1.6; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .section-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
+  .role-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #f5f5f5; border: 1px solid #e8e8e8; color: #555; margin: 2px 2px 2px 0; }
+  .activities { font-size: 12px; color: #555; line-height: 1.7; padding: 0; margin: 0; list-style: none; }
   .activities li::before { content: "· "; color: #D85A30; }
-
-  .deliverable {
-    font-size: 12px;
-    padding: 6px 10px;
-    border-left: 3px solid #D85A30;
-    margin: 4px 0;
-    color: #555;
-    background: #fdf6f3;
-    border-radius: 0 5px 5px 0;
-  }
-
+  .deliverable { font-size: 12px; padding: 6px 10px; border-left: 3px solid #D85A30; margin: 4px 0; color: #555; background: #fdf6f3; border-radius: 0 5px 5px 0; }
   .miro-section { margin-bottom: 16px; }
-
-  .miro-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 11px 14px;
-    border-radius: 8px;
-    border: 2px solid #FFD02F;
-    background: #fffbf0;
-    cursor: pointer;
-    text-decoration: none;
-    width: 100%;
-    transition: background 0.15s;
-  }
-
+  .miro-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 8px; border: 2px solid #FFD02F; background: #fffbf0; cursor: pointer; text-decoration: none; width: 100%; transition: background 0.15s; }
   .miro-btn:hover { background: #fff3cc; }
-
-  .miro-btn .miro-text { flex: 1; }
-  .miro-btn .miro-title { font-size: 13px; font-weight: 600; color: #050038; display: block; }
-  .miro-btn .miro-sub   { font-size: 11px; color: #635e00; display: block; }
-
-  .parallel-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: #fff7ed;
-    color: #9a3412;
-    border: 1px solid #fed7aa;
-    display: inline-block;
-    margin-left: 6px;
-  }
-
-  .parallel-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  .parallel-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .parallel-head {
-    padding: 7px 12px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .parallel-body {
-    padding: 10px 12px;
-    font-size: 11px;
-    color: #555;
-    line-height: 1.55;
-  }
-
-  .ref-group-note {
-    margin-top: 6px;
-    padding: 5px 8px;
-    background: #fffbeb;
-    border-radius: 4px;
-    font-size: 10px;
-    color: #92400e;
-  }
-
-  .doc-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    border-radius: 7px;
-    border: 1px solid #e8e8e8;
-    margin: 5px 0;
-    cursor: pointer;
-    text-decoration: none;
-    transition: border-color 0.15s, background 0.15s;
-    color: inherit;
-  }
-
-  .doc-row:hover {
-    border-color: #93c5fd;
-    background: #f0f7ff;
-  }
-
+  .miro-title { font-size: 13px; font-weight: 600; color: #050038; display: block; }
+  .miro-sub { font-size: 11px; color: #635e00; display: block; }
+  .parallel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; display: inline-block; margin-left: 6px; }
+  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .parallel-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .parallel-head { padding: 7px 12px; font-size: 11px; font-weight: 600; }
+  .parallel-body { padding: 10px 12px; font-size: 11px; color: #555; line-height: 1.55; }
+  .doc-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #e8e8e8; margin: 5px 0; text-decoration: none; transition: border-color 0.15s, background 0.15s; color: inherit; }
+  .doc-row:hover { border-color: #93c5fd; background: #f0f7ff; }
   .doc-icon { font-size: 16px; color: #3b82f6; flex-shrink: 0; }
   .doc-label { font-size: 13px; color: #1a1a1a; flex: 1; }
-  .doc-sub   { font-size: 10px; color: #999; }
-  .doc-ext   { font-size: 12px; color: #ccc; }
-
-  .nav-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 14px;
-    margin-top: 4px;
-  }
-
-  .nav-btn {
-    cursor: pointer;
-    padding: 8px 20px;
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    font-size: 13px;
-    background: transparent;
-    color: #333;
-    transition: background 0.15s;
-    font-family: inherit;
-  }
-
+  .doc-sub { font-size: 10px; color: #999; }
+  .nav-bar { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 14px; margin-top: 4px; }
+  .nav-btn { cursor: pointer; padding: 8px 20px; border: 1px solid #d0d0d0; border-radius: 8px; font-size: 13px; background: transparent; color: #333; transition: background 0.15s; font-family: inherit; }
   .nav-btn:hover { background: #f5f5f5; }
   .nav-btn:disabled { opacity: 0.3; cursor: default; }
-
   .pip-bar { display: flex; gap: 6px; align-items: center; }
-
-  .pip {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    cursor: pointer;
-    background: #d0d0d0;
-    border: none;
-    padding: 0;
-    transition: background 0.2s;
-  }
-
+  .pip { width: 7px; height: 7px; border-radius: 50%; cursor: pointer; background: #d0d0d0; border: none; padding: 0; transition: background 0.2s; }
   .pip.active { background: #D85A30; }
 
+  /* Embedded tool styles */
+  .tool-section { margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; }
+  .tool-header { background: #f8f8f8; padding: 10px 14px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
+  .tool-header-title { font-size: 12px; font-weight: 600; color: #333; }
+  .tool-header-sub { font-size: 11px; color: #888; }
+  .tool-body { padding: 14px; }
+  .tool-field { margin-bottom: 12px; }
+  .tool-field:last-child { margin-bottom: 0; }
+  .tool-label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 4px; display: block; }
+  .tool-hint { font-size: 10px; color: #999; margin-bottom: 4px; }
+  .tool-input { width: 100%; font-family: monospace; font-size: 11px; padding: 7px 10px; border: 1px solid #d0d0d0; border-radius: 5px; background: #fafafa; color: #1a1a1a; outline: none; }
+  .tool-input:focus { border-color: #D85A30; }
+  .tool-input-wrap { position: relative; }
+  .tool-input-wrap input { padding-right: 50px; }
+  .tool-show-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; background: none; border: none; color: #999; cursor: pointer; }
+  .tool-run-btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; margin-top: 4px; }
+  .tool-run-btn.orange { background: #D85A30; color: #fff; }
+  .tool-run-btn.orange:hover { background: #c04d24; }
+  .tool-run-btn.blue { background: #1a56a0; color: #fff; }
+  .tool-run-btn.blue:hover { background: #144080; }
+  .tool-run-btn:disabled { background: #d0d0d0; cursor: not-allowed; }
+  .tool-status { display: none; align-items: center; gap: 8px; font-size: 12px; color: #888; padding: 8px 0; }
+  .tool-status.visible { display: flex; }
+  .tool-spinner { width: 14px; height: 14px; border: 2px solid #e0e0e0; border-top-color: #D85A30; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  .tool-result { display: none; margin-top: 12px; }
+  .tool-result.visible { display: block; }
+  .tool-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .tool-result-label { font-size: 10px; font-weight: 600; color: #1D9E75; text-transform: uppercase; letter-spacing: .05em; }
+  .tool-copy-btn { font-size: 10px; padding: 3px 8px; border: 1px solid #d0d0d0; border-radius: 4px; background: transparent; color: #888; cursor: pointer; }
+  .tool-copy-btn:hover { border-color: #D85A30; color: #D85A30; }
+  .tool-output { background: #fafafa; border: 1px solid #1D9E75; border-radius: 8px; padding: 14px; font-size: 12px; line-height: 1.7; color: #1a1a1a; max-height: 280px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+  .tool-output h2 { font-size: 14px; font-weight: 600; margin: 14px 0 4px; }
+  .tool-output h2:first-child { margin-top: 0; }
+  .tool-output h3 { font-size: 11px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .05em; margin: 10px 0 3px; }
+  .tool-output p { margin-bottom: 8px; }
+  .tool-output ul { padding-left: 16px; margin-bottom: 8px; }
+  .tool-output li { margin-bottom: 3px; }
+  .tool-error { background: #fff5f5; border: 1px solid #fca5a5; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #7f1d1d; margin-top: 8px; display: none; }
+  .tool-error.visible { display: block; }
+  .tool-success { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #166534; margin-top: 8px; display: none; }
+  .tool-success.visible { display: block; }
+  .mandate-note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #1e40af; margin: 10px 0; line-height: 1.5; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
   @media (max-width: 560px) {
     .container { padding: 20px 16px; }
-    .two-col { grid-template-columns: 1fr; }
-    .parallel-grid { grid-template-columns: 1fr; }
+    .two-col, .parallel-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-
 <div class="container">
-
   <div class="page-header">
     <h1>Development process for new programs</h1>
-    <p>Step-by-step guide from strategy to NOKUT accreditation &mdash; including documents and tools for each phase.</p>
+    <p>Step-by-step guide from strategy to NOKUT accreditation — including tools, documents and templates for each phase.</p>
   </div>
 
   <div class="dots-bar" id="dots-bar"></div>
@@ -345,18 +136,90 @@
 
   <div id="miro-section" class="miro-section" style="display:none">
     <div class="section-label">Miro board</div>
-    <!-- REPLACE href with your actual Miro board URL -->
     <a class="miro-btn" href="https://miro.com" target="_blank" rel="noopener">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <rect width="24" height="24" rx="4" fill="#FFD02F"/>
-        <path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/>
-      </svg>
-      <div class="miro-text">
-        <span class="miro-title">Open ideation board in Miro</span>
-        <span class="miro-sub">Strategy &amp; idea development workspace</span>
-      </div>
-      <i class="ti ti-external-link" style="font-size:14px;color:#635e00"></i>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg>
+      <div><span class="miro-title">Open ideation board in Miro</span><span class="miro-sub">Strategy &amp; idea development workspace</span></div>
+      <i class="ti ti-external-link" style="font-size:14px;color:#635e00;margin-left:auto"></i>
     </a>
+  </div>
+
+  <!-- EMBEDDED SUMMARY GENERATOR (Step 1) -->
+  <div id="summary-tool-section" style="display:none">
+    <div class="section-label">Summary generator</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div><div class="tool-header-title">Miro → Program summary</div><div class="tool-header-sub">Reads your Miro board and generates a structured summary</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-field">
+          <label class="tool-label">Miro access token</label>
+          <div class="tool-input-wrap">
+            <input type="password" id="t-miro-token" class="tool-input" placeholder="eyJtaXJvLm9...">
+            <button class="tool-show-btn" onclick="toggleTool('t-miro-token',this)">show</button>
+          </div>
+        </div>
+        <div class="tool-field">
+          <label class="tool-label">Miro board ID</label>
+          <input type="text" id="t-board-id" class="tool-input" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
+        </div>
+        <div class="tool-field">
+          <label class="tool-label">Anthropic API key</label>
+          <div class="tool-input-wrap">
+            <input type="password" id="t-api-key" class="tool-input" placeholder="sk-ant-...">
+            <button class="tool-show-btn" onclick="toggleTool('t-api-key',this)">show</button>
+          </div>
+        </div>
+        <button class="tool-run-btn orange" id="summary-run-btn" onclick="runSummary()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Read Miro board and generate summary
+        </button>
+        <div class="tool-status" id="summary-status"><div class="tool-spinner"></div><span id="summary-status-text">Connecting...</span></div>
+        <div class="tool-error" id="summary-error"></div>
+        <div class="tool-result" id="summary-result">
+          <div class="tool-result-header">
+            <span class="tool-result-label">Generated summary</span>
+            <button class="tool-copy-btn" onclick="copySummary()">Copy</button>
+          </div>
+          <div class="tool-output" id="summary-output"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMBEDDED MANDATE GENERATOR (Step 3) -->
+  <div id="mandate-tool-section" style="display:none">
+    <div class="section-label">Mandate generator</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a56a0" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><div class="tool-header-title">Project mandate generator</div><div class="tool-header-sub">Generates a draft Word-ready mandate from your program summary</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="mandate-note" id="mandate-summary-note">
+          Uses the summary generated in Step 1. Make sure you have run the summary generator first.
+        </div>
+        <div class="tool-field">
+          <label class="tool-label">Anthropic API key</label>
+          <div class="tool-input-wrap">
+            <input type="password" id="m-api-key" class="tool-input" placeholder="sk-ant-...">
+            <button class="tool-show-btn" onclick="toggleTool('m-api-key',this)">show</button>
+          </div>
+          <div class="tool-hint">Same key as Step 1 — paste it again here</div>
+        </div>
+        <div class="tool-field">
+          <label class="tool-label">Program name</label>
+          <input type="text" id="m-program-name" class="tool-input" placeholder="e.g. Film Production — Online Studies">
+        </div>
+        <button class="tool-run-btn blue" id="mandate-run-btn" onclick="runMandate()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Generate project mandate
+        </button>
+        <div class="tool-status" id="mandate-status"><div class="tool-spinner" style="border-top-color:#1a56a0"></div><span id="mandate-status-text">Generating mandate...</span></div>
+        <div class="tool-error" id="mandate-error"></div>
+        <div class="tool-success" id="mandate-success">✓ Mandate opened in a new tab. Copy the content into Word, fill in the red placeholders, and send to Rector for approval.</div>
+      </div>
+    </div>
   </div>
 
   <div id="parallel-section" style="display:none;margin-bottom:16px">
@@ -366,17 +229,12 @@
     </div>
     <div class="parallel-grid">
       <div class="parallel-card">
-        <div class="parallel-head" style="background:#7a3018;color:#fff">6a &middot; Quality assurance</div>
-        <div class="parallel-body">
-          Quality control of program name, learning outcomes, course overview, industry integration and requirement specs for academic staff.
-          <div class="ref-group-note">Reference group gives feedback &middot; program adjusts</div>
-        </div>
+        <div class="parallel-head" style="background:#7a3018;color:#fff">6a · Quality assurance</div>
+        <div class="parallel-body">Quality control of program name, learning outcomes, course overview, industry integration and requirement specs for academic staff.<br><span style="display:block;margin-top:5px;padding:4px 6px;background:#fffbeb;border-radius:4px;font-size:10px;color:#92400e">Reference group gives feedback · program adjusts</span></div>
       </div>
       <div class="parallel-card">
-        <div class="parallel-head" style="background:#f5f5f5;color:#333;border-bottom:1px solid #e0e0e0">6b &middot; Course development</div>
-        <div class="parallel-body">
-          Finalise study plan (learning outcomes, course descriptions) and learning design (topics/tema, learning activities, assessments).
-        </div>
+        <div class="parallel-head" style="background:#f5f5f5;color:#333;border-bottom:1px solid #e0e0e0">6b · Course development</div>
+        <div class="parallel-body">Finalise study plan (learning outcomes, course descriptions) and learning design (topics/tema, learning activities, assessments).</div>
       </div>
     </div>
   </div>
@@ -392,107 +250,110 @@
   </div>
 
   <div class="nav-bar">
-    <button class="nav-btn" id="btn-prev" onclick="go(-1)">&#8592; Previous</button>
+    <button class="nav-btn" id="btn-prev" onclick="go(-1)">← Previous</button>
     <div class="pip-bar" id="pip-bar"></div>
-    <button class="nav-btn" id="btn-next" onclick="go(1)">Next &#8594;</button>
+    <button class="nav-btn" id="btn-next" onclick="go(1)">Next →</button>
   </div>
-
 </div>
 
 <script>
+const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
+let generatedSummary = '';
+
 const steps = [
   {
-    num: '1', title: 'Strategy',
-    badge: { label: 'Ideation', bg: '#e0e7ff', color: '#3730a3' },
-    intro: 'Set the overall ambition and develop ideas for new programs. This phase involves broad input from across the organisation and external stakeholders.',
-    roles: ['Program Manager', 'Curriculum Manager', 'Academic Environment SME', 'Marketing & Sales', 'Industry, reports & analysis', 'Board of Directors'],
-    activities: ['Define strategic direction for new programs', 'Identify and prioritise ideas', 'Develop high-level ambition and scope'],
-    deliverables: ['Strategy: overall direction', 'High-level development plan and ambition'],
-    docs: [
-      { icon: 'ti-file-text', label: 'Strategy template', sub: 'Word · Program development', href: '#' },
-      { icon: 'ti-chart-bar', label: 'Market analysis framework', sub: 'Excel · Industry data', href: '#' },
+    num:'1', title:'Strategy',
+    badge:{label:'Ideation', bg:'#e0e7ff', color:'#3730a3'},
+    intro:'Set the overall ambition and develop ideas for new programs. This phase involves broad input from across the organisation and external stakeholders.',
+    roles:['Program Manager','Curriculum Manager','Academic Environment SME','Marketing & Sales','Industry, reports & analysis','Board of Directors'],
+    activities:['Define strategic direction for new programs','Identify and prioritise ideas','Develop high-level ambition and scope'],
+    deliverables:['Strategy: overall direction','High-level development plan and ambition'],
+    docs:[
+      {icon:'ti-file-text', label:'Strategy template', sub:'Word · Program development', href:'#'},
+      {icon:'ti-chart-bar', label:'Market analysis framework', sub:'Excel · Industry data', href:'#'},
     ],
-    miro: true
+    miro:true, summaryTool:true
   },
   {
-    num: '2', title: 'Project design',
-    badge: { label: 'Planning', bg: '#dbeafe', color: '#1e40af' },
-    intro: 'Head of Development designs the project together with key internal and external experts. Prioritised ideas are brought to the VOC board for a formal decision.',
-    roles: ['Head of Development', 'Director of Strategy', 'Senior Advisor (Dev Dept)', 'Internal expert (e.g. Program/Curriculum Manager)', 'External expert (e.g. industry partners, consultants)'],
-    activities: ['Design project structure and scope', 'Identify key competencies needed', 'Prepare for VOC board decision'],
-    deliverables: ['Decision in the VOC board on prioritised ideas'],
-    docs: [
-      { icon: 'ti-file-text', label: 'Project design brief', sub: 'Word · Template', href: '#' },
-      { icon: 'ti-presentation', label: 'VOC board presentation template', sub: 'PowerPoint', href: '#' },
-      { icon: 'ti-list-check', label: 'Stakeholder map template', sub: 'Excel', href: '#' },
+    num:'2', title:'Project design',
+    badge:{label:'Planning', bg:'#dbeafe', color:'#1e40af'},
+    intro:'Head of Development designs the project together with key internal and external experts. Prioritised ideas are brought to the VOC board for a formal decision.',
+    roles:['Head of Development','Director of Strategy','Senior Advisor (Dev Dept)','Internal expert','External expert'],
+    activities:['Design project structure and scope','Identify key competencies needed','Prepare for VOC board decision'],
+    deliverables:['Decision in the VOC board on prioritised ideas'],
+    docs:[
+      {icon:'ti-file-text', label:'Project design brief', sub:'Word · Template', href:'#'},
+      {icon:'ti-presentation', label:'VOC board presentation template', sub:'PowerPoint', href:'#'},
+      {icon:'ti-list-check', label:'Stakeholder map template', sub:'Excel', href:'#'},
     ]
   },
   {
-    num: '3', title: 'Project mandate',
-    badge: { label: 'Approval', bg: '#fef3c7', color: '#92400e' },
-    intro: 'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
-    roles: ['Head of Development', 'Project Manager'],
-    activities: ['Define purpose and milestones', 'Conduct risk assessment', 'Set development budget', 'Define project organisation'],
-    deliverables: ['Project mandate finalised and approved by Rector'],
-    docs: [
-      { icon: 'ti-file-text', label: 'Project mandate template', sub: 'Word · Required document', href: '#' },
-      { icon: 'ti-alert-triangle', label: 'Risk assessment template', sub: 'Excel', href: '#' },
-      { icon: 'ti-file-invoice', label: 'Budget template', sub: 'Excel', href: '#' },
-    ]
-  },
-  {
-    num: '4', title: 'Project plan',
-    badge: { label: 'Execution prep', bg: '#dbeafe', color: '#1e40af' },
-    intro: 'The project manager develops a detailed project plan with clear activities, timeline, responsibilities, and meeting structure for the project group.',
-    roles: ['Project Manager', 'Project group'],
-    activities: ['Define all project activities', 'Set timeline and milestones', 'Clarify responsibilities and expectations', 'Establish status meeting cadence'],
-    deliverables: ['Project plan approved by Head of Development'],
-    docs: [
-      { icon: 'ti-file-text', label: 'Project plan template', sub: 'Word · Required document', href: '#' },
-      { icon: 'ti-calendar', label: 'Timeline template', sub: 'Excel · Gantt', href: '#' },
-      { icon: 'ti-users', label: 'RACI matrix template', sub: 'Excel · Responsibilities', href: '#' },
-    ]
-  },
-  {
-    num: '5', title: 'Project delivery',
-    badge: { label: 'Build', bg: '#d1fae5', color: '#065f46' },
-    intro: 'Execute all project activities and finalise the overall study plan. This is the main production phase — workshops with industry partners, creating course overviews and learning outcomes.',
-    roles: ['Project Manager', 'Project group', 'Industry partners', 'Pedagogic advisor'],
-    activities: ['Workshop 1: program scope and outcomes', 'Workshop 2: course structure and design', 'Create course overview', 'Develop overall program learning outcomes', 'Collect approval from industry partners'],
-    deliverables: ['Overall study plan ready for quality assurance'],
-    docs: [
-      { icon: 'ti-file-text', label: 'Workshop 1 agenda template', sub: 'Word', href: '#' },
-      { icon: 'ti-file-text', label: 'Workshop 2 agenda template', sub: 'Word', href: '#' },
-      { icon: 'ti-file-text', label: 'Study plan template', sub: 'Word · Core document', href: '#' },
-      { icon: 'ti-file-text', label: 'Industry approval form', sub: 'Word', href: '#' },
-    ]
-  },
-  {
-    num: '6', title: 'Quality assurance & course development',
-    badge: { label: 'Parallel', bg: '#ffedd5', color: '#9a3412' },
-    intro: 'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development finalises the study plan and learning design.',
-    roles: ['Reference group', 'Head of Development', 'Course developers', 'Pedagogic advisor', 'Academic responsible (faglig ansvarlig)'],
-    activities: ['QA: review program name, outcomes, industry integration', 'QA: reference group feedback and adjustments', 'Course dev: finalise learning outcomes and course descriptions', 'Course dev: finalise topics, learning activities (LAA), assessments'],
-    deliverables: ['Study plan and learning design document ready for content development'],
-    docs: [
-      { icon: 'ti-file-text', label: 'QA checklist', sub: 'Word · Quality assurance', href: '#' },
-      { icon: 'ti-file-text', label: 'Course description template', sub: 'Word · Per course', href: '#' },
-      { icon: 'ti-file-text', label: 'Learning design template', sub: 'Word · LAA & assessments', href: '#' },
-      { icon: 'ti-message', label: 'Reference group feedback form', sub: 'Word', href: '#' },
+    num:'3', title:'Project mandate',
+    badge:{label:'Approval', bg:'#fef3c7', color:'#92400e'},
+    intro:'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
+    roles:['Head of Development','Project Manager'],
+    activities:['Define purpose and milestones','Conduct risk assessment','Set development budget','Define project organisation'],
+    deliverables:['Project mandate finalised and approved by Rector'],
+    docs:[
+      {icon:'ti-file-text', label:'Project mandate template', sub:'Word · Required document', href:'#'},
+      {icon:'ti-alert-triangle', label:'Risk assessment template', sub:'Excel', href:'#'},
+      {icon:'ti-file-invoice', label:'Budget template', sub:'Excel', href:'#'},
     ],
-    parallel: true
+    mandateTool:true
   },
   {
-    num: '7', title: 'LOKUT / NOKUT application',
-    badge: { label: 'Accreditation', bg: '#fce7f3', color: '#9d174d' },
-    intro: 'Assess the study plan in accordance with laws and regulations. Write a recommendation to the vocational school board, then submit the formal application to NOKUT.',
-    roles: ['Head of Development', 'Academic responsible', 'Legal/compliance advisor'],
-    activities: ['Assess study plan against laws and regulations', 'Write recommendation to vocational school board', 'Submit application to NOKUT'],
-    deliverables: ['Vocational school board makes final decision on accreditation'],
-    docs: [
-      { icon: 'ti-file-text', label: 'NOKUT application template', sub: 'Word · Regulatory submission', href: '#' },
-      { icon: 'ti-file-text', label: 'Vocational board recommendation template', sub: 'Word', href: '#' },
-      { icon: 'ti-external-link', label: 'NOKUT portal', sub: 'External · nokut.no', href: 'https://www.nokut.no' },
+    num:'4', title:'Project plan',
+    badge:{label:'Execution prep', bg:'#dbeafe', color:'#1e40af'},
+    intro:'The project manager develops a detailed project plan with clear activities, timeline, responsibilities, and meeting structure for the project group.',
+    roles:['Project Manager','Project group'],
+    activities:['Define all project activities','Set timeline and milestones','Clarify responsibilities and expectations','Establish status meeting cadence'],
+    deliverables:['Project plan approved by Head of Development'],
+    docs:[
+      {icon:'ti-file-text', label:'Project plan template', sub:'Word · Required document', href:'#'},
+      {icon:'ti-calendar', label:'Timeline template', sub:'Excel · Gantt', href:'#'},
+      {icon:'ti-users', label:'RACI matrix template', sub:'Excel · Responsibilities', href:'#'},
+    ]
+  },
+  {
+    num:'5', title:'Project delivery',
+    badge:{label:'Build', bg:'#d1fae5', color:'#065f46'},
+    intro:'Execute all project activities and finalise the overall study plan. This is the main production phase — workshops with industry partners, creating course overviews and learning outcomes.',
+    roles:['Project Manager','Project group','Industry partners','Pedagogic advisor'],
+    activities:['Workshop 1: program scope and outcomes','Workshop 2: course structure and design','Create course overview','Develop overall program learning outcomes','Collect approval from industry partners'],
+    deliverables:['Overall study plan ready for quality assurance'],
+    docs:[
+      {icon:'ti-file-text', label:'Workshop 1 agenda template', sub:'Word', href:'#'},
+      {icon:'ti-file-text', label:'Workshop 2 agenda template', sub:'Word', href:'#'},
+      {icon:'ti-file-text', label:'Study plan template', sub:'Word · Core document', href:'#'},
+      {icon:'ti-file-text', label:'Industry approval form', sub:'Word', href:'#'},
+    ]
+  },
+  {
+    num:'6', title:'Quality assurance & course development',
+    badge:{label:'Parallel', bg:'#ffedd5', color:'#9a3412'},
+    intro:'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development finalises the study plan and learning design.',
+    roles:['Reference group','Head of Development','Course developers','Pedagogic advisor','Academic responsible (faglig ansvarlig)'],
+    activities:['QA: review program name, outcomes, industry integration','QA: reference group feedback and adjustments','Course dev: finalise learning outcomes and course descriptions','Course dev: finalise topics, learning activities (LAA), assessments'],
+    deliverables:['Study plan and learning design document ready for content development'],
+    docs:[
+      {icon:'ti-file-text', label:'QA checklist', sub:'Word · Quality assurance', href:'#'},
+      {icon:'ti-file-text', label:'Course description template', sub:'Word · Per course', href:'#'},
+      {icon:'ti-file-text', label:'Learning design template', sub:'Word · LAA & assessments', href:'#'},
+      {icon:'ti-message', label:'Reference group feedback form', sub:'Word', href:'#'},
+    ],
+    parallel:true
+  },
+  {
+    num:'7', title:'LOKUT / NOKUT application',
+    badge:{label:'Accreditation', bg:'#fce7f3', color:'#9d174d'},
+    intro:'Assess the study plan in accordance with laws and regulations. Write a recommendation to the vocational school board, then submit the formal application to NOKUT.',
+    roles:['Head of Development','Academic responsible','Legal/compliance advisor'],
+    activities:['Assess study plan against laws and regulations','Write recommendation to vocational school board','Submit application to NOKUT'],
+    deliverables:['Vocational school board makes final decision on accreditation'],
+    docs:[
+      {icon:'ti-file-text', label:'NOKUT application template', sub:'Word · Regulatory submission', href:'#'},
+      {icon:'ti-file-text', label:'Vocational board recommendation template', sub:'Word', href:'#'},
+      {icon:'ti-external-link', label:'NOKUT portal', sub:'External · nokut.no', href:'https://www.nokut.no'},
     ]
   }
 ];
@@ -501,58 +362,198 @@ let cur = 0;
 
 function render() {
   const s = steps[cur];
-
-  document.getElementById('step-counter').textContent = 'Step ' + s.num + ' of 7';
+  document.getElementById('step-counter').textContent = `Step ${s.num} of 7`;
   document.getElementById('step-title').textContent = s.title;
   document.getElementById('step-intro').textContent = s.intro;
-  document.getElementById('step-badge').innerHTML =
-    '<span class="pill" style="background:' + s.badge.bg + ';color:' + s.badge.color + '">' + s.badge.label + '</span>';
-
-  document.getElementById('step-roles').innerHTML =
-    s.roles.map(r => '<span class="role-chip"><i class="ti ti-user" style="font-size:11px"></i>' + r + '</span>').join('');
-
-  document.getElementById('step-activities').innerHTML =
-    s.activities.map(a => '<li>' + a + '</li>').join('');
-
-  document.getElementById('step-deliverables').innerHTML =
-    s.deliverables.map(d => '<div class="deliverable">' + d + '</div>').join('');
-
-  document.getElementById('step-docs').innerHTML =
-    s.docs.map(d =>
-      '<a class="doc-row" href="' + d.href + '" target="_blank" rel="noopener">' +
-      '<i class="ti ' + d.icon + ' doc-icon"></i>' +
-      '<div><div class="doc-label">' + d.label + '</div><div class="doc-sub">' + d.sub + '</div></div>' +
-      '<i class="ti ti-external-link doc-ext"></i>' +
-      '</a>'
-    ).join('');
-
+  document.getElementById('step-badge').innerHTML = `<span class="pill" style="background:${s.badge.bg};color:${s.badge.color}">${s.badge.label}</span>`;
+  document.getElementById('step-roles').innerHTML = s.roles.map(r=>`<span class="role-chip"><i class="ti ti-user" style="font-size:11px"></i>${r}</span>`).join('');
+  document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
+  document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
+  document.getElementById('step-docs').innerHTML = s.docs.map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon} doc-icon"></i><div><div class="doc-label">${d.label}</div><div class="doc-sub">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:#ccc"></i></a>`).join('');
   document.getElementById('miro-section').style.display = s.miro ? 'block' : 'none';
+  document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
+  document.getElementById('mandate-tool-section').style.display = s.mandateTool ? 'block' : 'none';
   document.getElementById('parallel-section').style.display = s.parallel ? 'block' : 'none';
-
   document.getElementById('btn-prev').disabled = cur === 0;
   document.getElementById('btn-next').disabled = cur === steps.length - 1;
-
-  document.getElementById('pip-bar').innerHTML = steps.map((_, i) =>
-    '<button class="pip' + (i === cur ? ' active' : '') + '" onclick="goto(' + i + ')" aria-label="Go to step ' + (i+1) + '"></button>'
-  ).join('');
-
-  document.getElementById('dots-bar').innerHTML = steps.map((st, i) => {
-    const isLast = i === steps.length - 1;
-    const active = i === cur;
-    const done   = i < cur;
-    const bg     = active ? '#D85A30' : done ? '#5DCAA5' : '#d0d0d0';
-    return '<div class="dot-item">' +
-      '<div class="dot-inner" onclick="goto(' + i + ')">' +
-        '<div class="dot-circle' + (active ? ' active' : done ? ' done' : '') + '"></div>' +
-        '<span class="dot-label' + (active ? ' active' : '') + '">' + st.title.split(' ')[0] + '</span>' +
-      '</div>' +
-      (!isLast ? '<div class="dot-line"></div>' : '') +
-    '</div>';
+  document.getElementById('pip-bar').innerHTML = steps.map((_,i)=>`<button class="pip${i===cur?' active':''}" onclick="goto(${i})" aria-label="Step ${i+1}"></button>`).join('');
+  document.getElementById('dots-bar').innerHTML = steps.map((st,i)=>{
+    const isLast = i===steps.length-1;
+    const active = i===cur, done = i<cur;
+    const bg = active ? '#D85A30' : done ? '#5DCAA5' : '#d0d0d0';
+    return `<div class="dot-item"><div class="dot-inner" onclick="goto(${i})"><div class="dot-circle${active?' active':done?' done':''}"></div><span class="dot-label${active?' active':''}">${st.title.split(' ')[0]}</span></div>${!isLast?'<div class="dot-line"></div>':''}</div>`;
   }).join('');
+  // Update mandate note
+  if (s.mandateTool) {
+    const note = document.getElementById('mandate-summary-note');
+    if (generatedSummary) {
+      note.style.background = '#f0fdf4';
+      note.style.borderColor = '#86efac';
+      note.style.color = '#166534';
+      note.textContent = '✓ Summary from Step 1 is ready — click the button to generate the mandate.';
+    } else {
+      note.style.background = '#eff6ff';
+      note.style.borderColor = '#bfdbfe';
+      note.style.color = '#1e40af';
+      note.textContent = 'Uses the summary generated in Step 1. Make sure you have run the summary generator first.';
+    }
+  }
 }
 
-function go(d) { cur = Math.max(0, Math.min(steps.length - 1, cur + d)); render(); }
+function go(d) { cur = Math.max(0, Math.min(steps.length-1, cur+d)); render(); }
 function goto(i) { cur = i; render(); }
+
+function toggleTool(id, btn) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? 'show' : 'hide';
+}
+
+async function callAI(apiKey, prompt, maxTokens = 2000) {
+  const proxyUrl = `${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}&apikey=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    if (res.status === 401) throw new Error('Invalid Anthropic API key.');
+    throw new Error('AI error: ' + err);
+  }
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
+async function runSummary() {
+  const token = document.getElementById('t-miro-token').value.trim();
+  const boardId = document.getElementById('t-board-id').value.trim();
+  const apiKey = document.getElementById('t-api-key').value.trim();
+  const errEl = document.getElementById('summary-error');
+  const statusEl = document.getElementById('summary-status');
+  const statusText = document.getElementById('summary-status-text');
+  const btn = document.getElementById('summary-run-btn');
+
+  errEl.classList.remove('visible');
+  if (!token) { errEl.textContent = 'Please enter your Miro access token.'; errEl.classList.add('visible'); return; }
+  if (!apiKey) { errEl.textContent = 'Please enter your Anthropic API key.'; errEl.classList.add('visible'); return; }
+
+  btn.disabled = true;
+  statusEl.classList.add('visible');
+  document.getElementById('summary-result').classList.remove('visible');
+
+  try {
+    statusText.textContent = 'Reading Miro board...';
+    let allItems = [], cursor = null;
+    do {
+      const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
+      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}&auth=${encodeURIComponent(token)}`);
+      if (!res.ok) throw new Error(res.status === 401 ? 'Invalid Miro token.' : res.status === 404 ? 'Board not found.' : 'Miro error ' + res.status);
+      const data = await res.json();
+      allItems = allItems.concat(data.data || []);
+      cursor = data.cursor || null;
+    } while (cursor);
+
+    if (!allItems.length) throw new Error('No items found on this board.');
+
+    statusText.textContent = `Found ${allItems.length} items — generating summary...`;
+
+    const sections = {}, loose = [];
+    allItems.forEach(item => {
+      let text = null;
+      if (item.data?.content) text = item.data.content.replace(/<[^>]*>/g, '').trim();
+      else if (item.data?.title) text = item.data.title.trim();
+      else if (item.data?.body) text = item.data.body.replace(/<[^>]*>/g, '').trim();
+      if (!text) return;
+      const frameId = item.parent?.id;
+      if (frameId) { if (!sections[frameId]) sections[frameId] = {title:'',items:[]}; sections[frameId].items.push({type:item.type,text}); }
+      else if (item.type==='frame') { if (!sections[item.id]) sections[item.id]={title:'',items:[]}; sections[item.id].title=text; }
+      else loose.push({type:item.type,text});
+    });
+    let boardContent = '';
+    Object.values(sections).forEach(s => { if (s.title) boardContent += `\n[Section: ${s.title}]\n`; s.items.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); });
+    if (loose.length) { boardContent += '\n[Ungrouped items]\n'; loose.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); }
+
+    const summary = await callAI(apiKey, `You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n${boardContent}\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section, missing info as "To be determined".`);
+
+    generatedSummary = summary;
+    const out = document.getElementById('summary-output');
+    let html = summary.replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^\*\*(.+)\*\*$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+    out.innerHTML = '<p>' + html + '</p>';
+    document.getElementById('summary-result').classList.add('visible');
+
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+}
+
+function copySummary() {
+  navigator.clipboard.writeText(generatedSummary).then(() => {
+    const btn = document.querySelector('.tool-copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+async function runMandate() {
+  const apiKey = document.getElementById('m-api-key').value.trim();
+  const programName = document.getElementById('m-program-name').value.trim() || 'New Program';
+  const errEl = document.getElementById('mandate-error');
+  const statusEl = document.getElementById('mandate-status');
+  const btn = document.getElementById('mandate-run-btn');
+
+  errEl.classList.remove('visible');
+  document.getElementById('mandate-success').classList.remove('visible');
+
+  if (!apiKey) { errEl.textContent = 'Please enter your Anthropic API key.'; errEl.classList.add('visible'); return; }
+  if (!generatedSummary) { errEl.textContent = 'No summary found. Please run the summary generator in Step 1 first.'; errEl.classList.add('visible'); return; }
+
+  btn.disabled = true;
+  statusEl.classList.add('visible');
+
+  try {
+    const today = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+    const mandateHTML = await callAI(apiKey, `Generate a complete Project Mandate HTML document for Noroff (Norwegian vocational college).
+
+PROGRAM: ${programName}
+TODAY: ${today}
+
+PROGRAM SUMMARY:
+${generatedSummary}
+
+Create a complete mandate following Noroff's structure. Use HTML with inline styles. Requirements:
+- Cover: program name in large text (color #1F3864), sponsor: Noroff Vocational School, date: ${today}
+- Change log table
+- Background section using the summary above as source
+- Strategic evaluation table (Strategic fit, Market need, Feasibility, Internal resources — Good/Acceptable/Uncertain)
+- Project objectives: Time, Scope, Quality
+- Risk table with 5+ risks (Impact 1-5, Probability 1-5, Risk management)  
+- Milestones table S1-S6
+- Project organisation table (all standard Noroff roles)
+- Benefits bullet list
+- Approval signatures table
+
+Style: Arial font, tables with border-collapse:collapse, th background #D5E8F0, borders 1px solid #ccc, padding 8px.
+Mark fields needing human input as: <span style="color:#CC0000;font-style:italic">[TO BE FILLED IN]</span>
+Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
+
+    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate — ${programName}</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#2E75B6;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px 10px;text-align:left;border:1px solid #aaa;font-size:12px}td{padding:7px 10px;border:1px solid #ccc;vertical-align:top;font-size:12px}ul{padding-left:20px}li{margin-bottom:4px}p{margin:6px 0 10px;line-height:1.6}@media print{body{margin:20px}}</style></head><body>${mandateHTML}</body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(fullHTML);
+    win.document.close();
+    document.getElementById('mandate-success').classList.add('visible');
+
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+}
 
 render();
 </script>
