@@ -471,11 +471,13 @@ async function fetchAllMiroItems(token, boardId) {
   let cursor = null;
 
   do {
-    const url = cursor
+    const miroUrl = cursor
       ? `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50&cursor=${cursor}`
       : `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50`;
 
-    const res = await fetch(url, {
+    const proxyUrl = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent(miroUrl)}`;
+
+    const res = await fetch(proxyUrl, {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Accept': 'application/json'
