@@ -79,12 +79,11 @@
   </div>
 
   <div class="warning">
-    Your tokens are used directly in your browser and never stored anywhere. Keep this page private — do not share the URL with others.
+    Your tokens are used directly in your browser and never stored anywhere. Keep this page private.
   </div>
 
   <div class="card">
     <div class="card-label">Step 1 · Credentials</div>
-
     <div class="field">
       <label for="miro-token">Miro access token</label>
       <p class="hint">From miro.com → Profile → Your apps → Process guide connector</p>
@@ -93,16 +92,14 @@
         <button class="token-toggle" onclick="toggleField('miro-token', this)">show</button>
       </div>
     </div>
-
     <div class="field">
       <label for="board-id">Miro board ID</label>
       <p class="hint">From the board URL: miro.com/app/board/<strong>THIS-PART</strong>/</p>
       <input type="text" id="board-id" value="uXjVHRH9-Rw=" placeholder="uXjVHRH9-Rw=">
     </div>
-
     <div class="field">
       <label for="anthropic-key">Anthropic API key</label>
-      <p class="hint">From console.anthropic.com → API Keys. Starts with sk-ant- — never share this publicly.</p>
+      <p class="hint">From console.anthropic.com → API Keys. Never share this publicly.</p>
       <div class="token-wrap">
         <input type="password" id="anthropic-key" placeholder="sk-ant-...">
         <button class="token-toggle" onclick="toggleField('anthropic-key', this)">show</button>
@@ -148,34 +145,24 @@
 </div>
 
 <script>
+const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
 let outputText = '';
 
 function toggleField(id, btn) {
   const input = document.getElementById(id);
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.textContent = 'hide';
-  } else {
-    input.type = 'password';
-    btn.textContent = 'show';
-  }
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? 'show' : 'hide';
 }
 
 function setStep(n) {
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById('s' + i);
-    if (i < n) el.className = 'step done';
-    else if (i === n) el.className = 'step active';
-    else el.className = 'step';
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
   }
 }
 
 function setStatus(text) { document.getElementById('status-text').textContent = text; }
-
-function showError(msg) {
-  document.getElementById('error-container').innerHTML = '<div class="error-box">' + msg + '</div>';
-}
-
+function showError(msg) { document.getElementById('error-container').innerHTML = '<div class="error-box">' + msg + '</div>'; }
 function clearError() { document.getElementById('error-container').innerHTML = ''; }
 
 async function runConnector() {
@@ -199,19 +186,19 @@ async function runConnector() {
     const items = await fetchAllMiroItems(token, boardId);
 
     if (!items || items.length === 0) {
-      throw new Error('No items found on this Miro board. Make sure the board has content and your token has access to it.');
+      throw new Error('No items found on this board. Make sure it has content and your token has access.');
     }
 
     setStatus(`Found ${items.length} items — extracting content...`);
     setStep(2);
     const boardContent = extractContent(items);
 
-    setStatus('Sending to AI — generating summary...');
+    setStatus('Generating summary with AI...');
     setStep(3);
     const summary = await generateSummary(boardContent, fields, apiKey);
 
     outputText = summary;
-    document.getElementById('items-count').textContent = `Based on ${items.length} items read from Miro board`;
+    document.getElementById('items-count').textContent = `Based on ${items.length} items from Miro board`;
     renderOutput(summary);
     document.getElementById('output-section').classList.add('visible');
     document.getElementById('status').classList.remove('visible');
@@ -221,46 +208,33 @@ async function runConnector() {
     showError('<strong>Error:</strong> ' + err.message);
     setStep(1);
   }
-
   document.getElementById('run-btn').disabled = false;
 }
 
 async function fetchAllMiroItems(token, boardId) {
   let allItems = [];
   let cursor = null;
-
   do {
-    const miroUrl = cursor
-      ? `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50&cursor=${cursor}`
-      : `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50`;
-
-    const proxyUrl = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent(miroUrl)}`;
-
-    const res = await fetch(proxyUrl, {
-      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-    });
-
+    const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
+    const proxyUrl = `${PROXY}/?url=${encodeURIComponent(miroUrl)}&auth=${encodeURIComponent(token)}`;
+    const res = await fetch(proxyUrl);
     if (!res.ok) {
-      const errText = await res.text();
-      if (res.status === 401) throw new Error('Invalid Miro token. Please check your access token.');
-      if (res.status === 403) throw new Error('Access denied. Make sure your token has boards:read permission.');
-      if (res.status === 404) throw new Error('Board not found. Please check your board ID.');
-      throw new Error(`Miro API error (${res.status}): ${errText}`);
+      const t = await res.text();
+      if (res.status === 401) throw new Error('Invalid Miro token.');
+      if (res.status === 403) throw new Error('Access denied. Check boards:read permission.');
+      if (res.status === 404) throw new Error('Board not found. Check your board ID.');
+      throw new Error(`Miro error (${res.status}): ${t}`);
     }
-
     const data = await res.json();
     allItems = allItems.concat(data.data || []);
     cursor = data.cursor || null;
-
   } while (cursor);
-
   return allItems;
 }
 
 function extractContent(items) {
   const sections = {};
   const loose = [];
-
   items.forEach(item => {
     const text = extractText(item);
     if (!text) return;
@@ -275,11 +249,10 @@ function extractContent(items) {
       loose.push({ type: item.type, text });
     }
   });
-
   let output = '';
-  Object.values(sections).forEach(section => {
-    if (section.title) output += `\n[Section: ${section.title}]\n`;
-    section.items.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
+  Object.values(sections).forEach(s => {
+    if (s.title) output += `\n[Section: ${s.title}]\n`;
+    s.items.forEach(i => { output += `- (${i.type}) ${i.text}\n`; });
   });
   if (loose.length > 0) {
     output += '\n[Ungrouped items]\n';
@@ -309,19 +282,16 @@ ${fields}
 Guidelines:
 - Write in clear, professional English
 - Be concise but substantive — each section should be 2-5 sentences or bullet points
-- Where information is missing or unclear from the board, note it as "To be determined"
+- Where information is missing, note it as "To be determined"
 - Format each section with a clear heading
 - The tone should be suitable for sharing with a board of directors`;
 
-  const proxyUrl = `https://miro-proxy.martins-macs.workers.dev/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`;
+  const anthropicUrl = 'https://api.anthropic.com/v1/messages';
+  const proxyUrl = `${PROXY}/?url=${encodeURIComponent(anthropicUrl)}&apikey=${encodeURIComponent(apiKey)}`;
 
   const res = await fetch(proxyUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1500,
@@ -331,7 +301,7 @@ Guidelines:
 
   if (!res.ok) {
     const err = await res.text();
-    if (res.status === 401) throw new Error('Invalid Anthropic API key. Please check your key at console.anthropic.com.');
+    if (res.status === 401) throw new Error('Invalid Anthropic API key. Check console.anthropic.com.');
     throw new Error('AI generation failed: ' + err);
   }
 
