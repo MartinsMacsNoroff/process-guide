@@ -115,6 +115,13 @@
   .mandate-editor td { padding: 6px 9px; border: 1px solid #ccc; vertical-align: top; font-size: 12px; }
   .mandate-editor ul { padding-left: 18px; }
   .mandate-editor li { margin-bottom: 3px; }
+  .generated-doc-card { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #bfdbfe; background: #eff6ff; margin: 5px 0; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .generated-doc-card:hover { border-color: #93c5fd; background: #dbeafe; }
+  .generated-doc-icon { font-size: 16px; color: #1a56a0; flex-shrink: 0; }
+  .generated-doc-label { font-size: 13px; color: #1a1a1a; flex: 1; font-weight: 500; }
+  .generated-doc-sub { font-size: 10px; color: #1a56a0; }
+  .generated-doc-download { font-size: 11px; padding: 3px 8px; border: 1px solid #1a56a0; border-radius: 4px; background: transparent; color: #1a56a0; cursor: pointer; font-family: inherit; }
+  .generated-doc-download:hover { background: #1a56a0; color: #fff; }
   .mandate-note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #1e40af; margin: 10px 0; line-height: 1.5; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -241,7 +248,7 @@
             <span class="mandate-doc-title">Draft project mandate — editable</span>
             <div class="mandate-doc-actions">
               <button class="mandate-action-btn" onclick="downloadMandate()">Download .html</button>
-              <button class="mandate-action-btn primary" onclick="printMandate()">Print / Save as PDF</button>
+              <button class="mandate-action-btn primary" onclick="addToDocuments()">Add to Documents</button>
             </div>
           </div>
           <div class="mandate-editor" id="mandate-editor" contenteditable="true"></div>
@@ -276,6 +283,7 @@
   <div style="margin-bottom:20px">
     <div class="section-label">Documents &amp; templates</div>
     <div id="step-docs"></div>
+    <div id="generated-docs"></div>
   </div>
 
   <div class="nav-bar">
@@ -597,13 +605,36 @@ function downloadMandate() {
   URL.revokeObjectURL(url);
 }
 
-function printMandate() {
+function addToDocuments() {
+  const programName = document.getElementById('m-program-name').value.trim() || 'Project Mandate';
   const editor = document.getElementById('mandate-editor');
-  const win = window.open('', '_blank');
-  if (!win) { alert('Please allow popups to print.'); return; }
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#2E75B6;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px 10px;text-align:left;border:1px solid #aaa;font-size:12px}td{padding:7px 10px;border:1px solid #ccc;vertical-align:top;font-size:12px}ul{padding-left:20px}li{margin-bottom:4px}p{margin:6px 0 10px;line-height:1.6}@media print{body{margin:20px}}</style></head><body>${editor.innerHTML}</body></html>`);
-  win.document.close();
-  setTimeout(() => win.print(), 500);
+  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#2E75B6;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px 10px;text-align:left;border:1px solid #aaa;font-size:12px}td{padding:7px 10px;border:1px solid #ccc;vertical-align:top;font-size:12px}ul{padding-left:20px}li{margin-bottom:4px}p{margin:6px 0 10px;line-height:1.6}</style></head><body>${editor.innerHTML}</body></html>`;
+  const blob = new Blob([fullHTML], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const today = new Date().toLocaleDateString('en-GB');
+  const container = document.getElementById('generated-docs');
+  const existing = container.querySelector(`[data-name="${programName}"]`);
+  if (existing) existing.remove();
+  const card = document.createElement('div');
+  card.className = 'generated-doc-card';
+  card.setAttribute('data-name', programName);
+  card.innerHTML = `
+    <i class="ti ti-file-text generated-doc-icon"></i>
+    <div style="flex:1">
+      <div class="generated-doc-label">${programName} — Project Mandate</div>
+      <div class="generated-doc-sub">Generated ${today} · Draft — ready for editing</div>
+    </div>
+    <button class="generated-doc-download" onclick="event.stopPropagation(); downloadFromCard('${url}', '${programName}')">Download</button>`;
+  card.onclick = () => document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth', block:'start'});
+  container.appendChild(card);
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function downloadFromCard(url, name) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name.replace(/\s+/g,'_') + '_Mandate.html';
+  a.click();
 }
 
 render();
