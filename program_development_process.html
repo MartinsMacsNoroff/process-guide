@@ -12,7 +12,7 @@
   .page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
   .page-header h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
   .page-header p { font-size: 13px; color: #666; margin: 0; }
-  .dots-bar { display: flex; align-items: center; margin-bottom: 20px; }
+  .dots-bar { display: block; margin-bottom: 0; }
   .dot-item { display: flex; align-items: center; flex: 1; }
   .dot-item:last-child { flex: 0; }
   .dot-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
@@ -29,7 +29,7 @@
   .step-intro { font-size: 14px; color: #555; margin: 0 0 18px; line-height: 1.6; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
   .section-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
-  .role-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #f5f5f5; border: 1px solid #e8e8e8; color: #555; margin: 2px 2px 2px 0; }
+
   .activities { font-size: 12px; color: #555; line-height: 1.7; padding: 0; margin: 0; list-style: none; }
   .activities li::before { content: "· "; color: #D85A30; }
   .deliverable { font-size: 12px; padding: 6px 10px; border-left: 3px solid #D85A30; margin: 4px 0; color: #555; background: #fdf6f3; border-radius: 0 5px 5px 0; }
@@ -126,6 +126,8 @@
   .summary-doc-section.visible { display: block; }
   .summary-editor { width: 100%; min-height: 200px; border: 1px solid #1D9E75; border-radius: 8px; padding: 14px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; line-height: 1.7; color: #1a1a1a; background: #fff; outline: none; overflow-y: auto; box-sizing: border-box; }
   .summary-editor:focus { border-color: #0F6E56; }
+  .phase-bar { display: flex; margin-bottom: 6px; border-radius: 6px; overflow: hidden; border: 1px solid #e0e0e0; }
+  .phase-seg { flex: 1; padding: 4px 8px; font-size: 9px; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: .05em; transition: background 0.3s, color 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mandate-note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #1e40af; margin: 10px 0; line-height: 1.5; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -152,15 +154,17 @@
   <h2 class="step-title" id="step-title"></h2>
   <p class="step-intro" id="step-intro"></p>
 
-  <div class="two-col">
-    <div>
-      <div class="section-label">Who's involved</div>
-      <div id="step-roles"></div>
-    </div>
-    <div>
-      <div class="section-label">Key activities</div>
-      <ul class="activities" id="step-activities"></ul>
-    </div>
+  <div style="margin-bottom:16px">
+    <div class="section-label">Key activities</div>
+    <ul class="activities" id="step-activities" style="margin-top:4px"></ul>
+  </div>
+  <div style="margin-bottom:12px">
+    <div class="section-label">Who's involved</div>
+    <div id="step-roles" style="margin-top:5px"></div>
+  </div>
+  <div style="margin-bottom:16px">
+    <div class="section-label">Who's responsible</div>
+    <div id="step-responsible" style="margin-top:5px;font-size:12px;color:#1a1a1a"></div>
   </div>
 
   <div id="miro-section" class="miro-section" style="display:none">
@@ -243,6 +247,40 @@
     </div>
   </div>
 
+  <div id="plan-tool-section" style="display:none">
+    <div class="section-label">Project plan generator</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div><div class="tool-header-title">Project plan generator</div><div class="tool-header-sub">Generates a draft project plan from your mandate</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="mandate-note" id="plan-mandate-note">Uses the mandate generated in Step 2.</div>
+        <div class="tool-field">
+          <label class="tool-label">Program name</label>
+          <input type="text" id="p-program-name" class="tool-input" placeholder="e.g. Film Production - Online Studies">
+        </div>
+        <button class="tool-run-btn" id="plan-run-btn" onclick="runPlan()" style="background:#0F6E56;color:#fff">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Generate project plan
+        </button>
+        <div class="tool-status" id="plan-status"><div class="tool-spinner" style="border-top-color:#0F6E56"></div><span id="plan-status-text">Generating plan...</span></div>
+        <div class="tool-error" id="plan-error"></div>
+        <div class="summary-doc-section" id="plan-doc-section">
+          <div class="mandate-doc-header" style="margin-top:10px">
+            <span class="mandate-doc-title" style="color:#0F6E56">Draft project plan - editable</span>
+            <div class="mandate-doc-actions">
+              <button class="mandate-action-btn" onclick="downloadPlan()">Download .html</button>
+              <button class="mandate-action-btn primary" style="background:#0F6E56;border-color:#0F6E56" onclick="addPlanToDocuments()">Add to Documents</button>
+            </div>
+          </div>
+          <div class="mandate-editor" id="plan-editor" contenteditable="true" style="border-color:#0F6E56"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit. Red italic text marks fields to fill in.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="parallel-section" style="display:none;margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
       <div class="section-label" style="margin:0">Parallel tracks</div>
@@ -281,71 +319,105 @@
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
 let generatedSummary = '';
+let generatedMandate = '';
+
+const phases = [
+  { label: 'Strategy & Planning', num: 'Phase 1', steps: [0,1,2], color: '#D85A30' },
+  { label: 'Program Development', num: 'Phase 2', steps: [3,4,5,6], color: '#1D9E75' },
+  { label: 'Accreditation', num: 'Phase 3', steps: [7], color: '#9d174d' },
+];
 
 const steps = [
   {
     num:'1', title:'Strategy',
+    phase: 0,
     badge:{label:'Ideation', bg:'#e0e7ff', color:'#3730a3'},
     intro:'Set the overall ambition and develop ideas for new programs. This phase involves broad input from across the organisation and external stakeholders.',
     roles:['Program Manager','Curriculum Manager','Academic Environment SME','Marketing & Sales','Industry, reports & analysis','Board of Directors'],
-    activities:['Define strategic direction for new programs','Identify and prioritise ideas','Develop high-level ambition and scope'],
-    deliverables:['Strategy: overall direction','High-level development plan and ambition'],
+    activities:['Define strategic direction for new programs','Identify and prioritise ideas','Develop high-level ambition and scope','VOC board decision on prioritised ideas'],
+    responsible: 'Head of Development',
+    deliverables:['Strategy: overall direction','High-level development plan and ambition','VOC board approval to proceed'],
     docs:[],
     miro:true, summaryTool:true
   },
   {
-    num:'2', title:'Project design',
-    badge:{label:'Planning', bg:'#dbeafe', color:'#1e40af'},
-    intro:'Head of Development designs the project together with key internal and external experts. Prioritised ideas are brought to the VOC board for a formal decision.',
-    roles:['Head of Development','Director of Strategy','Senior Advisor (Dev Dept)','Internal expert','External expert'],
-    activities:['Design project structure and scope','Identify key competencies needed','Prepare for VOC board decision'],
-    deliverables:['Decision in the VOC board on prioritised ideas'],
-    docs:[]
-  },
-  {
-    num:'3', title:'Project mandate',
+    num:'2', title:'Project Mandate',
+    phase: 0,
     badge:{label:'Approval', bg:'#fef3c7', color:'#92400e'},
-    intro:'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
-    roles:['Head of Development','Project Manager'],
-    activities:['Define purpose and milestones','Conduct risk assessment','Set development budget','Define project organisation'],
-    deliverables:['Project mandate finalised and approved by Rector'],
+    intro:'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget. Industry partners are identified and onboarding agreements are prepared.',
+    roles:['Head of Development','Project Manager','Director of Strategy','Industry Partners'],
+    activities:['Define purpose and milestones','Conduct risk assessment','Set development budget','Define project organisation','Identify and approach industry partners','Prepare partnership agreements'],
+    responsible: 'Head of Development + Project Manager',
+    deliverables:['Project mandate finalised and approved by Rector','Industry partner agreements signed'],
     docs:[],
     mandateTool:true
   },
   {
-    num:'4', title:'Project plan',
+    num:'3', title:'Project Plan',
+    phase: 0,
     badge:{label:'Execution prep', bg:'#dbeafe', color:'#1e40af'},
-    intro:'The project manager develops a detailed project plan with clear activities, timeline, responsibilities, and meeting structure for the project group.',
-    roles:['Project Manager','Project group'],
-    activities:['Define all project activities','Set timeline and milestones','Clarify responsibilities and expectations','Establish status meeting cadence'],
-    deliverables:['Project plan approved by Head of Development'],
+    intro:'The project manager develops a detailed project plan with clear activities, timeline and responsibilities. Industry partners are formally onboarded and the full project group is assembled.',
+    roles:['Project Manager','Project group','Industry Partners'],
+    activities:['Define all project activities and timeline','Clarify responsibilities and expectations','Establish status meeting cadence','Industry partner kick-off and onboarding','Align expectations with all stakeholders'],
+    responsible: 'Project Manager',
+    deliverables:['Project plan approved by Head of Development','Project group onboarded','Industry partners onboarded'],
+    docs:[],
+    planTool:true
+  },
+  {
+    num:'4', title:'Industry Workshops',
+    phase: 1,
+    badge:{label:'Co-creation', bg:'#d1fae5', color:'#065f46'},
+    intro:'Collaborative workshops with industry partners shape the program structure, topics, and learning outcomes. Run in Miro with Teams meeting recording for full documentation.',
+    roles:['Project Manager','Industry Partners','Subject Matter Experts','Pedagogic Advisor'],
+    activities:['Workshop 1: program scope and overall structure','Workshop 2: course structure and topics','Capture industry input and feedback in Miro','Document workshop outcomes'],
+    responsible: 'Project Manager',
+    deliverables:['Course overview table','Industry feedback documented','Workshop meeting minutes'],
+    docs:[],
+    miro:true, summaryTool:true
+  },
+  {
+    num:'5', title:'Learning Outcomes',
+    phase: 1,
+    badge:{label:'Academic', bg:'#fef3c7', color:'#92400e'},
+    intro:'Define and finalise the overall program learning outcomes and course-level learning outcomes. Reviewed and approved by industry partners and academic staff.',
+    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Industry Partners'],
+    activities:['Draft overall program learning outcomes','Draft course-level learning outcomes','Industry partner review and feedback','Finalise and approve learning outcomes'],
+    responsible: 'Curriculum Manager',
+    deliverables:['Overall learning outcomes document','Course-level learning outcomes','Industry approval'],
     docs:[]
   },
   {
-    num:'5', title:'Project delivery',
+    num:'6', title:'Course Development',
+    phase: 1,
     badge:{label:'Build', bg:'#d1fae5', color:'#065f46'},
-    intro:'Execute all project activities and finalise the overall study plan. This is the main production phase — workshops with industry partners, creating course overviews and learning outcomes.',
-    roles:['Project Manager','Project group','Industry partners','Pedagogic advisor'],
-    activities:['Workshop 1: program scope and outcomes','Workshop 2: course structure and design','Create course overview','Develop overall program learning outcomes','Collect approval from industry partners'],
-    deliverables:['Overall study plan ready for quality assurance'],
+    intro:'Finalise the study plan and develop the full learning design — topics, learning activities, assessments, and tools for each course.',
+    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Learning Designer'],
+    activities:['Finalise course descriptions and study plan','Define topics and learning activities (LAA)','Design assessments','Specify tools and software requirements'],
+    responsible: 'Curriculum Manager',
+    deliverables:['Completed study plan','Learning design document','Course descriptions'],
     docs:[]
   },
   {
-    num:'6', title:'Quality assurance & course development',
-    badge:{label:'Parallel', bg:'#ffedd5', color:'#9a3412'},
-    intro:'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development finalises the study plan and learning design.',
+    num:'7', title:'Quality Assurance',
+    phase: 1,
+    badge:{label:'QA', bg:'#ffedd5', color:'#9a3412'},
+    intro:'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development is finalised. Reference group gives feedback.',
     roles:['Reference group','Head of Development','Course developers','Pedagogic advisor','Academic responsible (faglig ansvarlig)'],
-    activities:['QA: review program name, outcomes, industry integration','QA: reference group feedback and adjustments','Course dev: finalise learning outcomes and course descriptions','Course dev: finalise topics, learning activities (LAA), assessments'],
-    deliverables:['Study plan and learning design document ready for content development'],
+    activities:['QA: review program name, outcomes, industry integration','Reference group feedback and adjustments','Finalise requirement specs for academic staff','Sign off on study plan and learning design'],
+    responsible: 'Head of Development',
+    deliverables:['QA sign-off','Study plan and learning design ready for content development'],
     docs:[],
     parallel:true
   },
   {
-    num:'7', title:'LOKUT / NOKUT application',
+    num:'8', title:'LOKUT / NOKUT Application',
+    phase: 2,
     badge:{label:'Accreditation', bg:'#fce7f3', color:'#9d174d'},
     intro:'Assess the study plan in accordance with laws and regulations. Write a recommendation to the vocational school board, then submit the formal application to NOKUT.',
     roles:['Head of Development','Academic responsible','Legal/compliance advisor'],
     activities:['Assess study plan against laws and regulations','Write recommendation to vocational school board','Submit application to NOKUT'],
+    responsible: 'Head of Development',
     deliverables:['Vocational school board makes final decision on accreditation'],
     docs:[
       {icon:'ti-external-link', label:'NOKUT portal', sub:'External · nokut.no', href:'https://www.nokut.no'},
@@ -357,27 +429,80 @@ let cur = 0;
 
 function render() {
   const s = steps[cur];
-  document.getElementById('step-counter').textContent = `Step ${s.num} of 7`;
+  const ph = phases[s.phase];
+  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${s.num} of 8`;
   document.getElementById('step-title').textContent = s.title;
   document.getElementById('step-intro').textContent = s.intro;
   document.getElementById('step-badge').innerHTML = `<span class="pill" style="background:${s.badge.bg};color:${s.badge.color}">${s.badge.label}</span>`;
-  document.getElementById('step-roles').innerHTML = s.roles.map(r=>`<span class="role-chip"><i class="ti ti-user" style="font-size:11px"></i>${r}</span>`).join('');
+  document.getElementById('step-roles').innerHTML = `<span style="font-size:13px;color:#555;line-height:1.8">${s.roles.join(', ')}</span>`;
   document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
+  const respEl = document.getElementById('step-responsible');
+  if (respEl) {
+    if (s.responsible) {
+      respEl.innerHTML = `<span style="font-size:13px;color:#555">${s.responsible}</span><span style="font-size:10px;color:#aaa;font-style:italic;margin-left:6px">from project plan</span>`;
+      respEl.parentElement.style.display = 'block';
+    } else {
+      respEl.parentElement.style.display = 'none';
+    }
+  }
   document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
   document.getElementById('step-docs').innerHTML = s.docs.map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon} doc-icon"></i><div><div class="doc-label">${d.label}</div><div class="doc-sub">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:#ccc"></i></a>`).join('');
   document.getElementById('miro-section').style.display = s.miro ? 'block' : 'none';
+  if (s.miro && s.num === '6') { document.querySelector('.miro-title').textContent = 'Open workshop board in Miro'; document.querySelector('.miro-sub').textContent = 'Industry partner workshop workspace'; } else if (s.miro) { document.querySelector('.miro-title').textContent = 'Open ideation board in Miro'; document.querySelector('.miro-sub').textContent = 'Strategy & idea development workspace'; }
   document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
   document.getElementById('mandate-tool-section').style.display = s.mandateTool ? 'block' : 'none';
+  document.getElementById('plan-tool-section').style.display = s.planTool ? 'block' : 'none';
+  if (s.planTool) {
+    const pnote = document.getElementById('plan-mandate-note');
+    if (pnote) {
+      if (generatedMandate) {
+        pnote.style.background = '#f0fdf4'; pnote.style.borderColor = '#86efac'; pnote.style.color = '#166534';
+        pnote.textContent = 'Mandate from Step 2 is ready -- click to generate the project plan.';
+      } else {
+        pnote.style.background = '#eff6ff'; pnote.style.borderColor = '#bfdbfe'; pnote.style.color = '#1e40af';
+        pnote.textContent = 'Uses the mandate generated in Step 2. Make sure you have run the mandate generator first.';
+      }
+    }
+  }
   document.getElementById('parallel-section').style.display = s.parallel ? 'block' : 'none';
   document.getElementById('btn-prev').disabled = cur === 0;
   document.getElementById('btn-next').disabled = cur === steps.length - 1;
   document.getElementById('pip-bar').innerHTML = steps.map((_,i)=>`<button class="pip${i===cur?' active':''}" onclick="goto(${i})" aria-label="Step ${i+1}"></button>`).join('');
-  document.getElementById('dots-bar').innerHTML = steps.map((st,i)=>{
-    const isLast = i===steps.length-1;
-    const active = i===cur, done = i<cur;
-    const bg = active ? '#D85A30' : done ? '#5DCAA5' : '#d0d0d0';
-    return `<div class="dot-item"><div class="dot-inner" onclick="goto(${i})"><div class="dot-circle${active?' active':done?' done':''}"></div><span class="dot-label${active?' active':''}">${st.title.split(' ')[0]}</span></div>${!isLast?'<div class="dot-line"></div>':''}</div>`;
-  }).join('');
+  // Phase bar + stepper
+  const phaseColors = ['#D85A30','#1D9E75','#9d174d'];
+  const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
+
+  // Phase bar — show Phase 1/2/3 number + name
+  let phaseHTML = '<div style="display:flex;gap:4px;margin-bottom:8px">';
+  phases.forEach((ph, pi) => {
+    const isActive = ph.steps.includes(cur);
+    const isDone = ph.steps.every(s => s < cur);
+    const bg = isActive ? phaseColors[pi] : isDone ? '#5DCAA5' : '#efefef';
+    const textColor = (isActive || isDone) ? '#fff' : '#aaa';
+    const border = (isActive || isDone) ? 'none' : '1px solid #e0e0e0';
+    phaseHTML += `<div style="flex:${ph.steps.length};background:${bg};color:${textColor};border:${border};border-radius:6px;padding:5px 8px;text-align:center;cursor:pointer" onclick="goto(${ph.steps[0]})">
+      <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.8">${ph.num}</div>
+      <div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ph.label}</div>
+    </div>`;
+  });
+  phaseHTML += '</div>';
+
+  // Stepper dots
+  let dotsHTML = '<div style="display:flex;align-items:center;margin-bottom:20px">';
+  steps.forEach((st, i) => {
+    const isLast = i === steps.length - 1;
+    const active = i === cur, done = i < cur;
+    const phColor = phaseColors[st.phase];
+    const dotBg = active ? phColor : done ? '#5DCAA5' : '#d0d0d0';
+    const labelColor = active ? phColor : '#999';
+    dotsHTML += `<div class="dot-item"><div class="dot-inner" onclick="goto(${i})">`;
+    dotsHTML += `<div class="dot-circle" style="background:${dotBg}"></div>`;
+    dotsHTML += `<span class="dot-label" style="color:${labelColor};font-weight:${active?'600':'400'}">${shortLabels[i]}</span>`;
+    dotsHTML += `</div>${!isLast ? '<div class="dot-line"></div>' : ''}</div>`;
+  });
+  dotsHTML += '</div>';
+
+  document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
   // Update mandate note
   if (s.mandateTool) {
     const note = document.getElementById('mandate-summary-note');
@@ -537,6 +662,7 @@ Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
     const editor = document.getElementById('mandate-editor');
     const cleanHTML = mandateHTML.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
     editor.innerHTML = cleanHTML;
+    generatedMandate = cleanHTML;
     document.getElementById('mandate-doc-section').classList.add('visible');
     document.getElementById('mandate-run-btn').style.display = 'none';
     document.getElementById('mandate-summary-note').style.display = 'none';
@@ -548,6 +674,84 @@ Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
   }
   statusEl.classList.remove('visible');
   btn.disabled = false;
+}
+
+async function runPlan() {
+  const programName = document.getElementById('p-program-name').value.trim() || 'New Program';
+  const errEl = document.getElementById('plan-error');
+  const statusEl = document.getElementById('plan-status');
+  const btn = document.getElementById('plan-run-btn');
+  errEl.classList.remove('visible');
+  if (!generatedMandate && !generatedSummary) {
+    errEl.textContent = 'No mandate found. Please run the mandate generator in Step 2 first.';
+    errEl.classList.add('visible'); return;
+  }
+  btn.disabled = true;
+  statusEl.classList.add('visible');
+  try {
+    const today = new Date().toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'});
+    const src = (generatedMandate || generatedSummary).replace(/<[^>]*>/g,'').substring(0,2000);
+    const prompt = `Generate a complete Project Plan HTML document for Noroff (Norwegian vocational college).
+PROGRAM: ${programName}
+TODAY: ${today}
+SOURCE (from mandate): ${src}
+Create a project plan with these sections:
+1. Cover: program name, project manager placeholder, date
+2. Project team and roles table (Name, Role, Responsibilities) with standard Noroff roles
+3. Timeline overview table: Milestone, Deadline, Status - covering all 8 process steps
+4. Status points: one section per milestone with activities, deadlines, responsible person
+Style: Arial font, tables border-collapse:collapse, th background #D5E8F0, borders 1px solid #ccc, padding 8px.
+Mark human input fields: <span style="color:#CC0000;font-style:italic">[TO BE FILLED IN]</span>
+Output ONLY HTML body content, no DOCTYPE or html/head/body tags.`;
+    const planHTML = await callAI(prompt, 3000);
+    const clean = planHTML.replace(/^```html\s*/i,'').replace(/```\s*$/i,'').trim();
+    const editor = document.getElementById('plan-editor');
+    editor.innerHTML = clean;
+    document.getElementById('plan-doc-section').classList.add('visible');
+    document.getElementById('plan-run-btn').style.display = 'none';
+    document.getElementById('plan-mandate-note').style.display = 'none';
+    editor.scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+}
+
+function downloadPlan() {
+  const programName = document.getElementById('p-program-name').value.trim() || 'Project_Plan';
+  const editor = document.getElementById('plan-editor');
+  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#0F6E56;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px 10px;text-align:left;border:1px solid #aaa;font-size:12px}td{padding:7px 10px;border:1px solid #ccc;vertical-align:top;font-size:12px}ul{padding-left:20px}li{margin-bottom:4px}p{margin:6px 0 10px;line-height:1.6}</style></head><body>${editor.innerHTML}</body></html>`;
+  const blob = new Blob([fullHTML],{type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = programName.replace(/\s+/g,'_')+'_Plan.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function addPlanToDocuments() {
+  const programName = document.getElementById('p-program-name').value.trim() || 'Project Plan';
+  const editor = document.getElementById('plan-editor');
+  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:900px;margin:40px auto;padding:0 20px}h1{color:#1F3864;font-size:22px;margin:24px 0 8px;border-bottom:2px solid #1F3864;padding-bottom:6px}h2{color:#0F6E56;font-size:16px;margin:18px 0 6px}table{width:100%;border-collapse:collapse;margin:12px 0}th{background:#D5E8F0;padding:8px;border:1px solid #aaa}td{padding:7px 8px;border:1px solid #ccc;vertical-align:top}</style></head><body>${editor.innerHTML}</body></html>`;
+  const blob = new Blob([fullHTML],{type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const today = new Date().toLocaleDateString('en-GB');
+  const container = document.getElementById('generated-docs');
+  const existing = container.querySelector('[data-name="plan"]');
+  if (existing) existing.remove();
+  const card = document.createElement('div');
+  card.className = 'generated-doc-card';
+  card.setAttribute('data-name','plan');
+  card.innerHTML = `<i class="ti ti-calendar-stats generated-doc-icon" style="color:#0F6E56"></i><div style="flex:1"><div class="generated-doc-label">${programName} -- Project Plan</div><div class="generated-doc-sub" style="color:#0F6E56">Generated ${today} - Draft</div></div><button class="generated-doc-download" style="border-color:#0F6E56;color:#0F6E56" onclick="event.stopPropagation();downloadFromCard('${url}','${programName}_Plan')">Download</button>`;
+  card.onclick = () => {
+    const sec = document.getElementById('plan-doc-section');
+    sec.classList.toggle('visible');
+    if (sec.classList.contains('visible')) document.getElementById('plan-editor').scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  document.getElementById('plan-doc-section').classList.remove('visible');
+  container.appendChild(card);
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function downloadMandate() {
