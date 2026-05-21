@@ -12,6 +12,13 @@
   .page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
   .page-header h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
   .page-header p { font-size: 13px; color: #666; margin: 0; }
+  .program-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 8px; margin-bottom: 20px; }
+  .program-bar-label { font-size: 11px; font-weight: 600; color: #555; white-space: nowrap; text-transform: uppercase; letter-spacing: .05em; }
+  .program-select { flex: 1; font-size: 13px; padding: 5px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; color: #1a1a1a; outline: none; }
+  .program-select:focus { border-color: #D85A30; }
+  .program-new-btn { font-size: 12px; padding: 5px 12px; border: 1px solid #D85A30; border-radius: 6px; background: transparent; color: #D85A30; cursor: pointer; white-space: nowrap; }
+  .program-new-btn:hover { background: #fdf6f3; }
+  .program-status { font-size: 11px; color: #aaa; white-space: nowrap; }
   .dots-bar { display: block; margin-bottom: 0; }
   .dot-item { display: flex; align-items: center; flex: 1; }
   .dot-item:last-child { flex: 0; }
@@ -144,6 +151,15 @@
   <div class="page-header">
     <h1>Development process for new programs</h1>
     <p>Step-by-step guide from strategy to NOKUT accreditation — including tools, documents and templates for each phase.</p>
+  </div>
+
+  <div class="program-bar">
+    <span class="program-bar-label">Active program</span>
+    <select class="program-select" id="program-select" onchange="switchProgram()">
+      <option value="">— Select or create a program —</option>
+    </select>
+    <button class="program-new-btn" onclick="newProgram()">+ New program</button>
+    <span class="program-status" id="program-status"></span>
   </div>
 
   <div class="dots-bar" id="dots-bar"></div>
@@ -326,6 +342,173 @@
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
 let generatedSummary = '';
 let generatedMandate = '';
+let currentProgramId = null;
+let programs = {};
+
+const STORAGE_KEY = 'noroff_programs';
+
+async function loadPrograms() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true).catch(() => null);
+    programs = result ? JSON.parse(result.value) : {};
+  } catch(e) { programs = {}; }
+  updateProgramSelector();
+}
+
+async function savePrograms() {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify(programs), true);
+  } catch(e) { console.error('Storage error:', e); }
+}
+
+function updateProgramSelector() {
+  const sel = document.getElementById('program-select');
+  const keys = Object.keys(programs);
+  sel.innerHTML = '<option value="">— Select or create a program —</option>' +
+    keys.map(k => `<option value="${k}" ${k===currentProgramId?'selected':''}>${programs[k].name}</option>`).join('');
+  updateProgramStatus();
+}
+
+function updateProgramStatus() {
+  const el = document.getElementById('program-status');
+  if (!currentProgramId || !programs[currentProgramId]) { el.textContent = ''; return; }
+  const p = programs[currentProgramId];
+  const count = [p.summary, p.mandate, p.plan].filter(Boolean).length;
+  el.textContent = count + ' document' + (count!==1?'s':'') + ' saved';
+}
+
+function newProgram() {
+  const name = prompt('Program name:', 'e.g. Film Production — Online Studies');
+  if (!name || !name.trim()) return;
+  const id = 'prog_' + Date.now();
+  programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'' };
+  currentProgramId = id;
+  savePrograms();
+  updateProgramSelector();
+  clearDocuments();
+  document.getElementById('program-status').textContent = 'New program created';
+}
+
+function switchProgram() {
+  const sel = document.getElementById('program-select');
+  currentProgramId = sel.value || null;
+  if (!currentProgramId) { clearDocuments(); return; }
+  restoreDocuments();
+  updateProgramStatus();
+}
+
+function clearDocuments() {
+  generatedSummary = '';
+  generatedMandate = '';
+  const se = document.getElementById('summary-editor');
+  if (se) se.innerHTML = '';
+  const sds = document.getElementById('summary-doc-section');
+  if (sds) sds.classList.remove('visible');
+  const me = document.getElementById('mandate-editor');
+  if (me) me.innerHTML = '';
+  const mds = document.getElementById('mandate-doc-section');
+  if (mds) mds.classList.remove('visible');
+  const pe = document.getElementById('plan-editor');
+  if (pe) pe.innerHTML = '';
+  const pds = document.getElementById('plan-doc-section');
+  if (pds) pds.classList.remove('visible');
+  document.getElementById('mandate-run-btn') && (document.getElementById('mandate-run-btn').style.display = '');
+  document.getElementById('plan-run-btn') && (document.getElementById('plan-run-btn').style.display = '');
+  document.getElementById('generated-docs').innerHTML = '';
+}
+
+function restoreDocuments() {
+  if (!currentProgramId || !programs[currentProgramId]) return;
+  const p = programs[currentProgramId];
+
+  if (p.summary) {
+    generatedSummary = p.summary;
+    const editor = document.getElementById('summary-editor');
+    if (editor) {
+      editor.innerHTML = p.summary;
+      document.getElementById('summary-doc-section').classList.add('visible');
+    autosaveDocument('summary', editor.innerHTML);
+    }
+  }
+
+  if (p.mandate) {
+    generatedMandate = p.mandate;
+    const editor = document.getElementById('mandate-editor');
+    if (editor) {
+      editor.innerHTML = p.mandate;
+      document.getElementById('mandate-doc-section').classList.add('visible');
+      document.getElementById('mandate-run-btn').style.display = 'none';
+      document.getElementById('mandate-summary-note').style.display = 'none';
+    }
+  }
+
+  if (p.plan) {
+    const editor = document.getElementById('plan-editor');
+    if (editor) {
+      editor.innerHTML = p.plan;
+      document.getElementById('plan-doc-section').classList.add('visible');
+      document.getElementById('plan-run-btn').style.display = 'none';
+      document.getElementById('plan-mandate-note').style.display = 'none';
+    }
+  }
+
+  rebuildDocCards(p);
+  updateProgramStatus();
+  render();
+}
+
+function rebuildDocCards(p) {
+  const container = document.getElementById('generated-docs');
+  container.innerHTML = '';
+  const today = new Date().toLocaleDateString('en-GB');
+
+  if (p.summary) {
+    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Program Summary</title></head><body>${p.summary}</body></html>`],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const card = document.createElement('div');
+    card.className = 'generated-doc-card';
+    card.setAttribute('data-name','summary');
+    card.innerHTML = `<i class="ti ti-file-description generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Program Summary</div><div class="generated-doc-sub" style="color:#888">Saved · Draft summary</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Program_Summary')">Download</button>`;
+    card.onclick = () => { const sec = document.getElementById('summary-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('summary-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
+    container.appendChild(card);
+  }
+
+  if (p.mandate) {
+    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title></head><body>${p.mandate}</body></html>`],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const card = document.createElement('div');
+    card.className = 'generated-doc-card';
+    card.setAttribute('data-name','mandate');
+    card.innerHTML = `<i class="ti ti-file-text generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Project Mandate</div><div class="generated-doc-sub" style="color:#888">Saved · Draft mandate</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Project_Mandate')">Download</button>`;
+    card.onclick = () => { const sec = document.getElementById('mandate-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
+    container.appendChild(card);
+  }
+
+  if (p.plan) {
+    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title></head><body>${p.plan}</body></html>`],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const card = document.createElement('div');
+    card.className = 'generated-doc-card';
+    card.setAttribute('data-name','plan');
+    card.innerHTML = `<i class="ti ti-calendar-stats generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Project Plan</div><div class="generated-doc-sub" style="color:#888">Saved · Draft plan</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Project_Plan')">Download</button>`;
+    card.onclick = () => { const sec = document.getElementById('plan-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('plan-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
+    container.appendChild(card);
+  }
+}
+
+async function autosaveDocument(type, content) {
+  if (!currentProgramId) {
+    const name = prompt('Name this program to save documents:', 'e.g. Film Production — Online Studies');
+    if (!name || !name.trim()) return;
+    const id = 'prog_' + Date.now();
+    programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'' };
+    currentProgramId = id;
+    updateProgramSelector();
+  }
+  programs[currentProgramId][type] = content;
+  await savePrograms();
+  updateProgramStatus();
+}
 
 const phases = [
   { label: 'Strategy & Planning', num: 'Phase 1', steps: [0,1,2], color: '#D85A30' },
@@ -607,6 +790,7 @@ async function runSummary() {
     const summary = await callAI(`You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n${boardContent}\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section, missing info as "To be determined".`);
 
     generatedSummary = summary;
+    autosaveDocument('summary', document.getElementById('summary-editor').innerHTML || summary);
     const out = document.getElementById('summary-output');
     let html = summary.replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^\*\*(.+)\*\*$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
     out.innerHTML = '<p>' + html + '</p>';
@@ -677,6 +861,7 @@ Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
     const cleanHTML = mandateHTML.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
     editor.innerHTML = cleanHTML;
     generatedMandate = cleanHTML;
+    autosaveDocument('mandate', cleanHTML);
     document.getElementById('mandate-doc-section').classList.add('visible');
     document.getElementById('mandate-run-btn').style.display = 'none';
     document.getElementById('mandate-summary-note').style.display = 'none';
@@ -721,6 +906,7 @@ Output ONLY HTML body content, no DOCTYPE or html/head/body tags.`;
     const clean = planHTML.replace(/^```html\s*/i,'').replace(/```\s*$/i,'').trim();
     const editor = document.getElementById('plan-editor');
     editor.innerHTML = clean;
+    autosaveDocument('plan', clean);
     document.getElementById('plan-doc-section').classList.add('visible');
     document.getElementById('plan-run-btn').style.display = 'none';
     document.getElementById('plan-mandate-note').style.display = 'none';
@@ -910,7 +1096,7 @@ async function saveToDashboard() {
   }
 }
 
-render();
+loadPrograms().then(() => render());
 </script>
 </body>
 </html>
