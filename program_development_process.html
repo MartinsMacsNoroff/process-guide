@@ -277,6 +277,7 @@
             <div class="mandate-doc-actions">
               <button class="mandate-action-btn" onclick="downloadPlan()">Download .html</button>
               <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addPlanToDocuments()">Add to Documents</button>
+              <button class="mandate-action-btn primary" style="background:#1a1a1a;border-color:#1a1a1a" onclick="saveToDashboard()">Save to dashboard</button>
             </div>
           </div>
           <div class="mandate-editor" id="plan-editor" contenteditable="true" style="border-color:#D85A30"></div>
@@ -850,6 +851,63 @@ function downloadFromCard(url, name) {
   a.href = url;
   a.download = name.replace(/\s+/g,'_') + '_Mandate.html';
   a.click();
+}
+
+async function saveToDashboard() {
+  const programName = document.getElementById('p-program-name').value.trim() || 'Unnamed Program';
+  const editor = document.getElementById('plan-editor');
+  if (!editor || !editor.innerHTML.trim()) {
+    alert('Please generate a project plan first.');
+    return;
+  }
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const projectId = 'proj_' + Date.now();
+    const today = new Date().toISOString().split('T')[0];
+
+    const projectData = {
+      id: projectId,
+      name: programName,
+      created: today,
+      currentStep: 3,
+      status: 'on-track',
+      owner: '[TO BE FILLED IN]',
+      deadline: '[TO BE FILLED IN]',
+      summary: generatedSummary ? generatedSummary.replace(/<[^>]*>/g,'').substring(0, 300) : '',
+      milestones: [
+        {name:'Strategy & ideation', done:true, date:'', owner:''},
+        {name:'Project mandate', done:true, date:'', owner:''},
+        {name:'Project plan', done:true, date:'', owner:''},
+        {name:'Industry workshops', done:false, active:true, date:'', owner:''},
+        {name:'Learning outcomes', done:false, date:'', owner:''},
+        {name:'Course development', done:false, date:'', owner:''},
+        {name:'Quality assurance', done:false, date:'', owner:''},
+        {name:'LOKUT application', done:false, date:'', owner:''},
+      ]
+    };
+
+    const existing = await window.storage.get('dashboard_projects').catch(() => null);
+    const projects = existing ? JSON.parse(existing.value) : [];
+    projects.push(projectData);
+    await window.storage.set('dashboard_projects', JSON.stringify(projects), true);
+
+    btn.textContent = 'Saved to dashboard!';
+    btn.style.background = '#2d6a2d';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Save to dashboard';
+      btn.style.background = '#1a1a1a';
+    }, 3000);
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = 'Save to dashboard';
+    alert('Could not save: ' + err.message);
+  }
 }
 
 render();
