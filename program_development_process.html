@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Program development process</title>
+<title>Noroff — Program development</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
@@ -144,23 +144,135 @@
     .container { padding: 20px 16px; }
     .two-col, .parallel-grid { grid-template-columns: 1fr; }
   }
+  /* ===== DASHBOARD VIEW ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .dash-wrap { max-width: 900px; margin: 0 auto; padding: 0; }
+  .dash-topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 16px; border-bottom: 1px solid #2a2a2a; margin-bottom: 20px; }
+  .dash-title { font-size: 17px; font-weight: 600; color: #f4f1eb; }
+  .dash-badge { font-size: 10px; padding: 2px 9px; border-radius: 10px; background: #D85A30; color: #fff; font-weight: 500; margin-left: 8px; }
+  .dash-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 24px; }
+  .dash-stat { background: #f4f1eb; border: 1px solid #e8e2d8; border-radius: 10px; padding: 16px 18px; }
+  .dash-stat-label { font-size: 10px; color: #5F5E5A; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; }
+  .dash-stat-value { font-size: 26px; font-weight: 600; color: #1a1814; }
+  .dash-stat-sub { font-size: 10px; color: #5F5E5A; margin-top: 3px; }
+  .dash-stat-accent { color: #D85A30; }
+  .dash-sec-label { font-size: 10px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .dash-new-btn { display: flex; align-items: center; gap: 8px; padding: 12px 18px; background: #D85A30; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 16px; font-family: inherit; transition: background .15s; }
+  .dash-new-btn:hover { background: #c04d24; }
+  .dash-prog-card { background: #f4f1eb; border: 1px solid #e8e2d8; border-radius: 12px; margin-bottom: 10px; overflow: hidden; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .dash-prog-card:hover { border-color: #D85A30; box-shadow: 0 2px 12px rgba(216,90,48,.1); }
+  .dash-prog-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; }
+  .dash-prog-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .dash-prog-name { font-size: 14px; font-weight: 600; color: #1a1814; flex: 1; }
+  .dash-prog-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .dash-prog-owner { font-size: 11px; color: #888; white-space: nowrap; }
+  .dash-prog-pct { font-size: 13px; font-weight: 600; color: #D85A30; min-width: 36px; text-align: right; }
+  .dash-prog-wrap { padding: 0 18px 14px; }
+  .dash-prog-track { height: 5px; border-radius: 3px; display: flex; gap: 2px; background: #e8e2d8; overflow: hidden; }
+  .dash-prog-seg { height: 100%; border-radius: 2px; }
+  .dash-prog-foot { display: flex; justify-content: space-between; margin-top:6px; }
+  .dash-prog-foot span { font-size: 10px; color: #888; }
+  .dash-open-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 12px; border: 1px solid #D85A30; border-radius: 6px; color: #D85A30; background: transparent; cursor: pointer; margin: 0 18px 14px; font-family: inherit; }
+  .dash-open-btn:hover { background: #fdf6f3; }
+  .dash-empty { background: #242424; border: 1px dashed #333; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 10px; }
+  .dash-empty p { color: #666; font-size: 13px; line-height: 1.8; }
+  .dash-empty strong { color: #aaa; }
+  .dash-getting-started { background: #242424; border: 1px solid #2a2a2a; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+  .dash-gs-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; }
+  .dash-gs-header:hover { background: #2a2a2a; }
+  .dash-gs-title { font-size: 13px; font-weight: 500; color: #f4f1eb; display: flex; align-items: center; gap: 8px; }
+  .dash-gs-chev { font-size: 14px; color: #666; transition: transform .2s; }
+  .dash-gs-chev.open { transform: rotate(180deg); }
+  .dash-gs-body { display: none; padding: 0 16px 16px; }
+  .dash-gs-body.open { display: block; }
+  .dash-gs-step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2a2a; }
+  .dash-gs-step:last-child { border-bottom: none; }
+  .dash-gs-num { width: 22px; height: 22px; border-radius: 50%; background: #D85A30; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dash-gs-text { font-size: 12px; color: #aaa; line-height: 1.6; }
+  .dash-gs-text strong { color: #f4f1eb; }
+
+  /* ===== GUIDE VIEW - back btn ===== */
+  .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
+  .back-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; background: transparent; border: 1px solid #e0e0e0; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-family: inherit; }
+  .back-btn:hover { border-color: #D85A30; color: #D85A30; }
+  .guide-prog-name { font-size: 14px; font-weight: 600; color: #1a1814; }
+
+  /* ===== STEP INSTRUCTIONS ===== */
+  .step-instruction { border: 1px solid #e8e8e8; border-radius: 7px; margin-bottom: 14px; overflow: hidden; }
+  .step-instruction-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; background: #fafafa; }
+  .step-instruction-header:hover { background: #f5f5f5; }
+  .step-instruction-title { font-size: 11px; font-weight: 600; color: #555; display: flex; align-items: center; gap: 6px; }
+  .step-instruction-chev { font-size: 12px; color: #bbb; transition: transform .2s; }
+  .step-instruction-chev.open { transform: rotate(180deg); }
+  .step-instruction-body { display: none; padding: 10px 12px; font-size: 12px; color: #555; line-height: 1.7; background: #fff; border-top: 1px solid #f0f0f0; }
+  .step-instruction-body.open { display: block; }
 </style>
 </head>
 <body>
+
+<!-- ===== DASHBOARD VIEW ===== -->
+<div id="view-dashboard" class="view active">
+  <div class="dash-wrap">
+
+    <div class="dash-topbar">
+      <div>
+        <span class="dash-title">Program development</span>
+        <span class="dash-badge">Noroff Vocational College</span>
+      </div>
+      <span style="font-size:11px;color:#555" id="dash-updated"></span>
+    </div>
+
+    <div class="dash-stats">
+      <div class="dash-stat"><div class="dash-stat-label">Active programs</div><div class="dash-stat-value" id="ds-active">0</div><div class="dash-stat-sub" id="ds-active-sub">No programs yet</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">Completed</div><div class="dash-stat-value" id="ds-done">0</div><div class="dash-stat-sub">NOKUT submitted</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">At risk</div><div class="dash-stat-value dash-stat-accent" id="ds-risk">0</div><div class="dash-stat-sub">Needs attention</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">Total programs</div><div class="dash-stat-value" id="ds-total">0</div><div class="dash-stat-sub">In portfolio</div></div>
+    </div>
+
+    <div class="dash-getting-started" id="dash-gs">
+      <div class="dash-gs-header" onclick="toggleGS()">
+        <span class="dash-gs-title"><i class="ti ti-info-circle" style="font-size:15px;color:#D85A30" aria-hidden="true"></i> How to use this tool</span>
+        <i class="ti ti-chevron-down dash-gs-chev" id="gs-chev" aria-hidden="true"></i>
+      </div>
+      <div class="dash-gs-body" id="gs-body">
+        <div class="dash-gs-step"><div class="dash-gs-num">1</div><div class="dash-gs-text"><strong>Create a new program</strong> — click the button below to start a new study program development project. Give it a name.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">2</div><div class="dash-gs-text"><strong>Work through the 8 steps</strong> — each step guides you through the process with key activities, who's involved, and AI tools to generate documents automatically.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">3</div><div class="dash-gs-text"><strong>Generate documents with AI</strong> — Step 1 generates a program summary from Miro. Step 2 generates the project mandate. Step 3 generates the project plan. Each builds on the previous.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">4</div><div class="dash-gs-text"><strong>All documents are saved</strong> — documents survive tab switches and are stored per program. Come back any time and continue where you left off.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">5</div><div class="dash-gs-text"><strong>Track progress here</strong> — this dashboard shows all programs, their current phase, completion percentage, and status. Your manager can see everything from here.</div></div>
+      </div>
+    </div>
+
+    <button class="dash-new-btn" onclick="dashNewProgram()">
+      <i class="ti ti-plus" style="font-size:16px" aria-hidden="true"></i> Create new program
+    </button>
+
+    <div class="dash-sec-label">Active programs</div>
+    <div id="dash-active"></div>
+
+    <div class="dash-sec-label" style="margin-top:20px">Completed</div>
+    <div id="dash-done"></div>
+
+  </div>
+</div>
+
+<!-- ===== GUIDE VIEW ===== -->
+<div id="view-guide" class="view">
 <div class="container">
+  <div class="back-bar">
+    <button class="back-btn" onclick="showDashboard()">
+      <i class="ti ti-arrow-left" style="font-size:13px" aria-hidden="true"></i> Dashboard
+    </button>
+    <span class="guide-prog-name" id="guide-prog-name"></span>
+  </div>
   <div class="page-header">
     <h1>Development process for new programs</h1>
     <p>Step-by-step guide from strategy to NOKUT accreditation — including tools, documents and templates for each phase.</p>
   </div>
 
-  <div class="program-bar">
-    <span class="program-bar-label">Active program</span>
-    <select class="program-select" id="program-select" onchange="switchProgram()">
-      <option value="">— Select or create a program —</option>
-    </select>
-    <button class="program-new-btn" onclick="newProgram()">+ New program</button>
-    <span class="program-status" id="program-status"></span>
-  </div>
+
 
   <div class="dots-bar" id="dots-bar"></div>
 
@@ -170,6 +282,14 @@
 
   <h2 class="step-title" id="step-title"></h2>
   <p class="step-intro" id="step-intro"></p>
+
+  <div class="step-instruction">
+    <div class="step-instruction-header" onclick="toggleInstruction()">
+      <span class="step-instruction-title"><i class="ti ti-list-check" style="font-size:13px;color:#D85A30" aria-hidden="true"></i> Your task at this step</span>
+      <i class="ti ti-chevron-down step-instruction-chev" id="step-instruction-chev" aria-hidden="true"></i>
+    </div>
+    <div class="step-instruction-body" id="step-instruction-body"></div>
+  </div>
 
   <div style="margin-bottom:14px">
     <div class="section-label">Key activities</div>
@@ -449,12 +569,125 @@ let programs = {};
 
 const STORAGE_KEY = 'noroff_programs';
 
+function showDashboard() {
+  document.getElementById('view-dashboard').classList.add('active');
+  document.getElementById('view-guide').classList.remove('active');
+  renderDashboard();
+}
+
+function showGuide(programId) {
+  currentProgramId = programId;
+  document.getElementById('view-dashboard').classList.remove('active');
+  document.getElementById('view-guide').classList.add('active');
+  const p = programs[programId];
+  document.getElementById('guide-prog-name').textContent = p ? p.name : '';
+  clearDocuments();
+  restoreDocuments();
+  render();
+}
+
+function dashNewProgram() {
+  const name = prompt('Program name:', 'e.g. Film Production — Online Studies');
+  if (!name || !name.trim()) return;
+  const id = 'prog_' + Date.now();
+  programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'', currentStep:1, status:'on-track' };
+  currentProgramId = id;
+  savePrograms();
+  showGuide(id);
+}
+
+function toggleGS() {
+  const body = document.getElementById('gs-body');
+  const chev = document.getElementById('gs-chev');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function toggleInstruction() {
+  const body = document.getElementById('step-instruction-body');
+  const chev = document.getElementById('step-instruction-chev');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function renderDashboard() {
+  const progs = Object.values(programs);
+  const active = progs.filter(p => p.status !== 'done');
+  const done = progs.filter(p => p.status === 'done');
+  const risk = progs.filter(p => p.status === 'at-risk');
+
+  document.getElementById('ds-active').textContent = active.length;
+  document.getElementById('ds-done').textContent = done.length;
+  document.getElementById('ds-risk').textContent = risk.length;
+  document.getElementById('ds-total').textContent = progs.length;
+  document.getElementById('ds-active-sub').textContent = risk.length > 0 ? risk.length + ' at risk' : active.length > 0 ? 'All on track' : 'No programs yet';
+  document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+
+  const phaseColors = ['#D85A30','#c04d24','#712B13'];
+
+  function renderProgCards(list, containerId) {
+    const el = document.getElementById(containerId);
+    if (!list.length) {
+      el.innerHTML = containerId === 'dash-active'
+        ? '<div class="dash-empty"><p><strong>No active programs yet</strong><br>Click "Create new program" to get started.</p></div>'
+        : '<p style="color:#666;font-size:12px;padding:4px 0">None yet.</p>';
+      return;
+    }
+    el.innerHTML = '';
+    list.forEach(p => {
+      const step = p.currentStep || 1;
+      const pct = Math.round(step / 8 * 100);
+      const statusColor = p.status === 'at-risk' ? '#BA7517' : '#D85A30';
+      const badgeBg = p.status === 'done' ? '#f5f5f5' : p.status === 'at-risk' ? '#FAEEDA' : '#FAECE7';
+      const badgeColor = p.status === 'done' ? '#666' : p.status === 'at-risk' ? '#633806' : '#712B13';
+      const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
+
+      const phaseDefs = [{n:3},{n:4},{n:1}];
+      let segs = phaseDefs.map((ph,pi) => {
+        const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
+        const d = Math.max(0,Math.min(step-start,ph.n));
+        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?phaseColors[pi]:'#e8e2d8'}"></div>`;
+      }).join('');
+
+      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
+      const dots = shortLabels.map((s,i) => {
+        const d = i<step, a = i===step-1;
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:50%;background:${d||a?'#D85A30':'#d0d0d0'};opacity:${!d&&!a?0.3:1}"></div><div style="font-size:8px;color:#bbb">${s.split(' ')[0]}</div></div>`;
+      }).join('');
+
+      const card = document.createElement('div');
+      card.className = 'dash-prog-card';
+      card.innerHTML = `
+        <div class="dash-prog-header">
+          <div class="dash-prog-dot" style="background:${statusColor}"></div>
+          <span class="dash-prog-name">${p.name}</span>
+          <span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor}">${badgeText}</span>
+          <span class="dash-prog-owner"><i class="ti ti-calendar" style="font-size:11px" aria-hidden="true"></i> ${p.created||'—'}</span>
+          <span class="dash-prog-pct">${pct}%</span>
+        </div>
+        <div class="dash-prog-wrap">
+          <div class="dash-prog-track">${segs}</div>
+          <div style="display:flex;margin-top:6px">${dots}</div>
+          <div class="dash-prog-foot"><span>Step ${step} of 8</span><span>${pct}% complete</span></div>
+        </div>
+        <button class="dash-open-btn" onclick="showGuide('${p.id}')">
+          <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i> Open program
+        </button>`;
+      el.appendChild(card);
+    });
+  }
+
+  renderProgCards(active, 'dash-active');
+  renderProgCards(done, 'dash-done');
+}
+
 async function loadPrograms() {
   try {
     const result = await window.storage.get(STORAGE_KEY, true).catch(() => null);
     programs = result ? JSON.parse(result.value) : {};
   } catch(e) { programs = {}; }
   updateProgramSelector();
+  renderDashboard();
 }
 
 async function savePrograms() {
@@ -612,6 +845,17 @@ async function autosaveDocument(type, content) {
   updateProgramStatus();
 }
 
+const stepInstructions = [
+  'Hold a strategy session with your team and capture ideas in Miro. When done, click "Read Miro board" below to generate a structured program summary. This summary becomes the foundation for all later documents.',
+  'Use the program summary to generate a draft Project Mandate. Review it carefully, fill in the red placeholders (names, dates, budget), and get it approved by the Rector before moving on.',
+  'Generate a Project Plan from the mandate. Fill in specific activities, deadlines, and team member names. This plan guides the whole project — make sure it is approved by the Head of Development.',
+  'Run two industry partner workshops using Miro and Teams. Use the tools below to generate a partner brief before each workshop and a summary after. The brief tells partners what to expect. The summary captures what was agreed.',
+  'Draft the overall program learning outcomes and course-level learning outcomes based on the workshop results. Review with industry partners and get their approval before moving on.',
+  'Develop the full study plan and learning design — course descriptions, topics, learning activities, and assessments. This is the core academic content of the program.',
+  'Run quality assurance in parallel with finalising course development. The reference group reviews the program and gives feedback. Both workstreams must be complete before submitting to NOKUT.',
+  'Assess the study plan against laws and regulations. Write a recommendation to the vocational school board and submit the formal application to NOKUT for accreditation.',
+];
+
 const phases = [
   { label: 'Strategy & Planning', num: 'Phase 1', steps: [0,1,2], color: '#D85A30' },
   { label: 'Program Development', num: 'Phase 2', steps: [3,4,5,6], color: '#D85A30' },
@@ -724,6 +968,12 @@ function render() {
   document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${s.num} of 8`;
   document.getElementById('step-title').textContent = s.title;
   document.getElementById('step-intro').textContent = s.intro;
+
+  // Step instruction
+  const instrEl = document.getElementById('step-instruction-body');
+  if (instrEl) instrEl.textContent = stepInstructions[cur] || '';
+  const instrChev = document.getElementById('step-instruction-chev');
+  if (instrChev) { instrChev.classList.remove('open'); instrEl.classList.remove('open'); }
 
   document.getElementById('step-roles').innerHTML = `<span style="font-size:13px;color:#555;line-height:1.8">${s.roles.join(', ')}</span>`;
   document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
@@ -1211,7 +1461,10 @@ async function saveToDashboard() {
   }
 }
 
-loadPrograms().then(() => render());
+loadPrograms().then(() => { renderDashboard(); });
 </script>
+</div><!-- end .container -->
+</div><!-- end #view-guide -->
+
 </body>
 </html>
