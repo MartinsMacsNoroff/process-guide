@@ -18,7 +18,7 @@
   .dot-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
   .dot-circle { width: 11px; height: 11px; border-radius: 50%; background: #d0d0d0; transition: background 0.2s; }
   .dot-circle.active { background: #D85A30; }
-  .dot-circle.done { background: #5DCAA5; }
+  .dot-circle.done { background: #D85A30; }
   .dot-label { font-size: 9px; white-space: nowrap; color: #999; }
   .dot-label.active { color: #D85A30; font-weight: 500; }
   .dot-line { flex: 1; height: 1px; background: #e0e0e0; margin: 0 4px 14px; }
@@ -28,14 +28,16 @@
   .step-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
   .step-intro { font-size: 14px; color: #555; margin: 0 0 18px; line-height: 1.6; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-  .section-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
+  .section-label { font-size: 10px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
 
   .activities { font-size: 12px; color: #555; line-height: 1.7; padding: 0; margin: 0; list-style: none; }
   .activities li::before { content: "· "; color: #D85A30; }
   .deliverable { font-size: 12px; padding: 6px 10px; border-left: 3px solid #D85A30; margin: 4px 0; color: #555; background: #fdf6f3; border-radius: 0 5px 5px 0; }
+  .section-divider { height: 1px; background: #f0f0f0; margin: 14px 0; }
   .miro-section { margin-bottom: 16px; }
-  .miro-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 8px; border: 2px solid #FFD02F; background: #fffbf0; cursor: pointer; text-decoration: none; width: 100%; transition: background 0.15s; }
-  .miro-btn:hover { background: #fff3cc; }
+  .miro-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 8px; border: 1px solid #FFD02F; background: transparent; cursor: pointer; text-decoration: none; width: 100%; transition: background 0.15s; }
+  .miro-btn:hover { background: rgba(255,208,47,0.06); }
+
   .miro-title { font-size: 13px; font-weight: 600; color: #050038; display: block; }
   .miro-sub { font-size: 11px; color: #635e00; display: block; }
   .parallel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; display: inline-block; margin-left: 6px; }
@@ -154,26 +156,30 @@
   <h2 class="step-title" id="step-title"></h2>
   <p class="step-intro" id="step-intro"></p>
 
-  <div style="margin-bottom:16px">
+  <div style="margin-bottom:14px">
     <div class="section-label">Key activities</div>
     <ul class="activities" id="step-activities" style="margin-top:4px"></ul>
   </div>
-  <div style="margin-bottom:12px">
+  <div class="section-divider"></div>
+  <div style="margin-bottom:12px;margin-top:14px">
     <div class="section-label">Who's involved</div>
     <div id="step-roles" style="margin-top:5px"></div>
   </div>
-  <div style="margin-bottom:16px">
+  <div class="section-divider"></div>
+  <div style="margin-bottom:14px;margin-top:14px">
     <div class="section-label">Who's responsible</div>
     <div id="step-responsible" style="margin-top:5px;font-size:12px;color:#1a1a1a"></div>
   </div>
+  <div class="section-divider"></div>
 
   <div id="miro-section" class="miro-section" style="display:none">
     <div class="section-label">Miro board</div>
-    <a class="miro-btn" href="https://miro.com" target="_blank" rel="noopener">
+    <a class="miro-btn" id="miro-open-btn" href="https://miro.com/app/board/uXjVHRH9-Rw=/" target="_blank" rel="noopener">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg>
       <div><span class="miro-title">Open ideation board in Miro</span><span class="miro-sub">Strategy &amp; idea development workspace</span></div>
       <i class="ti ti-external-link" style="font-size:14px;color:#635e00;margin-left:auto"></i>
     </a>
+
   </div>
 
   <!-- EMBEDDED SUMMARY GENERATOR (Step 1) -->
@@ -303,7 +309,7 @@
     <div id="step-deliverables"></div>
   </div>
 
-  <div style="margin-bottom:20px">
+  <div style="margin-bottom:20px;margin-top:14px">
     <div class="section-label">Documents &amp; templates</div>
     <div id="step-docs"></div>
     <div id="generated-docs"></div>
@@ -448,7 +454,15 @@ function render() {
   document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
   document.getElementById('step-docs').innerHTML = s.docs.map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon} doc-icon"></i><div><div class="doc-label">${d.label}</div><div class="doc-sub">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:#ccc"></i></a>`).join('');
   document.getElementById('miro-section').style.display = s.miro ? 'block' : 'none';
-  if (s.miro && s.num === '6') { document.querySelector('.miro-title').textContent = 'Open workshop board in Miro'; document.querySelector('.miro-sub').textContent = 'Industry partner workshop workspace'; } else if (s.miro) { document.querySelector('.miro-title').textContent = 'Open ideation board in Miro'; document.querySelector('.miro-sub').textContent = 'Strategy & idea development workspace'; }
+  if (s.miro && s.num === '6') {
+    document.querySelector('.miro-title').textContent = 'Open workshop board in Miro';
+    document.querySelector('.miro-sub').textContent = 'Industry partner workshop workspace';
+    document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
+  } else if (s.miro) {
+    document.querySelector('.miro-title').textContent = 'Open ideation board in Miro';
+    document.querySelector('.miro-sub').textContent = 'Strategy & idea development workspace';
+    document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
+  }
   document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
   document.getElementById('mandate-tool-section').style.display = s.mandateTool ? 'block' : 'none';
   document.getElementById('plan-tool-section').style.display = s.planTool ? 'block' : 'none';
@@ -469,7 +483,7 @@ function render() {
   document.getElementById('btn-next').disabled = cur === steps.length - 1;
   document.getElementById('pip-bar').innerHTML = steps.map((_,i)=>`<button class="pip${i===cur?' active':''}" onclick="goto(${i})" aria-label="Step ${i+1}"></button>`).join('');
   // Phase bar + stepper
-  const phaseColors = ['#D85A30','#1D9E75','#9d174d'];
+  const phaseColors = ['#D85A30','#D85A30','#D85A30'];
   const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
 
   // Phase bar — show Phase 1/2/3 number + name
@@ -477,7 +491,7 @@ function render() {
   phases.forEach((ph, pi) => {
     const isActive = ph.steps.includes(cur);
     const isDone = ph.steps.every(s => s < cur);
-    const bg = isActive ? phaseColors[pi] : isDone ? '#5DCAA5' : '#efefef';
+    const bg = isActive ? phaseColors[pi] : isDone ? '#D85A30' : '#efefef';
     const textColor = (isActive || isDone) ? '#fff' : '#aaa';
     const border = (isActive || isDone) ? 'none' : '1px solid #e0e0e0';
     phaseHTML += `<div style="flex:${ph.steps.length};background:${bg};color:${textColor};border:${border};border-radius:6px;padding:5px 8px;text-align:center;cursor:pointer" onclick="goto(${ph.steps[0]})">
@@ -493,7 +507,7 @@ function render() {
     const isLast = i === steps.length - 1;
     const active = i === cur, done = i < cur;
     const phColor = phaseColors[st.phase];
-    const dotBg = active ? phColor : done ? '#5DCAA5' : '#d0d0d0';
+    const dotBg = active ? phColor : done ? '#D85A30' : '#d0d0d0';
     const labelColor = active ? phColor : '#999';
     dotsHTML += `<div class="dot-item"><div class="dot-inner" onclick="goto(${i})">`;
     dotsHTML += `<div class="dot-circle" style="background:${dotBg}"></div>`;
