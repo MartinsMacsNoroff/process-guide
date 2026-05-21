@@ -303,6 +303,108 @@
     </div>
   </div>
 
+  <!-- WORKSHOP TOOLS (Step 6) -->
+  <div id="workshop-tool-section" style="display:none">
+
+    <!-- Tool 1: Partner brief -->
+    <div class="section-label">Industry partner brief</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+        <div><div class="tool-header-title">Workshop brief generator</div><div class="tool-header-sub">Generates a short brief to share with industry partners before the workshop</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="mandate-note" id="brief-summary-note">Uses the program summary from Step 1. Make sure you have run the summary generator first.</div>
+        <div class="tool-field">
+          <label class="tool-label">Workshop number</label>
+          <select id="brief-workshop-num" class="tool-input" style="font-family:inherit">
+            <option value="1">Workshop 1 — Program scope and structure</option>
+            <option value="2">Workshop 2 — Course structure and topics</option>
+          </select>
+        </div>
+        <div class="tool-field">
+          <label class="tool-label">Workshop date</label>
+          <input type="text" id="brief-date" class="tool-input" placeholder="e.g. 15 June 2026">
+        </div>
+        <button class="tool-run-btn orange" id="brief-run-btn" onclick="runBrief()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate partner brief
+        </button>
+        <div class="tool-status" id="brief-status"><div class="tool-spinner"></div><span id="brief-status-text">Generating brief...</span></div>
+        <div class="tool-error" id="brief-error"></div>
+        <div class="summary-doc-section" id="brief-doc-section">
+          <div class="mandate-doc-header" style="margin-top:10px">
+            <span class="mandate-doc-title" style="color:#D85A30">Partner brief — editable</span>
+            <div class="mandate-doc-actions">
+              <button class="mandate-action-btn" onclick="downloadBrief()">Download .html</button>
+              <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addBriefToDocuments()">Add to Documents</button>
+            </div>
+          </div>
+          <div class="mandate-editor" id="brief-editor" contenteditable="true"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit before sharing.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool 2: Miro template download -->
+    <div class="section-label" style="margin-top:16px">Miro workshop template</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect width="16" height="16" x="4" y="4" rx="2" fill="#FFD02F"/><path d="M13.5 6h-2l1.5 2.5-2 .5 1.5 4.5 1.5-2.5 1.5 1.5-2-6zM10.5 6l2 5-1.5-1-1.5 4-1.5-4.5-2-.5 1.5-3z" fill="#050038"/></svg>
+        <div><div class="tool-header-title">Miro workshop template</div><div class="tool-header-sub">Download a ready-to-use Miro board template for your workshop</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="mandate-note" style="margin-bottom:10px">Download the template, then import it into Miro via Board menu → Import → Upload backup. The template includes frames for all workshop sections.</div>
+        <div class="tool-field">
+          <label class="tool-label">Workshop number</label>
+          <select id="template-workshop-num" class="tool-input" style="font-family:inherit">
+            <option value="1">Workshop 1 — Program scope and structure</option>
+            <option value="2">Workshop 2 — Course structure and topics</option>
+          </select>
+        </div>
+        <button class="tool-run-btn orange" onclick="downloadMiroTemplate()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Miro template (.rtb)
+        </button>
+      </div>
+    </div>
+
+    <!-- Tool 3: Workshop summary -->
+    <div class="section-label" style="margin-top:16px">Workshop summary</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div><div class="tool-header-title">Miro → Workshop summary</div><div class="tool-header-sub">Reads your workshop Miro board and generates a structured summary</div></div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-field">
+          <label class="tool-label">Workshop number</label>
+          <select id="ws-workshop-num" class="tool-input" style="font-family:inherit">
+            <option value="1">Workshop 1 — Program scope and structure</option>
+            <option value="2">Workshop 2 — Course structure and topics</option>
+          </select>
+        </div>
+        <button class="tool-run-btn orange" id="ws-run-btn" onclick="runWorkshopSummary()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Read Miro board and generate workshop summary
+        </button>
+        <div class="tool-status" id="ws-status"><div class="tool-spinner"></div><span id="ws-status-text">Reading board...</span></div>
+        <div class="tool-error" id="ws-error"></div>
+        <div class="summary-doc-section" id="ws-doc-section">
+          <div class="mandate-doc-header" style="margin-top:10px">
+            <span class="mandate-doc-title" style="color:#D85A30">Workshop summary — editable</span>
+            <div class="mandate-doc-actions">
+              <button class="mandate-action-btn" onclick="downloadWsSummary()">Download .html</button>
+              <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addWsToDocuments()">Add to Documents</button>
+            </div>
+          </div>
+          <div class="mandate-editor" id="ws-editor" contenteditable="true"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit. Review before sharing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="parallel-section" style="display:none;margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
       <div class="section-label" style="margin:0">Parallel tracks</div>
@@ -563,7 +665,7 @@ const steps = [
     responsible: 'Project Manager',
     deliverables:['Course overview table','Industry feedback documented','Workshop meeting minutes'],
     docs:[],
-    miro:true, summaryTool:true
+    miro:true, summaryTool:true, workshopTool:true
   },
   {
     num:'5', title:'Learning Outcomes',
@@ -647,6 +749,19 @@ function render() {
     document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
   }
   document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
+  document.getElementById('workshop-tool-section').style.display = s.workshopTool ? 'block' : 'none';
+  if (s.workshopTool) {
+    const bnote = document.getElementById('brief-summary-note');
+    if (bnote) {
+      if (generatedSummary) {
+        bnote.style.background = '#fdf6f3'; bnote.style.borderColor = '#D85A30'; bnote.style.color = '#8b3a1a';
+        bnote.textContent = 'Program summary from Step 1 is ready — click to generate the partner brief.';
+      } else {
+        bnote.style.background = '#f9f9f9'; bnote.style.borderColor = '#e0e0e0'; bnote.style.color = '#555';
+        bnote.textContent = 'Uses the program summary from Step 1. Make sure you have run the summary generator first.';
+      }
+    }
+  }
   document.getElementById('mandate-tool-section').style.display = s.mandateTool ? 'block' : 'none';
   document.getElementById('plan-tool-section').style.display = s.planTool ? 'block' : 'none';
   if (s.planTool) {
