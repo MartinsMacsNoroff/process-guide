@@ -193,6 +193,30 @@
   .dash-gs-text { font-size: 12px; color: #aaa; line-height: 1.6; }
   .dash-gs-text strong { color: #f4f1eb; }
 
+  /* ===== CREATION MODAL ===== */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: #fff; border-radius: 14px; padding: 28px; width: 100%; max-width: 500px; margin: 20px; }
+  .modal-box h2 { font-size: 16px; font-weight: 600; color: #1a1814; margin-bottom: 4px; }
+  .modal-box p { font-size: 12px; color: #888; margin-bottom: 20px; line-height: 1.5; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-field label { display: block; font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .modal-field input, .modal-field textarea, .modal-field select { width: 100%; padding: 9px 11px; border: 1px solid #e0e0e0; border-radius: 7px; font-size: 13px; font-family: inherit; outline: none; color: #1a1a1a; background: #fafafa; }
+  .modal-field input:focus, .modal-field textarea:focus { border-color: #D85A30; background: #fff; }
+  .modal-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .modal-field .hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .modal-cancel { padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 7px; background: transparent; font-size: 13px; cursor: pointer; font-family: inherit; color: #555; }
+  .modal-submit { padding: 8px 20px; background: #D85A30; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .modal-submit:hover { background: #c04d24; }
+
+  /* ===== STRATEGIC CONTEXT BOX ===== */
+  .strategic-context { background: #fdf6f3; border: 1px solid #f5d0c0; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+  .strategic-context-label { font-size: 10px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .strategic-context-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .strategic-context-key { color: #888; min-width: 110px; flex-shrink: 0; }
+  .strategic-context-val { color: #1a1a1a; line-height: 1.5; }
+
   /* ===== GUIDE VIEW - back btn ===== */
   .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
   .back-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; background: transparent; border: 1px solid #e0e0e0; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-family: inherit; }
@@ -224,14 +248,24 @@
       <span style="font-size:11px;color:#555" id="dash-updated"></span>
     </div>
 
-    <div style="background:#242424;border:1px solid #2a2a2a;border-radius:10px;padding:18px 20px;margin-bottom:20px">
-      <div style="font-size:14px;font-weight:500;color:#f4f1eb;margin-bottom:8px">Welcome to the Study Plan Development dashboard</div>
-      <div style="font-size:12px;color:#888;line-height:1.8">
-        This is your shared workspace for developing new study programs at Noroff Vocational College — from the first strategic idea to NOKUT accreditation.
-        <br><br>
-        Each program follows an 8-step process across three phases: <span style="color:#D85A30;font-weight:500">Strategy &amp; Planning</span>, <span style="color:#D85A30;font-weight:500">Program Development</span>, and <span style="color:#D85A30;font-weight:500">Accreditation</span>. At every step you will find clear guidance, the right people, and AI tools that generate key documents automatically — saving time and ensuring consistency across all programs.
-        <br><br>
-        Create a new program to get started, or open an existing one to continue where you left off. Your manager can follow progress for all programs directly from this dashboard.
+    <div style="background:#242424;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin-bottom:20px">
+      <div style="font-size:13px;color:#aaa;line-height:1.7">
+        Your shared workspace for developing new study programs at Noroff Vocational College — from the first strategic idea to NOKUT accreditation.
+        <span id="welcome-more-link" onclick="toggleWelcome()" style="color:#D85A30;cursor:pointer;font-size:12px;margin-left:6px">Read more ↓</span>
+      </div>
+      <div id="welcome-more" style="display:none;margin-top:14px">
+        <div style="font-size:12px;color:#888;line-height:1.8;margin-bottom:14px">
+          Each program follows an 8-step process across three phases: <span style="color:#D85A30;font-weight:500">Strategy &amp; Planning</span>, <span style="color:#D85A30;font-weight:500">Program Development</span>, and <span style="color:#D85A30;font-weight:500">Accreditation</span>. At every step you will find clear guidance, the right people, and AI tools that generate key documents automatically — saving time and ensuring consistency across all programs.
+          <br><br>
+          Create a new program to get started, or open an existing one to continue where you left off. Your manager can follow progress for all programs directly from this dashboard.
+        </div>
+        <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">How to use this tool</div>
+        <div class="dash-gs-step"><div class="dash-gs-num">1</div><div class="dash-gs-text"><strong>Create a new program</strong> — click the button below to start. Give it a name.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">2</div><div class="dash-gs-text"><strong>Work through the 8 steps</strong> — each step guides you with activities, people involved, and AI tools to generate documents.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">3</div><div class="dash-gs-text"><strong>Generate documents with AI</strong> — Step 1 makes a program summary, Step 2 a mandate, Step 3 a project plan. Each builds on the previous.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">4</div><div class="dash-gs-text"><strong>Documents are saved per program</strong> — everything survives tab switches. Come back any time and continue where you left off.</div></div>
+        <div class="dash-gs-step"><div class="dash-gs-num">5</div><div class="dash-gs-text"><strong>Track progress here</strong> — this dashboard shows all programs, their phase, completion and status at a glance.</div></div>
+        <span onclick="toggleWelcome()" style="color:#D85A30;cursor:pointer;font-size:12px;display:inline-block;margin-top:8px">Show less ↑</span>
       </div>
     </div>
 
@@ -242,19 +276,7 @@
       <div class="dash-stat"><div class="dash-stat-label">Total programs</div><div class="dash-stat-value" id="ds-total">0</div><div class="dash-stat-sub">In portfolio</div></div>
     </div>
 
-    <div class="dash-getting-started" id="dash-gs">
-      <div class="dash-gs-header" onclick="toggleGS()">
-        <span class="dash-gs-title"><i class="ti ti-info-circle" style="font-size:15px;color:#D85A30" aria-hidden="true"></i> How to use this tool</span>
-        <i class="ti ti-chevron-down dash-gs-chev" id="gs-chev" aria-hidden="true"></i>
-      </div>
-      <div class="dash-gs-body" id="gs-body">
-        <div class="dash-gs-step"><div class="dash-gs-num">1</div><div class="dash-gs-text"><strong>Create a new program</strong> — click the button below to start a new study program development project. Give it a name.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">2</div><div class="dash-gs-text"><strong>Work through the 8 steps</strong> — each step guides you through the process with key activities, who's involved, and AI tools to generate documents automatically.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">3</div><div class="dash-gs-text"><strong>Generate documents with AI</strong> — Step 1 generates a program summary from Miro. Step 2 generates the project mandate. Step 3 generates the project plan. Each builds on the previous.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">4</div><div class="dash-gs-text"><strong>All documents are saved</strong> — documents survive tab switches and are stored per program. Come back any time and continue where you left off.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">5</div><div class="dash-gs-text"><strong>Track progress here</strong> — this dashboard shows all programs, their current phase, completion percentage, and status. Your manager can see everything from here.</div></div>
-      </div>
-    </div>
+
 
     <button class="dash-new-btn" onclick="dashNewProgram()">
       <i class="ti ti-plus" style="font-size:16px" aria-hidden="true"></i> Create new program
@@ -277,6 +299,12 @@
       <i class="ti ti-arrow-left" style="font-size:13px" aria-hidden="true"></i> Dashboard
     </button>
     <span class="guide-prog-name" id="guide-prog-name"></span>
+  </div>
+  <div class="strategic-context" id="strategic-context" style="display:none">
+    <div class="strategic-context-label">Strategic context</div>
+    <div class="strategic-context-row"><span class="strategic-context-key">Why this program</span><span class="strategic-context-val" id="sc-rationale">—</span></div>
+    <div class="strategic-context-row"><span class="strategic-context-key">Approved by</span><span class="strategic-context-val" id="sc-approved-by">—</span></div>
+    <div class="strategic-context-row"><span class="strategic-context-key">Approval date</span><span class="strategic-context-val" id="sc-approved-date">—</span></div>
   </div>
   <div class="page-header">
     <h1>Development process for new programs</h1>
@@ -592,26 +620,63 @@ function showGuide(programId) {
   document.getElementById('view-guide').classList.add('active');
   const p = programs[programId];
   document.getElementById('guide-prog-name').textContent = p ? p.name : '';
+
+  // Show strategic context
+  if (p && (p.rationale || p.approvedBy)) {
+    document.getElementById('sc-rationale').textContent = p.rationale || '—';
+    document.getElementById('sc-approved-by').textContent = p.approvedBy || '—';
+    document.getElementById('sc-approved-date').textContent = p.approvedDate || '—';
+    document.getElementById('strategic-context').style.display = 'block';
+  } else {
+    document.getElementById('strategic-context').style.display = 'none';
+  }
+
   clearDocuments();
   restoreDocuments();
   render();
 }
 
 function dashNewProgram() {
-  const name = prompt('Program name:', 'e.g. Film Production — Online Studies');
-  if (!name || !name.trim()) return;
+  document.getElementById('cm-name').value = '';
+  document.getElementById('cm-rationale').value = '';
+  document.getElementById('cm-approved-by').value = '';
+  document.getElementById('cm-approved-date').value = '';
+  document.getElementById('create-modal').classList.add('open');
+  setTimeout(() => document.getElementById('cm-name').focus(), 100);
+}
+
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('open');
+}
+
+function submitCreateModal() {
+  const name = document.getElementById('cm-name').value.trim();
+  if (!name) { document.getElementById('cm-name').focus(); return; }
+  const rationale = document.getElementById('cm-rationale').value.trim();
+  const approvedBy = document.getElementById('cm-approved-by').value.trim();
+  const approvedDate = document.getElementById('cm-approved-date').value.trim();
   const id = 'prog_' + Date.now();
-  programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'', currentStep:1, status:'on-track' };
+  programs[id] = {
+    id, name,
+    rationale: rationale || 'To be confirmed',
+    approvedBy: approvedBy || 'To be confirmed',
+    approvedDate: approvedDate || 'To be confirmed',
+    created: new Date().toISOString().split('T')[0],
+    summary:'', mandate:'', plan:'',
+    currentStep:1, status:'on-track'
+  };
   currentProgramId = id;
   savePrograms();
+  closeCreateModal();
   showGuide(id);
 }
 
-function toggleGS() {
-  const body = document.getElementById('gs-body');
-  const chev = document.getElementById('gs-chev');
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
+function toggleWelcome() {
+  const more = document.getElementById('welcome-more');
+  const link = document.getElementById('welcome-more-link');
+  const isOpen = more.style.display !== 'none';
+  more.style.display = isOpen ? 'none' : 'block';
+  link.style.display = isOpen ? 'inline' : 'none';
 }
 
 function toggleInstruction() {
@@ -857,7 +922,7 @@ async function autosaveDocument(type, content) {
 }
 
 const stepInstructions = [
-  'Hold a strategy session with your team and capture ideas in Miro. When done, click "Read Miro board" below to generate a structured program summary. This summary becomes the foundation for all later documents.',
+  'Review the strategic rationale for this program — it was set when the project was created. Design the project structure, identify who needs to be involved, and prepare the documentation for the VOC board decision.',
   'Use the program summary to generate a draft Project Mandate. Review it carefully, fill in the red placeholders (names, dates, budget), and get it approved by the Rector before moving on.',
   'Generate a Project Plan from the mandate. Fill in specific activities, deadlines, and team member names. This plan guides the whole project — make sure it is approved by the Head of Development.',
   'Run two industry partner workshops using Miro and Teams. Use the tools below to generate a partner brief before each workshop and a summary after. The brief tells partners what to expect. The summary captures what was agreed.',
@@ -875,16 +940,15 @@ const phases = [
 
 const steps = [
   {
-    num:'1', title:'Strategy',
+    num:'1', title:'Project Design',
     phase: 0,
     badge:{label:'Ideation', bg:'#e0e7ff', color:'#3730a3'},
-    intro:'Set the overall ambition and develop ideas for new programs. This phase involves broad input from across the organisation and external stakeholders.',
-    roles:['Program Manager','Curriculum Manager','Academic Environment SME','Marketing & Sales','Industry, reports & analysis','Board of Directors'],
-    activities:['Define strategic direction for new programs','Identify and prioritise ideas','Develop high-level ambition and scope','VOC board decision on prioritised ideas'],
+    intro:'Design the project structure based on the approved strategic idea. Identify key competencies, assemble the project team, and prepare for the VOC board decision.',
+    roles:['Head of Development','Director of Strategy','Senior Advisor (Dev Dept)','Internal expert','External expert'],
+    activities:['Review and confirm strategic rationale','Design project structure and scope','Identify key competencies needed','Prepare for VOC board decision'],
     responsible: 'Head of Development',
-    deliverables:['Strategy: overall direction','High-level development plan and ambition','VOC board approval to proceed'],
+    deliverables:['Decision in the VOC board on prioritised ideas'],
     docs:[],
-    miro:true, summaryTool:true
   },
   {
     num:'2', title:'Project Mandate',
@@ -999,7 +1063,7 @@ function render() {
   }
   document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
   document.getElementById('step-docs').innerHTML = s.docs.map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon} doc-icon"></i><div><div class="doc-label">${d.label}</div><div class="doc-sub">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:#ccc"></i></a>`).join('');
-  document.getElementById('miro-section').style.display = s.miro ? 'block' : 'none';
+  document.getElementById('miro-section').style.display = (s.miro && s.num !== '1') ? 'block' : 'none';
   if (s.miro && s.num === '6') {
     document.querySelector('.miro-title').textContent = 'Open workshop board in Miro';
     document.querySelector('.miro-sub').textContent = 'Industry partner workshop workspace';
@@ -1476,6 +1540,35 @@ loadPrograms().then(() => { renderDashboard(); });
 </script>
 </div><!-- end .container -->
 </div><!-- end #view-guide -->
+
+<!-- ===== CREATION MODAL ===== -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-box">
+    <h2>Create new program</h2>
+    <p>Fill in the strategic context before starting the project. This information is set by the Head of Development and visible to the whole project team.</p>
+    <div class="modal-field">
+      <label>Program name</label>
+      <input type="text" id="cm-name" placeholder="e.g. Film Production — Online Studies">
+    </div>
+    <div class="modal-field">
+      <label>Strategic rationale</label>
+      <textarea id="cm-rationale" placeholder="Why was this program approved? What need or opportunity does it address?"></textarea>
+      <div class="hint">2–4 sentences. This will be visible to the whole project team.</div>
+    </div>
+    <div class="modal-field">
+      <label>Approved by</label>
+      <input type="text" id="cm-approved-by" placeholder="e.g. Head of Development">
+    </div>
+    <div class="modal-field">
+      <label>Approval date</label>
+      <input type="text" id="cm-approved-date" placeholder="e.g. May 2026">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
+      <button class="modal-submit" onclick="submitCreateModal()">Create program</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
