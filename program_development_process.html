@@ -463,6 +463,24 @@
   </div>
 
   <!-- WORKSHOP TOOLS (Step 6) -->
+  <!-- SUMMARY DISPLAY (Step 1) -->
+  <div id="summary-display-section" style="display:none">
+    <div class="section-label">Program summary</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><div class="tool-header-title">Program summary</div><div class="tool-header-sub">Generated during program setup — used to create the project mandate</div></div>
+      </div>
+      <div class="tool-body">
+        <div id="summary-display-content" style="font-size:13px;color:#555;line-height:1.7;white-space:pre-wrap;word-break:break-word"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="mandate-action-btn" onclick="editSummaryDisplay()">Edit summary</button>
+        </div>
+        <textarea id="summary-display-editor" style="display:none;width:100%;min-height:160px;font-family:inherit;font-size:13px;padding:10px;border:1px solid #D85A30;border-radius:6px;margin-top:8px;outline:none;line-height:1.7" onblur="saveSummaryEdit()"></textarea>
+      </div>
+    </div>
+  </div>
+
   <div id="workshop-tool-section" style="display:none">
 
     <!-- Tool 1: Partner brief -->
@@ -1193,6 +1211,18 @@ function render() {
     document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
   }
   document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
+  const sds = document.getElementById('summary-display-section');
+  if (sds) {
+    if (s.summaryDisplay) {
+      sds.style.display = 'block';
+      const p = currentProgramId && programs[currentProgramId];
+      const summaryText = (p && p.summary) ? p.summary : generatedSummary || '';
+      const displayEl = document.getElementById('summary-display-content');
+      if (displayEl) displayEl.textContent = summaryText || 'No summary yet. Create a new program and generate a summary in the setup step.';
+    } else {
+      sds.style.display = 'none';
+    }
+  }
   document.getElementById('workshop-tool-section').style.display = s.workshopTool ? 'block' : 'none';
   if (s.workshopTool) {
     const bnote = document.getElementById('brief-summary-note');
