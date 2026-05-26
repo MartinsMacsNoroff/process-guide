@@ -738,20 +738,10 @@ async function runModalSummary() {
       else loose.push({type:item.type,text});
     });
     let boardContent = '';
-    Object.values(sections).forEach(s => { if(s.title) boardContent+=`
-[Section: ${s.title}]
-`; s.items.forEach(i=>{boardContent+=`- ${i.text}
-`;}); });
-    if (loose.length) { boardContent+='
-[Ungrouped]
-'; loose.forEach(i=>{boardContent+=`- ${i.text}
-`;}); }
+    Object.values(sections).forEach(s => { if(s.title) boardContent+='\n[Section: '+s.title+']\n'; s.items.forEach(i=>{boardContent+='- '+i.text+'\n';}); });
+    if (loose.length) { boardContent+='\n[Ungrouped]\n'; loose.forEach(i=>{boardContent+='- '+i.text+'\n';}); }
 
-    const summary = await callAI(`You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:
-
-${boardContent}
-
-Write a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section.`);
+    const summary = await callAI('You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n' + boardContent + '\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section.');
 
     document.getElementById('cm-summary').value = summary;
     statusEl.style.display = 'none';
