@@ -606,7 +606,6 @@ let generatedMandate = '';
 let currentProgramId = null;
 let programs = {};
 
-const STORAGE_KEY = 'noroff_programs';
 
 function showDashboard() {
   document.getElementById('view-dashboard').classList.add('active');
@@ -759,8 +758,9 @@ function renderDashboard() {
 
 async function loadPrograms() {
   try {
-    const result = await window.storage.get(STORAGE_KEY, true).catch(() => null);
-    programs = result ? JSON.parse(result.value) : {};
+    const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
+    const data = await res.json();
+    programs = data.value ? JSON.parse(data.value) : {};
   } catch(e) { programs = {}; }
   updateProgramSelector();
   renderDashboard();
@@ -768,7 +768,11 @@ async function loadPrograms() {
 
 async function savePrograms() {
   try {
-    await window.storage.set(STORAGE_KEY, JSON.stringify(programs), true);
+    await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(programs)
+    });
   } catch(e) { console.error('Storage error:', e); }
 }
 
@@ -1516,10 +1520,12 @@ async function saveToDashboard() {
       ]
     };
 
-    const existing = await window.storage.get('dashboard_projects').catch(() => null);
-    const projects = existing ? JSON.parse(existing.value) : [];
-    projects.push(projectData);
-    await window.storage.set('dashboard_projects', JSON.stringify(projects), true);
+    // Update in main programs store
+    if (currentProgramId && programs[currentProgramId]) {
+      programs[currentProgramId].currentStep = cur + 1;
+      programs[currentProgramId].status = 'on-track';
+    }
+    await savePrograms();
 
     btn.textContent = 'Saved to dashboard!';
     btn.style.background = '#2d6a2d';
