@@ -759,33 +759,43 @@ function renderDashboard() {
 async function loadPrograms() {
   try {
     const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
+    if (!res.ok) throw new Error('KV fetch failed: ' + res.status);
     const data = await res.json();
     programs = data.value ? JSON.parse(data.value) : {};
-  } catch(e) { programs = {}; }
+    console.log('Loaded programs:', Object.keys(programs).length);
+  } catch(e) {
+    console.error('loadPrograms error:', e);
+    programs = {};
+  }
   updateProgramSelector();
   renderDashboard();
 }
 
 async function savePrograms() {
   try {
-    await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+    const res = await fetch(`${PROXY}/?action=kv-put&key=programs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(programs)
     });
-  } catch(e) { console.error('Storage error:', e); }
+    const data = await res.json();
+    console.log('Saved programs:', data);
+  } catch(e) { console.error('savePrograms error:', e); }
 }
 
 function updateProgramSelector() {
   const sel = document.getElementById('program-select');
-  const keys = Object.keys(programs);
-  sel.innerHTML = '<option value="">— Select or create a program —</option>' +
-    keys.map(k => `<option value="${k}" ${k===currentProgramId?'selected':''}>${programs[k].name}</option>`).join('');
+  if (sel) {
+    const keys = Object.keys(programs);
+    sel.innerHTML = '<option value="">— Select or create a program —</option>' +
+      keys.map(k => `<option value="${k}" ${k===currentProgramId?'selected':''}>${programs[k].name}</option>`).join('');
+  }
   updateProgramStatus();
 }
 
 function updateProgramStatus() {
   const el = document.getElementById('program-status');
+  if (!el) return;
   if (!currentProgramId || !programs[currentProgramId]) { el.textContent = ''; return; }
   const p = programs[currentProgramId];
   const count = [p.summary, p.mandate, p.plan].filter(Boolean).length;
