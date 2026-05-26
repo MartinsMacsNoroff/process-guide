@@ -640,6 +640,17 @@ function dashNewProgram() {
   document.getElementById('cm-rationale').value = '';
   document.getElementById('cm-approved-by').value = '';
   document.getElementById('cm-approved-date').value = '';
+  document.getElementById('cm-summary').value = '';
+  document.getElementById('modal-miro-error').style.display = 'none';
+  document.getElementById('modal-miro-status').style.display = 'none';
+  document.getElementById('modal-step-1').style.display = 'block';
+  document.getElementById('modal-step-2').style.display = 'none';
+  document.getElementById('modal-step-1-dot').style.background = '#D85A30';
+  document.getElementById('modal-step-1-dot').style.color = '#fff';
+  document.getElementById('modal-step-1-label').style.color = '#D85A30';
+  document.getElementById('modal-step-2-dot').style.background = '#e0e0e0';
+  document.getElementById('modal-step-2-dot').style.color = '#aaa';
+  document.getElementById('modal-step-2-label').style.color = '#aaa';
   document.getElementById('create-modal').classList.add('open');
   setTimeout(() => document.getElementById('cm-name').focus(), 100);
 }
@@ -648,12 +659,100 @@ function closeCreateModal() {
   document.getElementById('create-modal').classList.remove('open');
 }
 
-function submitCreateModal() {
+function goToModalStep2() {
   const name = document.getElementById('cm-name').value.trim();
   if (!name) { document.getElementById('cm-name').focus(); return; }
+  document.getElementById('modal-step-1').style.display = 'none';
+  document.getElementById('modal-step-2').style.display = 'block';
+  document.getElementById('modal-step-1-dot').style.background = '#5DCAA5';
+  document.getElementById('modal-step-1-label').style.color = '#555';
+  document.getElementById('modal-step-2-dot').style.background = '#D85A30';
+  document.getElementById('modal-step-2-dot').style.color = '#fff';
+  document.getElementById('modal-step-2-label').style.color = '#D85A30';
+}
+
+function backToModalStep1() {
+  document.getElementById('modal-step-1').style.display = 'block';
+  document.getElementById('modal-step-2').style.display = 'none';
+  document.getElementById('modal-step-1-dot').style.background = '#D85A30';
+  document.getElementById('modal-step-1-label').style.color = '#D85A30';
+  document.getElementById('modal-step-2-dot').style.background = '#e0e0e0';
+  document.getElementById('modal-step-2-dot').style.color = '#aaa';
+  document.getElementById('modal-step-2-label').style.color = '#aaa';
+}
+
+async function runModalSummary() {
+  const btn = document.getElementById('modal-miro-btn');
+  const statusEl = document.getElementById('modal-miro-status');
+  const statusText = document.getElementById('modal-miro-status-text');
+  const errEl = document.getElementById('modal-miro-error');
+  const boardId = 'uXjVHRH9-Rw=';
+
+  btn.disabled = true;
+  statusEl.style.display = 'flex';
+  errEl.style.display = 'none';
+
+  try {
+    statusText.textContent = 'Reading Miro board...';
+    let allItems = [], cursor = null;
+    do {
+      const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
+      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}`);
+      if (!res.ok) throw new Error('Miro error ' + res.status);
+      const data = await res.json();
+      allItems = allItems.concat(data.data || []);
+      cursor = data.cursor || null;
+    } while (cursor);
+
+    if (!allItems.length) throw new Error('No items found on this board.');
+    statusText.textContent = `Found ${allItems.length} items — generating summary...`;
+
+    const sections = {}, loose = [];
+    allItems.forEach(item => {
+      let text = null;
+      if (item.data?.content) text = item.data.content.replace(/<[^>]*>/g,'').trim();
+      else if (item.data?.title) text = item.data.title.trim();
+      else if (item.data?.body) text = item.data.body.replace(/<[^>]*>/g,'').trim();
+      if (!text) return;
+      const frameId = item.parent?.id;
+      if (frameId) { if (!sections[frameId]) sections[frameId]={title:'',items:[]}; sections[frameId].items.push({type:item.type,text}); }
+      else if (item.type==='frame') { if (!sections[item.id]) sections[item.id]={title:'',items:[]}; sections[item.id].title=text; }
+      else loose.push({type:item.type,text});
+    });
+    let boardContent = '';
+    Object.values(sections).forEach(s => { if(s.title) boardContent+=`
+[Section: ${s.title}]
+`; s.items.forEach(i=>{boardContent+=`- ${i.text}
+`;}); });
+    if (loose.length) { boardContent+='
+[Ungrouped]
+'; loose.forEach(i=>{boardContent+=`- ${i.text}
+`;}); }
+
+    const summary = await callAI(`You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:
+
+${boardContent}
+
+Write a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section.`);
+
+    document.getElementById('cm-summary').value = summary;
+    statusEl.style.display = 'none';
+
+  } catch(err) {
+    statusEl.style.display = 'none';
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+  btn.disabled = false;
+}
+
+function submitCreateModal(hasSummary) {
+  const name = document.getElementById('cm-name').value.trim();
+  if (!name) return;
   const rationale = document.getElementById('cm-rationale').value.trim();
   const approvedBy = document.getElementById('cm-approved-by').value.trim();
   const approvedDate = document.getElementById('cm-approved-date').value.trim();
+  const summaryText = document.getElementById('cm-summary').value.trim();
   const id = 'prog_' + Date.now();
   programs[id] = {
     id, name,
@@ -661,10 +760,12 @@ function submitCreateModal() {
     approvedBy: approvedBy || 'To be confirmed',
     approvedDate: approvedDate || 'To be confirmed',
     created: new Date().toISOString().split('T')[0],
-    summary:'', mandate:'', plan:'',
+    summary: summaryText || '',
+    mandate:'', plan:'',
     currentStep:1, status:'on-track'
   };
   currentProgramId = id;
+  generatedSummary = summaryText || '';
   savePrograms();
   closeCreateModal();
   showGuide(id);
@@ -845,6 +946,10 @@ function clearDocuments() {
 function restoreDocuments() {
   if (!currentProgramId || !programs[currentProgramId]) return;
   const p = programs[currentProgramId];
+
+  // Always restore generatedSummary from program data so mandate generator works
+  if (p.summary) generatedSummary = p.summary;
+  else generatedSummary = '';
 
   if (p.summary) {
     generatedSummary = p.summary;
@@ -1559,30 +1664,82 @@ loadPrograms().then(() => { renderDashboard(); });
 
 <!-- ===== CREATION MODAL ===== -->
 <div class="modal-overlay" id="create-modal">
-  <div class="modal-box">
-    <h2>Create new program</h2>
-    <p>Fill in the strategic context before starting the project. This information is set by the Head of Development and visible to the whole project team.</p>
-    <div class="modal-field">
-      <label>Program name</label>
-      <input type="text" id="cm-name" placeholder="e.g. Film Production — Online Studies">
+  <div class="modal-box" style="max-width:560px">
+
+    <!-- Step indicator -->
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">
+      <div id="modal-step-1-dot" style="width:24px;height:24px;border-radius:50%;background:#D85A30;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div id="modal-step-1-label" style="font-size:12px;font-weight:600;color:#D85A30">Strategic context</div>
+      <div style="flex:1;height:1px;background:#e0e0e0;margin:0 4px"></div>
+      <div id="modal-step-2-dot" style="width:24px;height:24px;border-radius:50%;background:#e0e0e0;color:#aaa;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div id="modal-step-2-label" style="font-size:12px;color:#aaa">Program summary</div>
     </div>
-    <div class="modal-field">
-      <label>Strategic rationale</label>
-      <textarea id="cm-rationale" placeholder="Why was this program approved? What need or opportunity does it address?"></textarea>
-      <div class="hint">2–4 sentences. This will be visible to the whole project team.</div>
+
+    <!-- STEP 1 -->
+    <div id="modal-step-1">
+      <h2 style="font-size:16px;font-weight:600;color:#1a1814;margin-bottom:4px">Create new program</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:20px;line-height:1.5">Fill in the strategic context. This is set by the Head of Development and visible to the whole project team.</p>
+      <div class="modal-field">
+        <label>Program name *</label>
+        <input type="text" id="cm-name" placeholder="e.g. Film Production — Online Studies">
+      </div>
+      <div class="modal-field">
+        <label>Strategic rationale</label>
+        <textarea id="cm-rationale" placeholder="Why was this program approved? What need or opportunity does it address?"></textarea>
+        <div class="hint">2–4 sentences. Visible to the whole project team.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="modal-field">
+          <label>Approved by</label>
+          <input type="text" id="cm-approved-by" placeholder="e.g. Head of Development">
+        </div>
+        <div class="modal-field">
+          <label>Approval date</label>
+          <input type="text" id="cm-approved-date" placeholder="e.g. May 2026">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
+        <button class="modal-submit" onclick="goToModalStep2()">Next → Program summary</button>
+      </div>
     </div>
-    <div class="modal-field">
-      <label>Approved by</label>
-      <input type="text" id="cm-approved-by" placeholder="e.g. Head of Development">
+
+    <!-- STEP 2 -->
+    <div id="modal-step-2" style="display:none">
+      <h2 style="font-size:16px;font-weight:600;color:#1a1814;margin-bottom:4px">Program summary</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:16px;line-height:1.5">Generate a program summary from your Miro ideation board, or write one manually. This summary is used to generate the project mandate.</p>
+
+      <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin-bottom:12px">
+        <div style="background:#f8f8f8;padding:8px 12px;border-bottom:1px solid #e0e0e0;font-size:11px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate from Miro board
+        </div>
+        <div style="padding:12px">
+          <button onclick="runModalSummary()" id="modal-miro-btn" style="width:100%;padding:9px;background:#D85A30;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Read Miro board and generate summary
+          </button>
+          <div id="modal-miro-status" style="display:none;align-items:center;gap:8px;font-size:11px;color:#888;padding:6px 0">
+            <div style="width:12px;height:12px;border:2px solid #e0e0e0;border-top-color:#D85A30;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
+            <span id="modal-miro-status-text">Reading Miro board...</span>
+          </div>
+          <div id="modal-miro-error" style="font-size:11px;color:#cc3333;margin-top:6px;display:none"></div>
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label>Program summary <span style="font-weight:400;color:#aaa">(edit or write manually)</span></label>
+        <textarea id="cm-summary" style="min-height:140px" placeholder="Describe the program — target audience, rationale, scope, industry relevance. This will be used to generate the project mandate."></textarea>
+        <div class="hint">Generated from Miro or written manually. Required for mandate generation.</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="backToModalStep1()">← Back</button>
+        <button style="padding:8px 16px;border:1px solid #e0e0e0;border-radius:7px;background:transparent;font-size:13px;cursor:pointer;font-family:inherit;color:#555" onclick="submitCreateModal(false)">Skip summary for now</button>
+        <button class="modal-submit" onclick="submitCreateModal(true)">Create program</button>
+      </div>
     </div>
-    <div class="modal-field">
-      <label>Approval date</label>
-      <input type="text" id="cm-approved-date" placeholder="e.g. May 2026">
-    </div>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
-      <button class="modal-submit" onclick="submitCreateModal()">Create program</button>
-    </div>
+
   </div>
 </div>
 
