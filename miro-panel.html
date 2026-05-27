@@ -7,14 +7,44 @@
 <script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #1a1a1a; background: #fff; padding: 16px; height: 100vh; display: flex; flex-direction: column; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #1a1a1a; background: #fff; padding: 16px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  .header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+  .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
   .header-logo { width: 24px; height: 24px; border-radius: 6px; background: #D85A30; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
   .header-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
   .header-sub { font-size: 10px; color: #888; }
 
-  .mode-tabs { display: flex; gap: 4px; margin-bottom: 14px; background: #f5f5f5; border-radius: 7px; padding: 3px; }
+  /* Program context banner */
+  .program-banner { border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #e8e8e8; background: #f9f9f9; }
+  .program-banner.linked { background: #FAECE7; border-color: #D85A30; }
+  .program-banner.loading { background: #f9f9f9; }
+  .program-banner-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+  .program-name { font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; }
+  .program-step-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: #D85A30; color: #fff; white-space: nowrap; flex-shrink: 0; }
+  .program-step-badge.phase1 { background: #D85A30; }
+  .program-step-badge.phase2 { background: #1D9E75; }
+  .program-step-badge.phase3 { background: #3B5BDB; }
+  .program-meta { font-size: 10px; color: #888; margin-top: 3px; }
+  .program-status { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; margin-top: 4px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #1D9E75; flex-shrink: 0; }
+  .status-dot.at-risk { background: #E53E3E; }
+  .open-tool-btn { font-size: 10px; padding: 3px 8px; border: 1px solid #D85A30; border-radius: 4px; color: #D85A30; background: transparent; cursor: pointer; white-space: nowrap; margin-top: 6px; display: inline-block; text-decoration: none; }
+  .open-tool-btn:hover { background: #FAECE7; }
+  .no-program-text { font-size: 11px; color: #aaa; }
+  .link-board-btn { font-size: 10px; padding: 3px 8px; border: 1px solid #ccc; border-radius: 4px; color: #555; background: transparent; cursor: pointer; margin-top: 6px; display: inline-block; }
+  .link-board-btn:hover { border-color: #D85A30; color: #D85A30; }
+
+  /* Link board form */
+  .link-form { display: none; margin-top: 8px; }
+  .link-form.visible { display: block; }
+  .link-form select { width: 100%; padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 11px; font-family: inherit; color: #1a1a1a; background: #fff; outline: none; margin-bottom: 6px; }
+  .link-form select:focus { border-color: #D85A30; }
+  .link-form-btns { display: flex; gap: 5px; }
+  .link-save-btn { flex: 1; padding: 6px; background: #D85A30; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .link-save-btn:hover { background: #c04d24; }
+  .link-cancel-btn { padding: 6px 10px; background: transparent; color: #888; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 11px; cursor: pointer; font-family: inherit; }
+
+  .mode-tabs { display: flex; gap: 4px; margin-bottom: 12px; background: #f5f5f5; border-radius: 7px; padding: 3px; }
   .mode-tab { flex: 1; padding: 5px; text-align: center; font-size: 11px; font-weight: 500; color: #888; border-radius: 5px; cursor: pointer; transition: all .15s; }
   .mode-tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 
@@ -26,19 +56,21 @@
   .context-btn { font-size: 10px; padding: 2px 8px; border: 1px solid #D85A30; border-radius: 4px; color: #D85A30; background: transparent; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .context-btn:hover { background: #FAECE7; }
 
-  .prompt-area { flex: 1; display: flex; flex-direction: column; }
-  .prompt-input { width: 100%; padding: 9px 11px; border: 1px solid #e0e0e0; border-radius: 7px; font-size: 12px; font-family: inherit; outline: none; resize: none; line-height: 1.6; color: #1a1a1a; background: #fff; min-height: 90px; }
+  .scroll-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  .prompt-input { width: 100%; padding: 9px 11px; border: 1px solid #e0e0e0; border-radius: 7px; font-size: 12px; font-family: inherit; outline: none; resize: none; line-height: 1.6; color: #1a1a1a; background: #fff; min-height: 80px; }
   .prompt-input:focus { border-color: #D85A30; }
 
-  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0; }
   .option-btn { padding: 7px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; font-size: 11px; color: #555; cursor: pointer; text-align: left; transition: all .15s; line-height: 1.4; }
   .option-btn:hover { border-color: #D85A30; color: #D85A30; background: #FAECE7; }
+  .option-btn.step-action { border-color: #D85A3044; background: #FAECE722; }
 
   .run-btn { width: 100%; padding: 10px; background: #D85A30; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s; margin-top: 8px; }
   .run-btn:hover { background: #c04d24; }
   .run-btn:disabled { background: #e0c4bb; cursor: not-allowed; }
 
-  .status { display: none; align-items: center; gap: 8px; font-size: 11px; color: #888; padding: 8px 0; }
+  .status { display: none; align-items: center; gap: 8px; font-size: 11px; color: #888; padding: 6px 0; }
   .status.visible { display: flex; }
   .spinner { width: 14px; height: 14px; border: 2px solid #f0f0f0; border-top-color: #D85A30; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -46,7 +78,7 @@
   .error { display: none; font-size: 11px; color: #cc3333; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px 10px; margin-top: 6px; }
   .error.visible { display: block; }
 
-  .result-section { margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px; display: none; }
+  .result-section { margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 10px; display: none; }
   .result-section.visible { display: block; }
   .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .result-title { font-size: 11px; font-weight: 600; color: #1a1a1a; }
@@ -57,7 +89,7 @@
   .result-action-btn.secondary { background: transparent; color: #555; border: 1px solid #e0e0e0; }
   .result-action-btn.secondary:hover { border-color: #D85A30; color: #D85A30; }
 
-  .result-list { display: flex; flex-direction: column; gap: 5px; max-height: 280px; overflow-y: auto; }
+  .result-list { display: flex; flex-direction: column; gap: 5px; max-height: 220px; overflow-y: auto; }
   .result-item { background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #333; line-height: 1.5; cursor: pointer; transition: border-color .15s; display: flex; align-items: flex-start; gap: 6px; }
   .result-item:hover { border-color: #D85A30; }
   .result-item.selected { border-color: #D85A30; background: #FAECE7; }
@@ -72,8 +104,7 @@
 
   .sent-msg { font-size: 11px; color: #1D9E75; display: none; align-items: center; gap: 5px; padding: 6px 0; }
   .sent-msg.visible { display: flex; }
-
-  .divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
+  .divider { height: 1px; background: #f0f0f0; margin: 8px 0; }
 </style>
 </head>
 <body>
@@ -82,8 +113,13 @@
   <div class="header-logo">C</div>
   <div>
     <div class="header-title">Claude Assistant</div>
-    <div class="header-sub">AI writing assistant for Noroff</div>
+    <div class="header-sub">Noroff Study Plan Development</div>
   </div>
+</div>
+
+<!-- Program Context Banner -->
+<div class="program-banner loading" id="program-banner">
+  <div class="no-program-text" id="banner-loading">Loading program info...</div>
 </div>
 
 <div class="mode-tabs">
@@ -99,10 +135,12 @@
   <button class="context-btn" onclick="event.stopPropagation();readBoard()">Read board</button>
 </div>
 
+<div class="scroll-area">
+
 <!-- Mode: Generate -->
 <div id="mode-generate">
-  <div class="section-label">Quick actions</div>
-  <div class="options">
+  <div class="section-label" id="actions-label">Quick actions</div>
+  <div class="options" id="quick-actions">
     <button class="option-btn" onclick="setPrompt('Generate learning outcomes for this program based on the board content. Write 5-8 clear, measurable outcomes.')">📚 Learning outcomes</button>
     <button class="option-btn" onclick="setPrompt('Based on the board content, suggest a course structure with course names and brief descriptions.')">📋 Course structure</button>
     <button class="option-btn" onclick="setPrompt('Summarise the key decisions and outcomes from this workshop board.')">📝 Workshop summary</button>
@@ -112,7 +150,7 @@
   </div>
   <div class="divider"></div>
   <div class="section-label">Or write your own prompt</div>
-  <textarea class="prompt-input" id="prompt-input" placeholder="e.g. Write 6 learning outcomes for a film production online course, based on the workshop notes on this board..."></textarea>
+  <textarea class="prompt-input" id="prompt-input" placeholder="e.g. Write 6 learning outcomes for a film production online course..."></textarea>
   <button class="run-btn" onclick="runGenerate()" id="run-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
     Generate with Claude
@@ -122,7 +160,7 @@
 <!-- Mode: Read board -->
 <div id="mode-read" style="display:none">
   <div class="section-label">Board contents</div>
-  <div style="background:#f9f9f9;border:1px solid #e8e8e8;border-radius:7px;padding:10px;font-size:11px;color:#555;line-height:1.6;max-height:300px;overflow-y:auto" id="board-contents-display">Click "Read board" above to see the content.</div>
+  <div style="background:#f9f9f9;border:1px solid #e8e8e8;border-radius:7px;padding:10px;font-size:11px;color:#555;line-height:1.6;max-height:260px;overflow-y:auto" id="board-contents-display">Click "Read board" above to see the content.</div>
 </div>
 
 <!-- Mode: Refine -->
@@ -171,29 +209,205 @@
   </div>
 </div>
 
+</div><!-- end scroll-area -->
+
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
-const CLIENT_ID = '3458764673395961250';
+const WEB_TOOL_URL = 'https://martinsmacsnoroff.github.io/process-guide/';
+
+const STEP_LABELS = [
+  '', // 0 unused
+  'Step 1 — Project Design',
+  'Step 2 — Project Mandate',
+  'Step 3 — Project Plan',
+  'Step 4 — Industry Workshops',
+  'Step 5 — Learning Outcomes',
+  'Step 6 — Course Development',
+  'Step 7 — Quality Assurance',
+  'Step 8 — NOKUT Application'
+];
+
+const STEP_PHASE = [0,1,1,1,2,2,2,2,3];
+
+const STEP_ACTIONS = {
+  1: [
+    { icon: '🎯', label: 'VOC rationale', prompt: 'Based on the board content, write a strategic rationale for why this program should be developed. Include market demand, target audience, and Noroff positioning.' },
+    { icon: '📊', label: 'Market analysis', prompt: 'Summarise the market analysis for this program from the board content. Identify demand, competitors, and opportunities.' },
+    { icon: '👥', label: 'Target audience', prompt: 'Define the target audience for this program based on the board content. Include demographics, prior experience, and motivations.' },
+    { icon: '⚠️', label: 'Risk summary', prompt: 'Identify and summarise the key risks and open questions for this program based on the board content.' }
+  ],
+  2: [
+    { icon: '📋', label: 'Draft mandate', prompt: 'Based on the board content, draft a project mandate for this program. Include scope, objectives, timeline, and responsible parties.' },
+    { icon: '✅', label: 'Approval points', prompt: 'List the key decision points and approval criteria needed for the rector to approve this program mandate.' },
+    { icon: '📅', label: 'Timeline draft', prompt: 'Based on the board content, suggest a realistic development timeline for this program from mandate to launch.' },
+    { icon: '💰', label: 'Resource needs', prompt: 'Identify the resources needed to develop this program — staff, budget, tools, and external partners.' }
+  ],
+  3: [
+    { icon: '🗓️', label: 'Project plan', prompt: 'Draft a detailed project plan for this program development based on the board content. Include milestones, owners, and deadlines.' },
+    { icon: '🤝', label: 'Industry partners', prompt: 'Based on the board content, identify and describe the ideal industry partners for this program and how they should be involved.' },
+    { icon: '📐', label: 'Scope definition', prompt: 'Define the scope of this program clearly — what is included, what is excluded, and what the boundaries are.' },
+    { icon: '🔄', label: 'Workstreams', prompt: 'Break down this program development into clear workstreams and parallel activities based on the board content.' }
+  ],
+  4: [
+    { icon: '📝', label: 'Workshop agenda', prompt: 'Design a 2-hour industry workshop agenda for this program. Include icebreaker, discussion sections, and output activities.' },
+    { icon: '❓', label: 'Key questions', prompt: 'Generate 10 key questions to ask industry representatives in the workshop about this program and its relevance.' },
+    { icon: '📊', label: 'Workshop summary', prompt: 'Summarise the key insights and outcomes from this workshop board. Highlight themes, agreements, and open questions.' },
+    { icon: '🏭', label: 'Industry needs', prompt: 'Based on the workshop board, summarise what the industry needs from graduates of this program.' }
+  ],
+  5: [
+    { icon: '📚', label: 'Learning outcomes', prompt: 'Generate 6-8 clear, measurable learning outcomes for this program based on the board content. Follow the Norwegian higher education format.' },
+    { icon: '🎓', label: 'NOKUT format', prompt: 'Rewrite the learning outcomes on this board in the format required by NOKUT for accreditation. Include knowledge, skills, and general competence.' },
+    { icon: '🔗', label: 'Map to NQF', prompt: 'Map the learning outcomes on this board to the Norwegian Qualifications Framework (NQF) descriptors.' },
+    { icon: '✅', label: 'Industry validate', prompt: 'Assess whether the learning outcomes on this board match the industry needs identified in the workshops. Suggest improvements.' }
+  ],
+  6: [
+    { icon: '📋', label: 'Course structure', prompt: 'Based on the board content, design a course structure for this program. List each course with name, credits, and brief description.' },
+    { icon: '🗺️', label: 'Curriculum map', prompt: 'Create a curriculum map showing how learning outcomes are distributed across courses in this program.' },
+    { icon: '🛠', label: 'Tools & software', prompt: 'List the industry tools and software students should learn in this program based on the board content.' },
+    { icon: '📖', label: 'Course descriptions', prompt: 'Write brief course descriptions for each course on this board, suitable for the study plan document.' }
+  ],
+  7: [
+    { icon: '🔍', label: 'QA checklist', prompt: 'Generate a quality assurance checklist for this program based on NOKUT requirements and the board content.' },
+    { icon: '📊', label: 'Self-evaluation', prompt: 'Draft a self-evaluation summary for this program addressing quality, relevance, and feasibility.' },
+    { icon: '👥', label: 'Peer review prep', prompt: 'Prepare key talking points for the external peer review of this program based on the board content.' },
+    { icon: '✏️', label: 'QA sign-off', prompt: 'Summarise what needs to be confirmed and signed off before this program proceeds to NOKUT application.' }
+  ],
+  8: [
+    { icon: '📄', label: 'NOKUT summary', prompt: 'Write an executive summary for the NOKUT accreditation application based on this board content.' },
+    { icon: '📚', label: 'Study plan text', prompt: 'Draft the formal study plan text for NOKUT submission based on the board and program content.' },
+    { icon: '✅', label: 'Checklist', prompt: 'Generate a final NOKUT application checklist — what documents, approvals, and content are required.' },
+    { icon: '🗒️', label: 'Cover letter', prompt: 'Draft a cover letter for the NOKUT accreditation application for this program.' }
+  ]
+};
 
 let boardContent = '';
 let results = [];
 let selectedColor = 'yellow';
 let currentMode = 'generate';
 let boardId = '';
+let linkedProgram = null;
+let allPrograms = {};
 
-// Init Miro SDK
-miro.board.getInfo().then(info => {
-  boardId = info.id;
-}).catch(() => {});
+// Init
+async function init() {
+  try {
+    const info = await miro.board.getInfo();
+    boardId = info.id;
+    await loadProgramData();
+  } catch(e) {
+    showBannerUnlinked();
+  }
+}
+
+async function loadProgramData() {
+  try {
+    const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
+    const data = await res.json();
+    if (data.value) {
+      allPrograms = JSON.parse(data.value);
+      // Find program linked to this board
+      linkedProgram = Object.values(allPrograms).find(p => p.miroBoard === boardId) || null;
+    }
+  } catch(e) {}
+  renderBanner();
+}
+
+function renderBanner() {
+  const banner = document.getElementById('program-banner');
+  if (linkedProgram) {
+    const step = linkedProgram.currentStep || 1;
+    const phase = STEP_PHASE[step] || 1;
+    const phaseClass = `phase${phase}`;
+    banner.className = `program-banner linked`;
+    banner.innerHTML = `
+      <div class="program-banner-top">
+        <div class="program-name">${linkedProgram.name}</div>
+        <span class="program-step-badge ${phaseClass}">Step ${step}/8</span>
+      </div>
+      <div class="program-meta">${STEP_LABELS[step]}</div>
+      <div class="program-status">
+        <div class="status-dot ${linkedProgram.status === 'at-risk' ? 'at-risk' : ''}"></div>
+        <span>${linkedProgram.status === 'at-risk' ? 'At risk' : 'On track'}</span>
+      </div>
+      <a href="${WEB_TOOL_URL}" target="_blank" class="open-tool-btn">Open in Study Plan tool →</a>
+    `;
+    updateStepActions(step);
+  } else {
+    showBannerUnlinked();
+  }
+}
+
+function showBannerUnlinked() {
+  const banner = document.getElementById('program-banner');
+  banner.className = 'program-banner';
+  const programOptions = Object.values(allPrograms).map(p =>
+    `<option value="${p.id}">${p.name}</option>`
+  ).join('');
+  banner.innerHTML = `
+    <div class="no-program-text">This board is not linked to a program yet.</div>
+    <button class="link-board-btn" onclick="showLinkForm()">+ Link to program</button>
+    <div class="link-form" id="link-form">
+      <select id="program-select">
+        <option value="">Select a program...</option>
+        ${programOptions}
+      </select>
+      <div class="link-form-btns">
+        <button class="link-save-btn" onclick="saveLink()">Link board</button>
+        <button class="link-cancel-btn" onclick="hideLinkForm()">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function showLinkForm() {
+  document.getElementById('link-form').classList.add('visible');
+}
+
+function hideLinkForm() {
+  document.getElementById('link-form').classList.remove('visible');
+}
+
+async function saveLink() {
+  const select = document.getElementById('program-select');
+  const programId = select.value;
+  if (!programId) return;
+
+  const prog = allPrograms[programId];
+  if (!prog) return;
+
+  // Save miroBoard = boardId to this program
+  prog.miroBoard = boardId;
+  allPrograms[programId] = prog;
+
+  try {
+    await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allPrograms)
+    });
+    linkedProgram = prog;
+    renderBanner();
+  } catch(e) {
+    alert('Could not save link. Please try again.');
+  }
+}
+
+function updateStepActions(step) {
+  const actions = STEP_ACTIONS[step] || STEP_ACTIONS[1];
+  const container = document.getElementById('quick-actions');
+  const label = document.getElementById('actions-label');
+  label.textContent = `Step ${step} actions`;
+  container.innerHTML = actions.map(a =>
+    `<button class="option-btn step-action" onclick="setPrompt('${a.prompt.replace(/'/g, "\\'")}')">${a.icon} ${a.label}</button>`
+  ).join('');
+}
 
 function setMode(mode) {
   currentMode = mode;
-  document.getElementById('tab-generate').classList.toggle('active', mode === 'generate');
-  document.getElementById('tab-read').classList.toggle('active', mode === 'read');
-  document.getElementById('tab-refine').classList.toggle('active', mode === 'refine');
-  document.getElementById('mode-generate').style.display = mode === 'generate' ? 'block' : 'none';
-  document.getElementById('mode-read').style.display = mode === 'read' ? 'block' : 'none';
-  document.getElementById('mode-refine').style.display = mode === 'refine' ? 'block' : 'none';
+  ['generate','read','refine'].forEach(m => {
+    document.getElementById(`tab-${m}`).classList.toggle('active', m === mode);
+    document.getElementById(`mode-${m}`).style.display = m === mode ? 'block' : 'none';
+  });
   document.getElementById('result-section').classList.remove('visible');
 }
 
@@ -217,7 +431,6 @@ async function readBoard() {
   try {
     const items = await miro.board.get();
     const texts = [];
-
     for (const item of items) {
       let text = '';
       if (item.type === 'sticky_note') text = item.content || '';
@@ -227,16 +440,11 @@ async function readBoard() {
       else if (item.type === 'frame') text = '[Frame: ' + (item.title || 'untitled') + ']';
       if (text.trim()) texts.push(text.replace(/<[^>]*>/g, '').trim());
     }
-
     boardContent = texts.join('\n');
-
-    const contextEl = document.getElementById('context-text');
-    contextEl.textContent = `Board read — ${texts.length} items found`;
-
+    document.getElementById('context-text').textContent = `Board read — ${texts.length} items found`;
     if (currentMode === 'read') {
-      document.getElementById('board-contents-display').textContent = boardContent || 'No text content found on this board.';
+      document.getElementById('board-contents-display').textContent = boardContent || 'No text content found.';
     }
-
   } catch(e) {
     errEl.textContent = 'Could not read board: ' + e.message;
     errEl.classList.add('visible');
@@ -260,25 +468,16 @@ async function callClaude(prompt) {
 }
 
 function parseResults(text) {
-  // Try to split into numbered list items
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const items = [];
   let current = '';
-
   for (const line of lines) {
     const numbered = line.match(/^(\d+[\.\):]?\s*)(.*)/);
     const bulleted = line.match(/^[-•*]\s*(.*)/);
-    if (numbered) {
-      if (current) items.push(current);
-      current = numbered[2];
-    } else if (bulleted) {
-      if (current) items.push(current);
-      current = bulleted[1];
-    } else if (current) {
-      current += ' ' + line;
-    } else {
-      current = line;
-    }
+    if (numbered) { if (current) items.push(current); current = numbered[2]; }
+    else if (bulleted) { if (current) items.push(current); current = bulleted[1]; }
+    else if (current) { current += ' ' + line; }
+    else { current = line; }
   }
   if (current) items.push(current);
   return items.length > 1 ? items : [text];
@@ -295,20 +494,19 @@ async function runGenerate() {
   errEl.classList.remove('visible');
   document.getElementById('result-section').classList.remove('visible');
   document.getElementById('sent-msg').classList.remove('visible');
-
   btn.disabled = true;
   statusEl.classList.add('visible');
   statusText.textContent = 'Generating with Claude...';
 
   try {
-    const fullPrompt = boardContent
-      ? `You are helping develop a study program at Noroff (Norwegian vocational college).\n\nBOARD CONTENT:\n${boardContent}\n\nTASK:\n${prompt}\n\nRespond with a clear numbered list. Each item on its own line. No extra explanation.`
-      : `You are helping develop a study program at Noroff (Norwegian vocational college).\n\nTASK:\n${prompt}\n\nRespond with a clear numbered list. Each item on its own line. No extra explanation.`;
-
+    const programContext = linkedProgram
+      ? `PROGRAM: ${linkedProgram.name}\nCURRENT STEP: ${STEP_LABELS[linkedProgram.currentStep || 1]}\nPHASE: ${STEP_PHASE[linkedProgram.currentStep || 1]}\n\n`
+      : '';
+    const boardContext = boardContent ? `BOARD CONTENT:\n${boardContent}\n\n` : '';
+    const fullPrompt = `You are helping develop a study program at Noroff (Norwegian vocational college).\n\n${programContext}${boardContext}TASK:\n${prompt}\n\nRespond with a clear numbered list. Each item on its own line. No extra explanation.`;
     const response = await callClaude(fullPrompt);
     results = parseResults(response);
     showResults(results, 'Generated results');
-
   } catch(e) {
     errEl.textContent = e.message;
     errEl.classList.add('visible');
@@ -323,10 +521,9 @@ async function runRefine() {
 
   const errEl = document.getElementById('error');
   const statusEl = document.getElementById('status');
-  const statusText = document.getElementById('status-text');
   errEl.classList.remove('visible');
   statusEl.classList.add('visible');
-  statusText.textContent = 'Refining with Claude...';
+  document.getElementById('status-text').textContent = 'Refining with Claude...';
 
   try {
     const selection = await miro.board.getSelection();
@@ -334,14 +531,11 @@ async function runRefine() {
       .filter(i => i.type === 'sticky_note' || i.type === 'text' || i.type === 'card')
       .map(i => (i.content || i.title || '').replace(/<[^>]*>/g,'').trim())
       .filter(Boolean);
-
     if (!texts.length) throw new Error('No sticky notes or text selected. Select items on the board first.');
-
     const fullPrompt = `Refine the following items from a Noroff study program board.\n\nINSTRUCTION: ${prompt}\n\nITEMS:\n${texts.map((t,i)=>`${i+1}. ${t}`).join('\n')}\n\nReturn the same number of refined items as a numbered list.`;
     const response = await callClaude(fullPrompt);
     results = parseResults(response);
     showResults(results, 'Refined results');
-
   } catch(e) {
     errEl.textContent = e.message;
     errEl.classList.add('visible');
@@ -374,17 +568,15 @@ function selectColor(el) {
 }
 
 async function sendToBoard() {
-  const selected = [...document.querySelectorAll('.result-item.selected')].map(el =>
-    el.querySelector('.result-item-text').textContent.trim()
-  );
+  const selected = [...document.querySelectorAll('.result-item.selected')]
+    .map(el => el.querySelector('.result-item-text').textContent.trim());
   if (!selected.length) return;
 
   const errEl = document.getElementById('error');
   const statusEl = document.getElementById('status');
-  const statusText = document.getElementById('status-text');
   errEl.classList.remove('visible');
   statusEl.classList.add('visible');
-  statusText.textContent = 'Sending to board...';
+  document.getElementById('status-text').textContent = 'Sending to board...';
 
   try {
     const viewport = await miro.board.viewport.get();
@@ -392,7 +584,6 @@ async function sendToBoard() {
     const startY = viewport.y + 20;
     const cols = Math.min(3, selected.length);
     const W = 200, H = 120, GAP = 20;
-
     for (let i = 0; i < selected.length; i++) {
       const col = i % cols;
       const row = Math.floor(i / cols);
@@ -404,16 +595,16 @@ async function sendToBoard() {
         width: W,
       });
     }
-
     document.getElementById('sent-msg').classList.add('visible');
     setTimeout(() => document.getElementById('sent-msg').classList.remove('visible'), 3000);
-
   } catch(e) {
     errEl.textContent = 'Could not write to board: ' + e.message;
     errEl.classList.add('visible');
   }
   statusEl.classList.remove('visible');
 }
+
+init();
 </script>
 </body>
 </html>
