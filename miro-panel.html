@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Assistant</title>
+<script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #1a1a1a; background: #fff; padding: 16px; height: 100vh; display: flex; flex-direction: column; }
+
+  .header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+  .header-logo { width: 24px; height: 24px; border-radius: 6px; background: #D85A30; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .header-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .header-sub { font-size: 10px; color: #888; }
+
+  .mode-tabs { display: flex; gap: 4px; margin-bottom: 14px; background: #f5f5f5; border-radius: 7px; padding: 3px; }
+  .mode-tab { flex: 1; padding: 5px; text-align: center; font-size: 11px; font-weight: 500; color: #888; border-radius: 5px; cursor: pointer; transition: all .15s; }
+  .mode-tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+
+  .section-label { font-size: 10px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+
+  .context-box { background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 7px; padding: 8px 10px; margin-bottom: 10px; font-size: 11px; color: #555; line-height: 1.5; min-height: 36px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .context-box:hover { border-color: #D85A30; }
+  .context-text { flex: 1; }
+  .context-btn { font-size: 10px; padding: 2px 8px; border: 1px solid #D85A30; border-radius: 4px; color: #D85A30; background: transparent; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .context-btn:hover { background: #FAECE7; }
+
+  .prompt-area { flex: 1; display: flex; flex-direction: column; }
+  .prompt-input { width: 100%; padding: 9px 11px; border: 1px solid #e0e0e0; border-radius: 7px; font-size: 12px; font-family: inherit; outline: none; resize: none; line-height: 1.6; color: #1a1a1a; background: #fff; min-height: 90px; }
+  .prompt-input:focus { border-color: #D85A30; }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+  .option-btn { padding: 7px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; font-size: 11px; color: #555; cursor: pointer; text-align: left; transition: all .15s; line-height: 1.4; }
+  .option-btn:hover { border-color: #D85A30; color: #D85A30; background: #FAECE7; }
+
+  .run-btn { width: 100%; padding: 10px; background: #D85A30; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s; margin-top: 8px; }
+  .run-btn:hover { background: #c04d24; }
+  .run-btn:disabled { background: #e0c4bb; cursor: not-allowed; }
+
+  .status { display: none; align-items: center; gap: 8px; font-size: 11px; color: #888; padding: 8px 0; }
+  .status.visible { display: flex; }
+  .spinner { width: 14px; height: 14px; border: 2px solid #f0f0f0; border-top-color: #D85A30; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error { display: none; font-size: 11px; color: #cc3333; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px 10px; margin-top: 6px; }
+  .error.visible { display: block; }
+
+  .result-section { margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px; display: none; }
+  .result-section.visible { display: block; }
+  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .result-title { font-size: 11px; font-weight: 600; color: #1a1a1a; }
+  .result-actions { display: flex; gap: 5px; }
+  .result-action-btn { font-size: 10px; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: inherit; }
+  .result-action-btn.primary { background: #D85A30; color: #fff; border: none; }
+  .result-action-btn.primary:hover { background: #c04d24; }
+  .result-action-btn.secondary { background: transparent; color: #555; border: 1px solid #e0e0e0; }
+  .result-action-btn.secondary:hover { border-color: #D85A30; color: #D85A30; }
+
+  .result-list { display: flex; flex-direction: column; gap: 5px; max-height: 280px; overflow-y: auto; }
+  .result-item { background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #333; line-height: 1.5; cursor: pointer; transition: border-color .15s; display: flex; align-items: flex-start; gap: 6px; }
+  .result-item:hover { border-color: #D85A30; }
+  .result-item.selected { border-color: #D85A30; background: #FAECE7; }
+  .result-item-num { width: 16px; height: 16px; border-radius: 50%; background: #D85A30; color: #fff; font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .result-item-text { flex: 1; }
+
+  .write-options { margin-top: 8px; }
+  .write-label { font-size: 10px; color: #888; margin-bottom: 5px; }
+  .color-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .color-opt { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color .15s; }
+  .color-opt.selected { border-color: #1a1a1a; }
+
+  .sent-msg { font-size: 11px; color: #1D9E75; display: none; align-items: center; gap: 5px; padding: 6px 0; }
+  .sent-msg.visible { display: flex; }
+
+  .divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">C</div>
+  <div>
+    <div class="header-title">Claude Assistant</div>
+    <div class="header-sub">AI writing assistant for Noroff</div>
+  </div>
+</div>
+
+<div class="mode-tabs">
+  <div class="mode-tab active" onclick="setMode('generate')" id="tab-generate">Generate</div>
+  <div class="mode-tab" onclick="setMode('read')" id="tab-read">Read board</div>
+  <div class="mode-tab" onclick="setMode('refine')" id="tab-refine">Refine</div>
+</div>
+
+<!-- Board context -->
+<div class="section-label">Board context</div>
+<div class="context-box" onclick="readBoard()">
+  <span class="context-text" id="context-text">Click to read board content</span>
+  <button class="context-btn" onclick="event.stopPropagation();readBoard()">Read board</button>
+</div>
+
+<!-- Mode: Generate -->
+<div id="mode-generate">
+  <div class="section-label">Quick actions</div>
+  <div class="options">
+    <button class="option-btn" onclick="setPrompt('Generate learning outcomes for this program based on the board content. Write 5-8 clear, measurable outcomes.')">📚 Learning outcomes</button>
+    <button class="option-btn" onclick="setPrompt('Based on the board content, suggest a course structure with course names and brief descriptions.')">📋 Course structure</button>
+    <button class="option-btn" onclick="setPrompt('Summarise the key decisions and outcomes from this workshop board.')">📝 Workshop summary</button>
+    <button class="option-btn" onclick="setPrompt('Based on the board, identify the main competencies students should develop.')">🎯 Competencies</button>
+    <button class="option-btn" onclick="setPrompt('Write assessment descriptions for each learning outcome on this board.')">✅ Assessments</button>
+    <button class="option-btn" onclick="setPrompt('Suggest industry-relevant tools and software for this program based on the board content.')">🛠 Tools & software</button>
+  </div>
+  <div class="divider"></div>
+  <div class="section-label">Or write your own prompt</div>
+  <textarea class="prompt-input" id="prompt-input" placeholder="e.g. Write 6 learning outcomes for a film production online course, based on the workshop notes on this board..."></textarea>
+  <button class="run-btn" onclick="runGenerate()" id="run-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Generate with Claude
+  </button>
+</div>
+
+<!-- Mode: Read board -->
+<div id="mode-read" style="display:none">
+  <div class="section-label">Board contents</div>
+  <div style="background:#f9f9f9;border:1px solid #e8e8e8;border-radius:7px;padding:10px;font-size:11px;color:#555;line-height:1.6;max-height:300px;overflow-y:auto" id="board-contents-display">Click "Read board" above to see the content.</div>
+</div>
+
+<!-- Mode: Refine -->
+<div id="mode-refine" style="display:none">
+  <div class="section-label">Select items on the board, then refine</div>
+  <div class="options">
+    <button class="option-btn" onclick="setRefinePrompt('Make this more concise')">✂️ Make concise</button>
+    <button class="option-btn" onclick="setRefinePrompt('Make this more formal and academic')">🎓 More academic</button>
+    <button class="option-btn" onclick="setRefinePrompt('Translate this to Norwegian')">🇳🇴 To Norwegian</button>
+    <button class="option-btn" onclick="setRefinePrompt('Improve the clarity and structure')">✨ Improve clarity</button>
+  </div>
+  <textarea class="prompt-input" id="refine-input" placeholder="Describe how to refine the selected items..."></textarea>
+  <button class="run-btn" onclick="runRefine()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Refine selected
+  </button>
+</div>
+
+<div class="status" id="status"><div class="spinner"></div><span id="status-text">Reading board...</span></div>
+<div class="error" id="error"></div>
+
+<!-- Results -->
+<div class="result-section" id="result-section">
+  <div class="result-header">
+    <span class="result-title" id="result-title">Results</span>
+    <div class="result-actions">
+      <button class="result-action-btn secondary" onclick="selectAll()">Select all</button>
+      <button class="result-action-btn primary" onclick="sendToBoard()">Send to board →</button>
+    </div>
+  </div>
+  <div class="result-list" id="result-list"></div>
+  <div class="write-options">
+    <div class="write-label">Sticky note color:</div>
+    <div class="color-row">
+      <div class="color-opt selected" style="background:#FFD02F" data-color="yellow" onclick="selectColor(this)"></div>
+      <div class="color-opt" style="background:#F5A623" data-color="orange" onclick="selectColor(this)"></div>
+      <div class="color-opt" style="background:#95D5B2" data-color="light_green" onclick="selectColor(this)"></div>
+      <div class="color-opt" style="background:#AED9E0" data-color="light_blue" onclick="selectColor(this)"></div>
+      <div class="color-opt" style="background:#F4A7B9" data-color="pink" onclick="selectColor(this)"></div>
+      <div class="color-opt" style="background:#E8E8E8" data-color="gray" onclick="selectColor(this)"></div>
+    </div>
+  </div>
+  <div class="sent-msg" id="sent-msg">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    Sent to board!
+  </div>
+</div>
+
+<script>
+const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
+const CLIENT_ID = '3458764673395961250';
+
+let boardContent = '';
+let results = [];
+let selectedColor = 'yellow';
+let currentMode = 'generate';
+let boardId = '';
+
+// Init Miro SDK
+miro.board.getInfo().then(info => {
+  boardId = info.id;
+}).catch(() => {});
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-generate').classList.toggle('active', mode === 'generate');
+  document.getElementById('tab-read').classList.toggle('active', mode === 'read');
+  document.getElementById('tab-refine').classList.toggle('active', mode === 'refine');
+  document.getElementById('mode-generate').style.display = mode === 'generate' ? 'block' : 'none';
+  document.getElementById('mode-read').style.display = mode === 'read' ? 'block' : 'none';
+  document.getElementById('mode-refine').style.display = mode === 'refine' ? 'block' : 'none';
+  document.getElementById('result-section').classList.remove('visible');
+}
+
+function setPrompt(text) {
+  document.getElementById('prompt-input').value = text;
+  document.getElementById('prompt-input').focus();
+}
+
+function setRefinePrompt(text) {
+  document.getElementById('refine-input').value = text;
+}
+
+async function readBoard() {
+  const errEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  errEl.classList.remove('visible');
+  statusEl.classList.add('visible');
+  statusText.textContent = 'Reading board...';
+
+  try {
+    const items = await miro.board.get();
+    const texts = [];
+
+    for (const item of items) {
+      let text = '';
+      if (item.type === 'sticky_note') text = item.content || '';
+      else if (item.type === 'text') text = item.content || '';
+      else if (item.type === 'card') text = (item.title || '') + (item.description ? ': ' + item.description : '');
+      else if (item.type === 'shape') text = item.content || '';
+      else if (item.type === 'frame') text = '[Frame: ' + (item.title || 'untitled') + ']';
+      if (text.trim()) texts.push(text.replace(/<[^>]*>/g, '').trim());
+    }
+
+    boardContent = texts.join('\n');
+
+    const contextEl = document.getElementById('context-text');
+    contextEl.textContent = `Board read — ${texts.length} items found`;
+
+    if (currentMode === 'read') {
+      document.getElementById('board-contents-display').textContent = boardContent || 'No text content found on this board.';
+    }
+
+  } catch(e) {
+    errEl.textContent = 'Could not read board: ' + e.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+}
+
+async function callClaude(prompt) {
+  const res = await fetch(`${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) throw new Error('API error ' + res.status);
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
+function parseResults(text) {
+  // Try to split into numbered list items
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const items = [];
+  let current = '';
+
+  for (const line of lines) {
+    const numbered = line.match(/^(\d+[\.\):]?\s*)(.*)/);
+    const bulleted = line.match(/^[-•*]\s*(.*)/);
+    if (numbered) {
+      if (current) items.push(current);
+      current = numbered[2];
+    } else if (bulleted) {
+      if (current) items.push(current);
+      current = bulleted[1];
+    } else if (current) {
+      current += ' ' + line;
+    } else {
+      current = line;
+    }
+  }
+  if (current) items.push(current);
+  return items.length > 1 ? items : [text];
+}
+
+async function runGenerate() {
+  const prompt = document.getElementById('prompt-input').value.trim();
+  if (!prompt) { document.getElementById('prompt-input').focus(); return; }
+
+  const errEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  const btn = document.getElementById('run-btn');
+  errEl.classList.remove('visible');
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('sent-msg').classList.remove('visible');
+
+  btn.disabled = true;
+  statusEl.classList.add('visible');
+  statusText.textContent = 'Generating with Claude...';
+
+  try {
+    const fullPrompt = boardContent
+      ? `You are helping develop a study program at Noroff (Norwegian vocational college).\n\nBOARD CONTENT:\n${boardContent}\n\nTASK:\n${prompt}\n\nRespond with a clear numbered list. Each item on its own line. No extra explanation.`
+      : `You are helping develop a study program at Noroff (Norwegian vocational college).\n\nTASK:\n${prompt}\n\nRespond with a clear numbered list. Each item on its own line. No extra explanation.`;
+
+    const response = await callClaude(fullPrompt);
+    results = parseResults(response);
+    showResults(results, 'Generated results');
+
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+}
+
+async function runRefine() {
+  const prompt = document.getElementById('refine-input').value.trim();
+  if (!prompt) return;
+
+  const errEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  errEl.classList.remove('visible');
+  statusEl.classList.add('visible');
+  statusText.textContent = 'Refining with Claude...';
+
+  try {
+    const selection = await miro.board.getSelection();
+    const texts = selection
+      .filter(i => i.type === 'sticky_note' || i.type === 'text' || i.type === 'card')
+      .map(i => (i.content || i.title || '').replace(/<[^>]*>/g,'').trim())
+      .filter(Boolean);
+
+    if (!texts.length) throw new Error('No sticky notes or text selected. Select items on the board first.');
+
+    const fullPrompt = `Refine the following items from a Noroff study program board.\n\nINSTRUCTION: ${prompt}\n\nITEMS:\n${texts.map((t,i)=>`${i+1}. ${t}`).join('\n')}\n\nReturn the same number of refined items as a numbered list.`;
+    const response = await callClaude(fullPrompt);
+    results = parseResults(response);
+    showResults(results, 'Refined results');
+
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+}
+
+function showResults(items, title) {
+  document.getElementById('result-title').textContent = title + ` (${items.length})`;
+  const list = document.getElementById('result-list');
+  list.innerHTML = '';
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'result-item selected';
+    div.innerHTML = `<div class="result-item-num">${i+1}</div><div class="result-item-text">${item}</div>`;
+    div.onclick = () => div.classList.toggle('selected');
+    list.appendChild(div);
+  });
+  document.getElementById('result-section').classList.add('visible');
+}
+
+function selectAll() {
+  document.querySelectorAll('.result-item').forEach(el => el.classList.add('selected'));
+}
+
+function selectColor(el) {
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+
+async function sendToBoard() {
+  const selected = [...document.querySelectorAll('.result-item.selected')].map(el =>
+    el.querySelector('.result-item-text').textContent.trim()
+  );
+  if (!selected.length) return;
+
+  const errEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  errEl.classList.remove('visible');
+  statusEl.classList.add('visible');
+  statusText.textContent = 'Sending to board...';
+
+  try {
+    const viewport = await miro.board.viewport.get();
+    const startX = viewport.x + 20;
+    const startY = viewport.y + 20;
+    const cols = Math.min(3, selected.length);
+    const W = 200, H = 120, GAP = 20;
+
+    for (let i = 0; i < selected.length; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      await miro.board.createStickyNote({
+        content: selected[i],
+        style: { fillColor: selectedColor },
+        x: startX + col * (W + GAP),
+        y: startY + row * (H + GAP),
+        width: W,
+      });
+    }
+
+    document.getElementById('sent-msg').classList.add('visible');
+    setTimeout(() => document.getElementById('sent-msg').classList.remove('visible'), 3000);
+
+  } catch(e) {
+    errEl.textContent = 'Could not write to board: ' + e.message;
+    errEl.classList.add('visible');
+  }
+  statusEl.classList.remove('visible');
+}
+</script>
+</body>
+</html>
