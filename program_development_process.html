@@ -955,6 +955,15 @@ function buildTimeline() {
   });
 }
 
+async function deleteProgram(id) {
+  const p = programs[id];
+  if (!p) return;
+  if (!confirm(`Delete "${p.name}"?\n\nThis will permanently remove the program and all its saved documents.`)) return;
+  delete programs[id];
+  await savePrograms();
+  renderDashboard();
+}
+
 function renderDashboard() {
   const progs = Object.values(programs);
   const active = progs.filter(p => p.status !== 'done');
@@ -1015,9 +1024,14 @@ function renderDashboard() {
           <div style="display:flex;margin-top:6px">${dots}</div>
           <div class="dash-prog-foot"><span>Step ${step} of 8</span><span>${pct}% complete</span></div>
         </div>
-        <button class="dash-open-btn" onclick="showGuide('${p.id}')">
-          <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i> Open program
-        </button>`;
+        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px">
+          <button class="dash-open-btn" style="margin:0" onclick="showGuide('${p.id}')">
+            <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i> Open program
+          </button>
+          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent;color:#aaa;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px" onmouseover="this.style.borderColor='#cc3333';this.style.color='#cc3333'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#aaa'">
+            <i class="ti ti-trash" style="font-size:12px" aria-hidden="true"></i> Delete
+          </button>
+        </div>`;
       el.appendChild(card);
     });
   }
