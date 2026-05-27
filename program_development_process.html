@@ -1457,6 +1457,7 @@ function render() {
     dotsHTML += `</div>${!isLast ? '<div class="dot-line"></div>' : ''}</div>`;
   });
   dotsHTML += '</div>';
+  document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
 
   // Update mandate note
   if (s.mandateTool) {
