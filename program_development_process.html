@@ -19,7 +19,6 @@
   .program-new-btn { font-size: 12px; padding: 5px 12px; border: 1px solid #D85A30; border-radius: 6px; background: transparent; color: #D85A30; cursor: pointer; white-space: nowrap; }
   .program-new-btn:hover { background: #fdf6f3; }
   .program-status { font-size: 11px; color: #aaa; white-space: nowrap; }
-  .dots-bar { display: block; margin-bottom: 0; }
   .dot-item { display: flex; align-items: center; flex: 1; }
   .dot-item:last-child { flex: 0; }
   .dot-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
@@ -217,6 +216,25 @@
   .strategic-context-key { color: #888; min-width: 110px; flex-shrink: 0; }
   .strategic-context-val { color: #1a1a1a; line-height: 1.5; }
 
+  /* ===== STEP TIMELINE HEADER ===== */
+  .timeline-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 8px; cursor: pointer; margin-bottom: 10px; user-select: none; }
+  .timeline-toggle:hover { background: #f5f5f5; }
+  .timeline-toggle-label { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
+  .timeline-toggle-chev { font-size: 13px; color: #bbb; transition: transform .2s; }
+  .timeline-toggle-chev.open { transform: rotate(180deg); }
+  .timeline-panel { display: none; background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 16px 12px; margin-bottom: 14px; overflow-x: auto; }
+  .timeline-panel.open { display: block; }
+  .tl-phase-row { display: flex; gap: 3px; margin-bottom: 8px; min-width: 600px; }
+  .tl-phase-seg { display: flex; align-items: center; justify-content: center; padding: 5px 8px; border-radius: 5px 5px 0 0; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
+  .tl-track { display: flex; align-items: flex-start; min-width: 600px; padding: 4px 0 8px; }
+  .tl-connector { flex: 1; height: 2px; margin-top: 12px; }
+  .tl-step { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 72px; }
+  .tl-step:hover .tl-dot { transform: scale(1.1); }
+  .tl-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; transition: transform .15s; flex-shrink: 0; }
+  .tl-dot.active { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+  .tl-step-name { font-size: 10px; font-weight: 500; color: #1a1a1a; margin-top: 6px; text-align: center; white-space: nowrap; }
+  .tl-step-sub { font-size: 9px; color: #aaa; text-align: center; white-space: nowrap; }
+
   /* ===== GUIDE VIEW - back btn ===== */
   .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
   .back-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; background: transparent; border: 1px solid #e0e0e0; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-family: inherit; }
@@ -248,24 +266,40 @@
       <span style="font-size:11px;color:#555" id="dash-updated"></span>
     </div>
 
-    <div style="background:#242424;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin-bottom:20px">
-      <div style="font-size:13px;color:#aaa;line-height:1.7">
-        Your shared workspace for developing new study programs at Noroff Vocational College — from the first strategic idea to NOKUT accreditation.
-        <span id="welcome-more-link" onclick="toggleWelcome()" style="color:#D85A30;cursor:pointer;font-size:12px;margin-left:6px">Read more ↓</span>
+    <!-- PROCESS OVERVIEW TIMELINE -->
+    <div style="background:#fff;border:1px solid #e8e2d8;border-radius:10px;margin-bottom:20px;overflow:hidden">
+      <div onclick="toggleWelcome()" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;background:#f4f1eb">
+        <span style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px"><i class="ti ti-timeline" style="font-size:14px;color:#D85A30"></i> Process overview — 8 steps to NOKUT accreditation</span>
+        <i class="ti ti-chevron-down" id="welcome-chev" style="font-size:14px;color:#999;transition:transform .2s"></i>
       </div>
-      <div id="welcome-more" style="display:none;margin-top:14px">
-        <div style="font-size:12px;color:#888;line-height:1.8;margin-bottom:14px">
-          Each program follows an 8-step process across three phases: <span style="color:#D85A30;font-weight:500">Strategy &amp; Planning</span>, <span style="color:#D85A30;font-weight:500">Program Development</span>, and <span style="color:#D85A30;font-weight:500">Accreditation</span>. At every step you will find clear guidance, the right people, and AI tools that generate key documents automatically — saving time and ensuring consistency across all programs.
-          <br><br>
-          Create a new program to get started, or open an existing one to continue where you left off. Your manager can follow progress for all programs directly from this dashboard.
+      <div id="welcome-more" style="display:none;padding:16px 16px 12px;overflow-x:auto">
+        <!-- Phase labels -->
+        <div style="display:flex;gap:3px;margin-bottom:6px;min-width:700px">
+          <div style="flex:3;background:#FAECE7;color:#712B13;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 1 — Strategy &amp; Planning</div>
+          <div style="flex:4;background:#E1F5EE;color:#085041;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 2 — Program Development</div>
+          <div style="flex:1;background:#E6F1FB;color:#0C447C;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 3 — Accreditation</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">How to use this tool</div>
-        <div class="dash-gs-step"><div class="dash-gs-num">1</div><div class="dash-gs-text"><strong>Create a new program</strong> — click the button below to start. Give it a name.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">2</div><div class="dash-gs-text"><strong>Work through the 8 steps</strong> — each step guides you with activities, people involved, and AI tools to generate documents.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">3</div><div class="dash-gs-text"><strong>Generate documents with AI</strong> — Step 1 makes a program summary, Step 2 a mandate, Step 3 a project plan. Each builds on the previous.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">4</div><div class="dash-gs-text"><strong>Documents are saved per program</strong> — everything survives tab switches. Come back any time and continue where you left off.</div></div>
-        <div class="dash-gs-step"><div class="dash-gs-num">5</div><div class="dash-gs-text"><strong>Track progress here</strong> — this dashboard shows all programs, their phase, completion and status at a glance.</div></div>
-        <span onclick="toggleWelcome()" style="color:#D85A30;cursor:pointer;font-size:12px;display:inline-block;margin-top:8px">Show less ↑</span>
+        <!-- Step track -->
+        <div style="display:flex;align-items:flex-start;min-width:700px;padding:8px 0 4px" id="dash-step-track"></div>
+        <!-- Detail panel -->
+        <div id="dash-step-detail" style="margin-top:12px;border-top:1px solid #f0f0f0;padding-top:12px;display:none">
+          <div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:8px" id="dsd-title"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+            <div><div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:5px">Tools &amp; AI</div><div style="display:flex;flex-wrap:wrap;gap:3px" id="dsd-tools"></div></div>
+            <div><div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:5px">Who's involved</div><div style="display:flex;flex-wrap:wrap;gap:3px" id="dsd-people"></div></div>
+            <div><div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:5px">Documents</div><div style="display:flex;flex-wrap:wrap;gap:3px" id="dsd-docs"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#633806;background:#FAEEDA;border:1px solid #FAC775;border-radius:20px;padding:4px 10px;width:fit-content"><i class="ti ti-flag" style="font-size:11px"></i><span id="dsd-gate"></span></div>
+        </div>
+        <!-- Legend -->
+        <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#D85A30"></div>Phase 1</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#1D9E75"></div>Phase 2</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#378ADD"></div>Phase 3</div>
+          <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #D85A30;color:#993C1D;background:#FAECE7">AI generator</div>
+          <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #F0997B;color:#712B13;background:#FDF1EE">Miro</div>
+          <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #85B7EB;color:#0C447C;background:#EEF5FC">Document</div>
+        </div>
       </div>
     </div>
 
@@ -306,6 +340,19 @@
     <div class="strategic-context-row"><span class="strategic-context-key">Approved by</span><span class="strategic-context-val" id="sc-approved-by">—</span></div>
     <div class="strategic-context-row"><span class="strategic-context-key">Approval date</span><span class="strategic-context-val" id="sc-approved-date">—</span></div>
   </div>
+  <!-- STEP TIMELINE HEADER -->
+  <div class="timeline-toggle" onclick="toggleTimeline()">
+    <span class="timeline-toggle-label">
+      <i class="ti ti-timeline" style="font-size:14px;color:#D85A30" aria-hidden="true"></i>
+      Process overview
+    </span>
+    <i class="ti ti-chevron-down timeline-toggle-chev" id="timeline-chev" aria-hidden="true"></i>
+  </div>
+  <div class="timeline-panel" id="timeline-panel">
+    <div class="tl-phase-row" id="tl-phase-row"></div>
+    <div class="tl-track" id="tl-track"></div>
+  </div>
+
   <div class="page-header">
     <h1>Development process for new programs</h1>
     <p>Step-by-step guide from strategy to NOKUT accreditation — including tools, documents and templates for each phase.</p>
@@ -313,7 +360,7 @@
 
 
 
-  <div class="dots-bar" id="dots-bar"></div>
+
 
   <div class="step-meta">
     <span class="step-counter" id="step-counter"></span>
@@ -779,12 +826,76 @@ function submitCreateModal(hasSummary) {
   showGuide(id);
 }
 
+const dashSteps = [
+  { num:1, name:'Project design', sub:'VOC board decision', color:'#D85A30', line:'#F0997B',
+    tools:['Strategic context review','VOC board preparation'], people:['Head of Development','Director of Strategy','Senior Advisor'], docs:['Project design brief'], gate:'VOC board approves idea to proceed' },
+  { num:2, name:'Project mandate', sub:'Rector approval', color:'#D85A30', line:'#F0997B',
+    tools:['AI mandate generator','Program summary','Risk assessment'], people:['Head of Development','Project Manager'], docs:['Project mandate','Risk register'], gate:'Mandate approved by Rector' },
+  { num:3, name:'Project plan', sub:'Plan approved', color:'#D85A30', line:'#5DCAA5',
+    tools:['AI plan generator','Partner onboarding brief'], people:['Project Manager','Project group','Industry partners'], docs:['Project plan','Partner agreements'], gate:'Plan approved by Head of Development' },
+  { num:4, name:'Industry workshops', sub:'2 workshops in Miro', color:'#1D9E75', line:'#5DCAA5',
+    tools:['Miro workshop board','Teams transcript','AI workshop summary','Partner brief generator'], people:['Project Manager','Industry partners','SMEs'], docs:['Workshop summaries','Partner brief'], gate:'Course overview approved by partners' },
+  { num:5, name:'Learning outcomes', sub:'Industry approved', color:'#1D9E75', line:'#5DCAA5',
+    tools:['AI LO generator','Industry review'], people:['Curriculum Manager','SME','Industry partners'], docs:['Program LOs','Course-level LOs'], gate:'Learning outcomes approved by industry' },
+  { num:6, name:'Course development', sub:'Study plan ready', color:'#1D9E75', line:'#5DCAA5',
+    tools:['Miro learning design','AI course generator'], people:['Curriculum Manager','Learning designer'], docs:['Study plan','Course descriptions'], gate:'Study plan ready for QA' },
+  { num:7, name:'Quality assurance', sub:'QA sign-off', color:'#1D9E75', line:'#85B7EB',
+    tools:['QA checklist','Reference group feedback'], people:['Head of Development','Reference group'], docs:['QA sign-off','Adjusted study plan'], gate:'QA complete · ready for NOKUT' },
+  { num:8, name:'NOKUT application', sub:'Accreditation decision', color:'#378ADD', line:null,
+    tools:['NOKUT portal','Board recommendation'], people:['Head of Development','Academic responsible'], docs:['NOKUT application','Board recommendation'], gate:'Vocational school board final decision' },
+];
+
+let dashActiveStep = null;
+
+function buildDashTimeline() {
+  const track = document.getElementById('dash-step-track');
+  if (!track) return;
+  track.innerHTML = '';
+  dashSteps.forEach((s, i) => {
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.style.cssText = `flex:1;height:2px;background:${dashSteps[i-1].line};margin-top:12px`;
+      track.appendChild(conn);
+    }
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:76px';
+    const isActive = dashActiveStep === i;
+    wrap.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:${s.color};color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;${isActive?'outline:3px solid #1a1a1a;outline-offset:2px':''};transition:transform .15s">${s.num}</div><div style="font-size:10px;font-weight:${isActive?'600':'500'};color:#1a1a1a;margin-top:5px;text-align:center">${s.name}</div><div style="font-size:9px;color:#888;text-align:center">${s.sub}</div>`;
+    wrap.onmouseenter = () => wrap.querySelector('div').style.transform = 'scale(1.15)';
+    wrap.onmouseleave = () => wrap.querySelector('div').style.transform = '';
+    wrap.onclick = () => { dashActiveStep = dashActiveStep === i ? null : i; buildDashTimeline(); showDashStepDetail(i); };
+    track.appendChild(wrap);
+  });
+}
+
+function showDashStepDetail(i) {
+  const detail = document.getElementById('dash-step-detail');
+  if (dashActiveStep === null) { detail.style.display = 'none'; return; }
+  const s = dashSteps[i];
+  document.getElementById('dsd-title').textContent = `Step ${s.num} — ${s.name}`;
+  const aiTools = ['AI mandate generator','AI plan generator','AI workshop summary','AI LO generator','AI course generator','Teams transcript','Partner brief generator'];
+  const miroTools = ['Miro workshop board','Miro learning design'];
+  document.getElementById('dsd-tools').innerHTML = s.tools.map(t => {
+    const isAI = aiTools.some(a => t.includes(a.split(' ')[1]||a));
+    const isMiro = miroTools.some(m => t.includes('Miro'));
+    const bg = isMiro ? '#FDF1EE' : isAI ? '#FAECE7' : '#f5f5f5';
+    const border = isMiro ? '#F0997B' : isAI ? '#D85A30' : '#e0e0e0';
+    const color = isMiro ? '#712B13' : isAI ? '#993C1D' : '#555';
+    return `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:${bg};border:1px solid ${border};color:${color}">${t}</span>`;
+  }).join('');
+  document.getElementById('dsd-people').innerHTML = s.people.map(p => `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#f5f5f5;border:1px solid #e0e0e0;color:#555">${p}</span>`).join('');
+  document.getElementById('dsd-docs').innerHTML = s.docs.map(d => `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#EEF5FC;border:1px solid #85B7EB;color:#0C447C">${d}</span>`).join('');
+  document.getElementById('dsd-gate').textContent = s.gate;
+  detail.style.display = 'block';
+}
+
 function toggleWelcome() {
   const more = document.getElementById('welcome-more');
-  const link = document.getElementById('welcome-more-link');
+  const chev = document.getElementById('welcome-chev');
   const isOpen = more.style.display !== 'none';
   more.style.display = isOpen ? 'none' : 'block';
-  link.style.display = isOpen ? 'inline' : 'none';
+  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
+  if (!isOpen) buildDashTimeline();
 }
 
 function toggleInstruction() {
@@ -792,6 +903,56 @@ function toggleInstruction() {
   const chev = document.getElementById('step-instruction-chev');
   body.classList.toggle('open');
   chev.classList.toggle('open');
+}
+
+function toggleTimeline() {
+  const panel = document.getElementById('timeline-panel');
+  const chev = document.getElementById('timeline-chev');
+  panel.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function buildTimeline() {
+  const phDefs = [
+    {label:'Phase 1 — Strategy & Planning', steps:[0,1,2], color:'#D85A30', bg:'#FAECE7', text:'#712B13', line:'#F0997B'},
+    {label:'Phase 2 — Program Development', steps:[3,4,5,6], color:'#1D9E75', bg:'#E1F5EE', text:'#085041', line:'#5DCAA5'},
+    {label:'Phase 3 — Accreditation', steps:[7], color:'#378ADD', bg:'#E6F1FB', text:'#0C447C', line:'#85B7EB'},
+  ];
+  const stepSubs = ['VOC board','Rector approval','Plan approved','2 workshops','LO approved','Study plan','QA sign-off','Accreditation'];
+
+  const phRow = document.getElementById('tl-phase-row');
+  const track = document.getElementById('tl-track');
+  if (!phRow || !track) return;
+
+  phRow.innerHTML = '';
+  track.innerHTML = '';
+
+  phDefs.forEach(ph => {
+    const seg = document.createElement('div');
+    seg.className = 'tl-phase-seg';
+    seg.style.flex = ph.steps.length;
+    seg.style.background = ph.bg;
+    seg.style.color = ph.text;
+    seg.textContent = ph.label;
+    phRow.appendChild(seg);
+  });
+
+  steps.forEach((s, i) => {
+    if (i > 0) {
+      const ph = phDefs.find(p => p.steps.includes(i));
+      const conn = document.createElement('div');
+      conn.className = 'tl-connector';
+      conn.style.background = ph ? ph.line : '#e0e0e0';
+      track.appendChild(conn);
+    }
+    const ph = phDefs.find(p => p.steps.includes(i));
+    const wrap = document.createElement('div');
+    wrap.className = 'tl-step';
+    const activeCls = i === cur ? ' active' : '';
+    wrap.innerHTML = `<div class="tl-dot${activeCls}" style="background:${ph?ph.color:'#ccc'}">${i+1}</div><div class="tl-step-name">${s.title}</div><div class="tl-step-sub">${stepSubs[i]||''}</div>`;
+    wrap.onclick = () => goto(i);
+    track.appendChild(wrap);
+  });
 }
 
 function renderDashboard() {
@@ -1167,7 +1328,7 @@ let cur = 0;
 function render() {
   const s = steps[cur];
   const ph = phases[s.phase];
-  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${s.num} of 8`;
+  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${cur+1} of 8`;
   document.getElementById('step-title').textContent = s.title;
   document.getElementById('step-intro').textContent = s.intro;
 
@@ -1278,7 +1439,6 @@ function render() {
   });
   dotsHTML += '</div>';
 
-  document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
   // Update mandate note
   if (s.mandateTool) {
     const note = document.getElementById('mandate-summary-note');
