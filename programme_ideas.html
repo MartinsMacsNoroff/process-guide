@@ -270,83 +270,8 @@
 
   td.target { width: 220px; min-width: 180px; color: var(--mid); }
 
-  .courses-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--red);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px 0 0 0;
-    margin-top: 4px;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .courses-toggle:hover { text-decoration: underline; }
-
-  .courses-toggle .chevron {
-    display: inline-block;
-    transition: transform 0.15s;
-    font-size: 9px;
-  }
-
-  .courses-toggle.expanded .chevron { transform: rotate(90deg); }
-
-  tr.courses-row { display: none; }
-  tr.courses-row.expanded { display: table-row; }
-  tr.courses-row.expanded.hidden-by-filter { display: none; }
-  tr.courses-row td {
-    background: var(--light) !important;
-    padding: 18px 16px 22px 16px;
-  }
-
-  .semester-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
-
-  .semester-block {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 10px 12px;
-  }
-
-  .semester-block .sem-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--red);
-    margin-bottom: 6px;
-  }
-
-  .semester-block ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .semester-block ul li {
-    font-size: 12px;
-    color: var(--dark);
-    padding: 2px 0;
-    line-height: 1.4;
-  }
-
-  .semester-block ul li::before {
-    content: "· ";
-    color: var(--red);
-    font-weight: 700;
-  }
-
   @media (max-width: 900px) {
-    .semester-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+    }
 
   .no-results {
     display: none;
@@ -431,20 +356,9 @@
         <div class="concept-text">Upskilling programme for working professionals who need to apply AI tools in their current roles across any industry.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI tool fundamentals</li><li>Ethics and responsible use</li><li>Industry-specific application</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c1')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI tool fundamentals</li><li>Ethics and responsible use</li><li>Industry-specific application</li></ul></td>
       <td class="target">Working professionals across industries: designers, developers, business users</td>
     </tr>
-    <tr class="courses-row" id="c1">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Introduction to AI Tools and Concepts</li><li>Digital Ethics and Responsible Use</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>AI in the Workplace: Practical Applications</li><li>Data Literacy for Non-Technical Users</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Industry-Specific AI Application</li><li>Process Improvement with AI Tools</li><li>Practical Project: AI Adoption Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Change Management and AI Adoption</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="overlap" data-rank="23">
       <td class="title">
         <div class="title-text">Fullstack AI Developer</div>
@@ -455,20 +369,9 @@
         <div class="concept-text">Fullstack development with AI tools integrated throughout. Focus on using AI as a developer, not building AI systems from scratch.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Frontend and backend development</li><li>AI-assisted coding</li><li>AI fundamentals for developers</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c2')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Frontend and backend development</li><li>AI-assisted coding</li><li>AI fundamentals for developers</li></ul></td>
       <td class="target">New students interested in development; existing developers seeking reskilling</td>
     </tr>
-    <tr class="courses-row" id="c2">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Frontend Fundamentals (HTML, CSS, JS)</li><li>Introduction to AI-Assisted Coding</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Backend Development and APIs</li><li>AI Fundamentals for Developers</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Fullstack Frameworks and Databases</li><li>AI-Assisted Testing and Debugging</li><li>Practical Project: AI-Augmented App</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Deployment and Cloud Basics</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="overlap" data-rank="26">
       <td class="title">
         <div class="title-text">AI Cybersecurity / Defence / Resilience</div>
@@ -479,20 +382,9 @@
         <div class="concept-text">Programme focused on AI applications in cybersecurity and digital defence. Early-stage concept, not yet fully developed.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI in security contexts</li><li>Further detail not developed</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c3')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI in security contexts</li><li>Further detail not developed</li></ul></td>
       <td class="target">Not specified</td>
     </tr>
-    <tr class="courses-row" id="c3">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Introduction to Cybersecurity</li><li>AI Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Network Security Basics</li><li>AI for Threat Detection</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Digital Defence and Resilience</li><li>AI-Assisted Incident Response</li><li>Practical Project: Security Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Security Governance Basics</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="overlap" data-rank="25">
       <td class="title">
         <div class="title-text">AI-Driven Customer Experience / Service Design</div>
@@ -503,20 +395,9 @@
         <div class="concept-text">Redesigned successor to the current Service Design programme. Focuses on designing AI-driven customer journeys and conversational experiences using human-centred methods.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Conversational AI design</li><li>Human-centred service design</li><li>AI-driven customer journeys</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c4')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Conversational AI design</li><li>Human-centred service design</li><li>AI-driven customer journeys</li></ul></td>
       <td class="target">Design-minded students; UX/UI designers expanding into AI; customer service professionals upskilling</td>
     </tr>
-    <tr class="courses-row" id="c4">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Foundations of Service Design</li><li>Introduction to Conversational AI</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Human-Centred Design Methods</li><li>Designing AI-Driven Customer Journeys</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Conversational Interface Design</li><li>Service Prototyping and Testing</li><li>Practical Project: CX Redesign Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Ethics in AI-Driven Service Design</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="18">
       <td class="title">
         <div class="title-text">Autonomous Systems Technology</div>
@@ -527,20 +408,9 @@
         <div class="concept-text">Vocational programme for UAV operators and technicians. Addresses Norway's defence, maritime, and energy sectors where no formal vocational pipeline currently exists.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Regulatory frameworks</li><li>Computer vision</li><li>Counter-UAS and cybersecurity</li><li>Autonomous systems concepts</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c5')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Regulatory frameworks</li><li>Computer vision</li><li>Counter-UAS and cybersecurity</li><li>Autonomous systems concepts</li></ul></td>
       <td class="target">Young people drawn to defence and security technology; IT/electronics workers upskilling for defence</td>
     </tr>
-    <tr class="courses-row" id="c5">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Introduction to UAV Systems</li><li>Regulatory Frameworks for Drones</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Embedded Systems and Sensors</li><li>Computer Vision Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Autonomous Navigation Concepts</li><li>Counter-UAS and Cybersecurity</li><li>Practical Project: UAV Operations Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Sector Applications (Maritime, Energy, Defence)</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="5">
       <td class="title">
         <div class="title-text">AISysOps: AI Infrastructure Operations</div>
@@ -551,20 +421,9 @@
         <div class="concept-text">Trains people to integrate, run, and monitor AI systems in existing IT infrastructure. The gap between traditional IT operations and machine learning: not building AI, but operating it.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI API deployment and management</li><li>RAG pipeline maintenance</li><li>AI system monitoring</li><li>Workflow chain management</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c6')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI API deployment and management</li><li>RAG pipeline maintenance</li><li>AI system monitoring</li><li>Workflow chain management</li></ul></td>
       <td class="target">Working IT professionals; network and cybersecurity students wanting AI specialisation</td>
     </tr>
-    <tr class="courses-row" id="c6">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>IT Infrastructure Fundamentals</li><li>Introduction to AI Systems</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Deploying and Managing AI APIs</li><li>Cloud Infrastructure Basics</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>RAG Pipeline Maintenance</li><li>AI System Monitoring and Logging</li><li>Practical Project: AI Ops Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Workflow Chain Management</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="partial" data-rank="16">
       <td class="title">
         <div class="title-text">AI Native Software Engineering: AI Product Engineering</div>
@@ -575,20 +434,9 @@
         <div class="concept-text">Fullstack engineering with AI integrated throughout the development lifecycle. Students build AI-powered applications and services for end users, bridging software engineering with product thinking.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Frontend, backend, cloud and API</li><li>AI product design</li><li>Human-AI interaction</li><li>Startup and product development</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c7')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Frontend, backend, cloud and API</li><li>AI product design</li><li>Human-AI interaction</li><li>Startup and product development</li></ul></td>
       <td class="target">New students; career changers; developers transitioning to AI-enabled roles</td>
     </tr>
-    <tr class="courses-row" id="c7">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Frontend and Backend Foundations</li><li>Introduction to AI Product Design</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Cloud and API Integration</li><li>Human-AI Interaction Design</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Building AI-Powered Applications</li><li>Product Thinking and Startup Development</li><li>Practical Project: AI Product Build</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Scaling and Deployment</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="11">
       <td class="title">
         <div class="title-text">AI Native Software Engineering: Agentic AI Engineering</div>
@@ -599,20 +447,9 @@
         <div class="concept-text">Students build AI agents that perform tasks autonomously. Focus on multi-agent systems, LLM engineering, and agentic workflows for real applications.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Agent design and architecture</li><li>Multi-agent systems</li><li>LLM engineering</li><li>Agent evaluation</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c8')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Agent design and architecture</li><li>Multi-agent systems</li><li>LLM engineering</li><li>Agent evaluation</li></ul></td>
       <td class="target">Aspiring software developers; students wanting to build AI-powered products and startups</td>
     </tr>
-    <tr class="courses-row" id="c8">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Programming Foundations</li><li>Introduction to LLMs</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Agent Design and Architecture</li><li>LLM Engineering Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Multi-Agent Systems</li><li>Agent Evaluation and Testing</li><li>Practical Project: Autonomous Agent Build</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Agentic Workflows in Production</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="partial" data-rank="17">
       <td class="title">
         <div class="title-text">AI Native Software Engineering: AI Automation Engineering</div>
@@ -623,20 +460,9 @@
         <div class="concept-text">Trains professionals to identify, design, build, and optimise AI-powered automation solutions. Addresses the disconnect between technical and business automation competencies in organisations.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Workflow automation</li><li>Intelligent automation</li><li>Systems integration</li><li>Operational AI</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c9')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Workflow automation</li><li>Intelligent automation</li><li>Systems integration</li><li>Operational AI</li></ul></td>
       <td class="target">New students; working professionals in development or operations seeking AI-enabled roles</td>
     </tr>
-    <tr class="courses-row" id="c9">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Introduction to Workflow Automation</li><li>AI Fundamentals for Automation</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Low-Code/No-Code Platforms</li><li>Intelligent Automation Design</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Systems Integration</li><li>Operational AI in Practice</li><li>Practical Project: Automation Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Optimising Automated Solutions</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="12">
       <td class="title">
         <div class="title-text">AI Native Software Engineering: AI Systems Design and Architecture</div>
@@ -647,20 +473,9 @@
         <div class="concept-text">Develops professionals who can design scalable AI-enabled systems and support organisational AI transformation. Focus on integration, security, cloud, and governance of AI infrastructure.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Enterprise architecture</li><li>AI infrastructure</li><li>Cloud architecture</li><li>Systems integration and governance</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c10')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Enterprise architecture</li><li>AI infrastructure</li><li>Cloud architecture</li><li>Systems integration and governance</li></ul></td>
       <td class="target">New students; career changers from IT, operations, or digital product development</td>
     </tr>
-    <tr class="courses-row" id="c10">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Enterprise Architecture Fundamentals</li><li>Introduction to AI Infrastructure</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Cloud Architecture for AI Systems</li><li>Systems Integration Principles</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Scalable AI System Design</li><li>AI Governance in Architecture</li><li>Practical Project: System Design Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Organisational AI Transformation</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="partial" data-rank="21">
       <td class="title">
         <div class="title-text">AI-Driven Digital Retail Design</div>
@@ -671,20 +486,9 @@
         <div class="concept-text">Uses AI to support product visuals, campaign content, digital merchandising, and e-commerce storytelling. Targets the gap between creative skills and AI tool fluency in retail organisations.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>E-commerce content workflows</li><li>AI-assisted product content</li><li>Visual merchandising</li><li>Brand consistency and campaign planning</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c11')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>E-commerce content workflows</li><li>AI-assisted product content</li><li>Visual merchandising</li><li>Brand consistency and campaign planning</li></ul></td>
       <td class="target">Graphic design and digital marketing students; fashion and lifestyle creatives; e-commerce assistants</td>
     </tr>
-    <tr class="courses-row" id="c11">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Foundations of Digital Retail Design</li><li>Introduction to AI Visual Tools</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>E-commerce Content Workflows</li><li>AI-Assisted Product Photography and Editing</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Visual Merchandising and Campaigns</li><li>Brand Consistency in AI Production</li><li>Practical Project: Retail Campaign Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>E-commerce Storytelling</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="20">
       <td class="title">
         <div class="title-text">AI-Driven Interactive Media Design</div>
@@ -695,20 +499,9 @@
         <div class="concept-text">AI-assisted concept development for games, interactive media, and storyworlds. Addresses the need for creatives who can use AI while maintaining original design judgement and authorship.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Visual storytelling and concept art</li><li>Worldbuilding and narrative design</li><li>Interactive prototyping</li><li>Game concept development</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c12')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Visual storytelling and concept art</li><li>Worldbuilding and narrative design</li><li>Interactive prototyping</li><li>Game concept development</li></ul></td>
       <td class="target">Graphic design and game-interested students; illustration and motion students; interactive storytelling enthusiasts</td>
     </tr>
-    <tr class="courses-row" id="c12">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Visual Storytelling Fundamentals</li><li>Introduction to AI Concept Art</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Worldbuilding and Narrative Design</li><li>AI-Assisted Concept Development</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Interactive Prototyping</li><li>Game Concept Development</li><li>Practical Project: Interactive Media Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Authorship and Originality in AI Workflows</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="partial" data-rank="10">
       <td class="title">
         <div class="title-text">Applied AI Design and Human-Centred Systems</div>
@@ -719,20 +512,9 @@
         <div class="concept-text">Trains people to govern, design, communicate with, and operationalise AI responsibly. Addresses the blurred and shifting AI role landscape employers currently face.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI literacy and ethics</li><li>AI interaction and conversational design</li><li>AI workflow and business automation</li><li>Agentic systems and experience design</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c13')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI literacy and ethics</li><li>AI interaction and conversational design</li><li>AI workflow and business automation</li><li>Agentic systems and experience design</li></ul></td>
       <td class="target">First-degree students entering the workforce AI-ready; career switchers and professionals navigating AI disruption</td>
     </tr>
-    <tr class="courses-row" id="c13">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>AI Literacy and Ethics</li><li>Introduction to Human-Centred Systems</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>AI Interaction and Conversational Design</li><li>Business Automation Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Agentic Systems and Experience Design</li><li>Governing AI Responsibly</li><li>Practical Project: Applied AI Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Strategic AI Communication</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="overlap" data-rank="22">
       <td class="title">
         <div class="title-text">Secure Fullstack Developer with AI</div>
@@ -743,20 +525,9 @@
         <div class="concept-text">Fullstack development with security and AI integrated throughout. Distinguishes between surface-level AI-assisted coding and real developer engineering. Emphasis on secure, production-ready code.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI foundations and prompt engineering</li><li>LLMs and RAG systems</li><li>Secure coding and OWASP Top 10</li><li>DevSecOps and container security</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c14')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI foundations and prompt engineering</li><li>LLMs and RAG systems</li><li>Secure coding and OWASP Top 10</li><li>DevSecOps and container security</li></ul></td>
       <td class="target">Current developers adapting to the AI era; new students depending on programme level</td>
     </tr>
-    <tr class="courses-row" id="c14">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>AI Foundations and Prompt Engineering</li><li>Secure Coding Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>LLMs and RAG Systems</li><li>OWASP Top 10 and Application Security</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>DevSecOps Practices</li><li>Authentication and Container Security</li><li>Practical Project: Secure AI App Build</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Production-Ready Engineering</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="1">
       <td class="title">
         <div class="title-text">AI Governance, Risk and Compliance</div>
@@ -767,20 +538,9 @@
         <div class="concept-text">Trains professionals to manage AI governance, regulatory compliance (EU AI Act, GDPR), and organisational risk. One of the most fully developed cards from the workshop.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI systems and technologies</li><li>Governance frameworks and EU AI Act</li><li>Risk management and cybersecurity</li><li>Ethics, trust, and responsible AI</li><li>Business implementation and audit</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c15')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI systems and technologies</li><li>Governance frameworks and EU AI Act</li><li>Risk management and cybersecurity</li><li>Ethics, trust, and responsible AI</li><li>Business implementation and audit</li></ul></td>
       <td class="target">Quality managers; HR and administration; IT and cybersecurity professionals; career changers in compliance or risk</td>
     </tr>
-    <tr class="courses-row" id="c15">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Introduction to AI Systems and Technologies</li><li>Digital Ethics and Responsible AI</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>AI Governance Frameworks and the EU AI Act</li><li>Risk Management and Cybersecurity Fundamentals</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>GDPR, NIS2 and Norwegian Regulatory Compliance</li><li>AI Audit and Business Implementation</li><li>Practical Project: Compliance Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Organisational Change and AI Adoption</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="new" data-rank="3">
       <td class="title">
         <div class="title-text">AI Operations and Workflow Automation</div>
@@ -791,20 +551,9 @@
         <div class="concept-text">Trains people to integrate AI tools into real business workflows and processes. Broad employer base: almost every organisation is currently trying to automate processes and implement AI tools.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>AI foundations</li><li>Process analysis and workflow design</li><li>Automation technologies (low/no-code)</li><li>Data and decision support</li><li>Digital transformation and change</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c16')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>AI foundations</li><li>Process analysis and workflow design</li><li>Automation technologies (low/no-code)</li><li>Data and decision support</li><li>Digital transformation and change</li></ul></td>
       <td class="target">Students seeking tech-adjacent careers without coding; working professionals wanting automation and AI implementation skills</td>
     </tr>
-    <tr class="courses-row" id="c16">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>AI Foundations</li><li>Process Analysis and Workflow Design</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Automation Technologies (Low/No-Code)</li><li>Data and Decision Support</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Digital Transformation and Change</li><li>AI Tool Implementation in Practice</li><li>Practical Project: Automation Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Measuring Automation Impact</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="15">
       <td class="title">
         <div class="title-text">Learning and Development Specialist</div>
@@ -815,20 +564,9 @@
         <div class="concept-text">Trains specialists to design AI-enhanced learning experiences for employees, customers, and learners. Addresses growing demand for L&amp;D professionals who combine learning science with AI and digital tools.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Learning design and adult learning principles</li><li>Human-centred design and UX</li><li>AI for learning (tutoring and analytics)</li><li>Digital learning products</li><li>Organisational learning and change</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c17')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Learning design and adult learning principles</li><li>Human-centred design and UX</li><li>AI for learning (tutoring and analytics)</li><li>Digital learning products</li><li>Organisational learning and change</li></ul></td>
       <td class="target">Trainers and HR professionals; L&amp;D practitioners; professionals involved in onboarding or customer education</td>
     </tr>
-    <tr class="courses-row" id="c17">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Learning Design and Adult Learning Principles</li><li>Introduction to AI for Learning</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Human-Centred Design and UX</li><li>AI Tutoring and Personalisation</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Digital Learning Products</li><li>Learning Analytics</li><li>Practical Project: L&amp;D Programme Design</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Organisational Learning and Change</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="13">
       <td class="title">
         <div class="title-text">Sustainability Data and ESG Analytics</div>
@@ -839,20 +577,9 @@
         <div class="concept-text">Combines data skills, business understanding, and sustainability literacy to fill the gap between traditional sustainability work and modern data-driven ESG reporting obligations facing Norwegian organisations.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Sustainability and ESG frameworks</li><li>Data analytics and visualisation</li><li>ESG reporting and carbon accounting</li><li>AI-assisted analysis</li><li>Stakeholder communication</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c18')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Sustainability and ESG frameworks</li><li>Data analytics and visualisation</li><li>ESG reporting and carbon accounting</li><li>AI-assisted analysis</li><li>Stakeholder communication</li></ul></td>
       <td class="target">Professionals in reporting, compliance, or procurement; employees building ESG analytics skills; students interested in data and sustainability</td>
     </tr>
-    <tr class="courses-row" id="c18">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Sustainability and ESG Frameworks</li><li>Introduction to Data Analytics</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Data Visualisation</li><li>ESG Reporting and Carbon Accounting</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>AI-Assisted Sustainability Analysis</li><li>Stakeholder Communication</li><li>Practical Project: ESG Reporting Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Regulatory Reporting in Norway</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="overlap" data-rank="14">
       <td class="title">
         <div class="title-text">AI-Driven Cybersecurity and Network Operations</div>
@@ -863,20 +590,9 @@
         <div class="concept-text">Vocational programme for SOC/NOC technicians using AI tools. Addresses the growing complexity of networks and the need for AI-assisted security monitoring and incident response.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Networking and network security fundamentals</li><li>Cloud and infrastructure operations</li><li>SIEM tools and log analysis</li><li>Python for network and security automation</li><li>Applied AI for anomaly detection</li><li>NIS2 and governance</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c19')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Networking and network security fundamentals</li><li>Cloud and infrastructure operations</li><li>SIEM tools and log analysis</li><li>Python for network and security automation</li><li>Applied AI for anomaly detection</li><li>NIS2 and governance</li></ul></td>
       <td class="target">IT infrastructure students; cybersecurity and networking students; junior IT support staff specialising</td>
     </tr>
-    <tr class="courses-row" id="c19">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Networking and Network Security Fundamentals</li><li>Cloud and Infrastructure Operations</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>SIEM Tools and Log Analysis</li><li>Python for Security Automation</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Applied AI for Anomaly Detection</li><li>NIS2 and Governance</li><li>Practical Project: SOC/NOC Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Incident Response in Practice</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="partial" data-rank="8">
       <td class="title">
         <div class="title-text">AI-Driven Smart Infrastructure</div>
@@ -887,20 +603,9 @@
         <div class="concept-text">Trains technicians to work with sensor data, IoT systems, and AI tools in buildings, energy, and industrial facilities. Addresses sustainability reporting and operational efficiency needs across Norwegian industry.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Smart infrastructure and IoT fundamentals</li><li>Time-series and sensor data</li><li>AI for forecasting and anomaly detection</li><li>Predictive maintenance</li><li>Energy optimisation and emissions reporting</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c20')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Smart infrastructure and IoT fundamentals</li><li>Time-series and sensor data</li><li>AI for forecasting and anomaly detection</li><li>Predictive maintenance</li><li>Energy optimisation and emissions reporting</li></ul></td>
       <td class="target">Students interested in technology, energy, and sustainability; technicians wanting AI and data skills</td>
     </tr>
-    <tr class="courses-row" id="c20">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Smart Infrastructure and IoT Fundamentals</li><li>Introduction to Sensor Data</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Time-Series Data Analysis</li><li>AI for Forecasting and Anomaly Detection</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Predictive Maintenance</li><li>Energy Optimisation</li><li>Practical Project: Smart Building Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Emissions Reporting and Sustainability</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="6">
       <td class="title">
         <div class="title-text">AI-Driven Maritime Operations</div>
@@ -911,20 +616,9 @@
         <div class="concept-text">Trains operational support staff for Norway's maritime sector, using AI for fleet monitoring, predictive maintenance, and remote operations support. Leverages Norway's maritime industry strength.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Maritime operations fundamentals</li><li>Fleet and vessel data</li><li>AI for anomaly detection</li><li>Emissions monitoring and reporting</li><li>Maritime cybersecurity</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c21')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Maritime operations fundamentals</li><li>Fleet and vessel data</li><li>AI for anomaly detection</li><li>Emissions monitoring and reporting</li><li>Maritime cybersecurity</li></ul></td>
       <td class="target">Students interested in maritime technology and offshore operations; technicians wanting AI and data skills</td>
     </tr>
-    <tr class="courses-row" id="c21">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Maritime Operations Fundamentals</li><li>Introduction to Fleet Data Systems</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>AI for Anomaly Detection</li><li>Predictive Maintenance for Vessels</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Emissions Monitoring and Reporting</li><li>Maritime Cybersecurity</li><li>Practical Project: Fleet Monitoring Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Remote Operations Support</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="overlap" data-rank="19">
       <td class="title">
         <div class="title-text">AI-Driven Built Environment Design</div>
@@ -935,20 +629,9 @@
         <div class="concept-text">Trains technicians to work with BIM, construction data, and AI tools across the building lifecycle: project documentation, site inspection, smart buildings, and facilities management.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>BIM fundamentals</li><li>Construction project workflows</li><li>AI-assisted document review</li><li>Smart building systems</li><li>Predictive maintenance for buildings</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c22')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>BIM fundamentals</li><li>Construction project workflows</li><li>AI-assisted document review</li><li>Smart building systems</li><li>Predictive maintenance for buildings</li></ul></td>
       <td class="target">Students interested in construction and BIM; construction workers seeking digital upskilling</td>
     </tr>
-    <tr class="courses-row" id="c22">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>BIM Fundamentals</li><li>Introduction to Construction Data</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Construction Project Workflows</li><li>AI-Assisted Document Review</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Smart Building Systems</li><li>Predictive Maintenance for Buildings</li><li>Practical Project: BIM Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Facilities Management Technology</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="4">
       <td class="title">
         <div class="title-text">Business Systems and Operations</div>
@@ -959,20 +642,9 @@
         <div class="concept-text">Trains the person between IT and the rest of the business: configuring and running CRM, ERP, and digital business tools that organisations already own but underuse. No clear education pathway currently exists for this role.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Business process mapping</li><li>ERP and CRM platforms</li><li>Workflow automation</li><li>Microsoft 365 administration</li><li>Data and reporting basics</li><li>AI as a tool in business operations</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c23')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Business process mapping</li><li>ERP and CRM platforms</li><li>Workflow automation</li><li>Microsoft 365 administration</li><li>Data and reporting basics</li><li>AI as a tool in business operations</li></ul></td>
       <td class="target">18–25 year olds interested in how businesses work digitally; career changers from administration, retail, or public sector</td>
     </tr>
-    <tr class="courses-row" id="c23">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Business Process Mapping</li><li>Introduction to ERP and CRM Platforms</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Workflow Automation</li><li>Microsoft 365 Administration</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Data and Reporting Basics</li><li>AI as a Tool in Business Operations</li><li>Practical Project: Business Systems Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Systems Administration in Practice</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="new" data-rank="2">
       <td class="title">
         <div class="title-text">IT Governance and Compliance</div>
@@ -983,20 +655,9 @@
         <div class="concept-text">Trains the person who makes sure organisations handle data responsibly. GDPR, NIS2, information security policies, and AI compliance in a Norwegian regulatory context. AI systems add new obligations that most organisations are unprepared for.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>GDPR and Norwegian data protection law</li><li>NIS2 and information security regulation</li><li>Risk assessment and ISO 27001 basics</li><li>AI governance and ethics</li><li>Compliance documentation and internal audit</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c24')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>GDPR and Norwegian data protection law</li><li>NIS2 and information security regulation</li><li>Risk assessment and ISO 27001 basics</li><li>AI governance and ethics</li><li>Compliance documentation and internal audit</li></ul></td>
       <td class="target">Career changers from administration, law, HR, or public sector; 18–25 year olds interested in law and technology</td>
     </tr>
-    <tr class="courses-row" id="c24">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>GDPR and Norwegian Data Protection Law</li><li>Introduction to Information Security</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>NIS2 and Information Security Regulation</li><li>Risk Assessment and ISO 27001 Basics</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>AI Governance and Ethics</li><li>Compliance Documentation and Internal Audit</li><li>Practical Project: Compliance Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Regulatory Change Management</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr data-portfolio="new" data-rank="9">
       <td class="title">
         <div class="title-text">Digital Commerce Operations</div>
@@ -1007,20 +668,9 @@
         <div class="concept-text">Trains people to manage the operational layer of online business: webshop platforms, payment systems, logistics integrations, and product data management. AI is embedded throughout these systems but no education pathway exists for the role.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Webshop platforms (Shopify, WooCommerce)</li><li>Payment systems (Vipps, Klarna)</li><li>ERP integration and logistics systems</li><li>Product data management</li><li>Order flow, analytics, and reporting</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c25')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Webshop platforms (Shopify, WooCommerce)</li><li>Payment systems (Vipps, Klarna)</li><li>ERP integration and logistics systems</li><li>Product data management</li><li>Order flow, analytics, and reporting</li></ul></td>
       <td class="target">18–25 year olds interested in how online business works; retail and logistics professionals formalising digital operations skills</td>
     </tr>
-    <tr class="courses-row" id="c25">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Foundations of Digital Business</li><li>Webshop Platforms and Product Data</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Payment Systems and Logistics Integration</li><li>AI Tools in E-commerce Operations</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>ERP Integration and Order Flow Management</li><li>Analytics and Reporting for Online Business</li><li>Practical Project: Webshop Operations Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>Customer Experience and Digital Marketing Operations</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
     <tr class="shaded" data-portfolio="new" data-rank="7">
       <td class="title">
         <div class="title-text">Digital Project and Implementation Coordinator</div>
@@ -1031,21 +681,10 @@
         <div class="concept-text">Trains the person who makes digital projects actually happen: not the developer, not the manager. Coordination, vendor dialogue, and implementation of digital change projects, with AI tools increasingly part of every project.</div>
         <div class="programme-structure">2-year programme · 120 credits · 4 semesters · 19 weeks each</div>
       </td>
-      <td class="topics"><ul><li>Project management fundamentals</li><li>Vendor and contract management</li><li>Change management and stakeholder communication</li><li>Requirements gathering and agile methods</li><li>AI tools in project delivery</li></ul><button class="courses-toggle" onclick="toggleCourses(this, 'c26')"><span class="chevron">▶</span> View suggested courses</button></td>
+      <td class="topics"><ul><li>Project management fundamentals</li><li>Vendor and contract management</li><li>Change management and stakeholder communication</li><li>Requirements gathering and agile methods</li><li>AI tools in project delivery</li></ul></td>
       <td class="target">18–25 year olds interested in project delivery without coding; professionals in admin or operations running digital projects without formal training</td>
     </tr>
-    <tr class="courses-row" id="c26">
-      <td colspan="4">
-        <div class="semester-grid">
-          <div class="semester-block"><div class="sem-label">Semester 1</div><ul><li>Project Management Fundamentals</li><li>Introduction to Digital Change Projects</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 2</div><ul><li>Vendor and Contract Management</li><li>Requirements Gathering</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 3</div><ul><li>Change Management and Stakeholder Communication</li><li>Agile Methods</li><li>Practical Project: Implementation Case Study</li></ul></div>
-          <div class="semester-block"><div class="sem-label">Semester 4</div><ul><li>AI Tools in Project Delivery</li><li>Capstone Project</li></ul></div>
-        </div>
-      </td>
-    </tr>
-
-  </tbody>
+    </tbody>
 </table>
 <div class="no-results" id="noResults">No ideas match this filter.</div>
 </div>
@@ -1113,19 +752,10 @@
     btn.classList.add('active');
     const rows = document.querySelectorAll('#ideasTable tbody tr[data-portfolio]');
     rows.forEach(row => {
-      const coursesRow = row.nextElementSibling;
       if (filter === 'all' || row.dataset.portfolio === filter) {
         row.classList.remove('hidden');
       } else {
         row.classList.add('hidden');
-        // collapse and hide associated courses row too
-        if (coursesRow && coursesRow.classList.contains('courses-row')) {
-          coursesRow.classList.add('hidden-by-filter');
-        }
-      }
-      if (coursesRow && coursesRow.classList.contains('courses-row')) {
-        coursesRow.classList.remove('hidden-by-filter');
-        if (row.classList.contains('hidden')) coursesRow.classList.add('hidden-by-filter');
       }
     });
     updateCount();
@@ -1148,26 +778,13 @@
       sortedByRank = false;
     }
 
-    // move each main row along with its courses-row sibling
-    mainRows.forEach(row => {
-      const coursesRow = row.nextElementSibling;
-      tbody.appendChild(row);
-      if (coursesRow && coursesRow.classList.contains('courses-row')) {
-        tbody.appendChild(coursesRow);
-      }
-    });
+    mainRows.forEach(row => tbody.appendChild(row));
 
     updateCount();
     applyShading();
   }
 
-  function toggleCourses(btn, id) {
-    const row = document.getElementById(id);
-    row.classList.toggle('expanded');
-    btn.classList.toggle('expanded');
-  }
-
-  // Store original order on load
+    // Store original order on load
   document.addEventListener('DOMContentLoaded', () => {
     const rows = document.querySelectorAll('#ideasTable tbody tr[data-portfolio]');
     rows.forEach((row, i) => row.dataset.originalIndex = i);
