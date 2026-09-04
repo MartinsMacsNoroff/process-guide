@@ -1,0 +1,358 @@
+/* ============================================================
+   Noroff Study Plan Development — Shared Stylesheet
+   v1.0 · September 2026
+   
+   Usage: add to any HTML file:
+   <link rel="stylesheet" href="noroff-style.css">
+   
+   Design principles: Tufte — maximum information, minimum
+   decoration. Colour encodes meaning, never decoration.
+   ============================================================ */
+
+/* ── Tokens ── */
+:root {
+  /* Brand */
+  --red:         #FF2F02;
+  --red-dark:    #CC2502;
+  --red-light:   #FFE8E3;
+  --sage:        #E6EFE9;
+  --sage-dark:   #C8D9CD;
+
+  /* Ink */
+  --ink:         #1a1a1a;
+  --ink-2:       #555;
+  --ink-3:       #888;
+  --ink-4:       #bbb;
+
+  /* Surfaces */
+  --surface:     #ffffff;
+  --page:        #f9f9f7;
+  --rule:        #d8d8d8;
+
+  /* Status — tints only, never solid fills */
+  --tint-positive: #E6EFE9;   /* sage — on track, completed, Phase 2, Phase 3 */
+  --tint-attention: #FFE8E3;  /* red light — at risk, Phase 1 */
+  --tint-warning-bg: #FEF3D7;
+  --tint-warning-text: #7A4F00;
+
+  /* Phase colours — for progress bars and dots only */
+  --phase-1: #FF2F02;
+  --phase-2: #1D7A4A;
+  --phase-3: #378ADD;
+
+  /* Radius */
+  --r-sm:   2px;   /* badges, inputs */
+  --r:      4px;   /* buttons, cells */
+  --r-lg:   6px;   /* cards */
+
+  /* Typography */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Dark mode ── */
+[data-theme="dark"] {
+  --ink:         #e8e4dc;
+  --ink-2:       #bbb;
+  --ink-3:       #888;
+  --ink-4:       #666;
+
+  --surface:     #1e1e1e;
+  --page:        #141414;
+  --rule:        #2a2a2a;
+
+  --sage:        #1e2820;
+  --sage-dark:   #253020;
+  --red-light:   #2a0a04;
+
+  --tint-positive:   #1e2820;
+  --tint-attention:  #2a0a04;
+  --tint-warning-bg: #2a1e04;
+  --tint-warning-text: #d4a040;
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/* ── Typography ── */
+.ns-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .09em;
+}
+
+.ns-meta {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ── Buttons ── */
+.ns-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--r);
+  cursor: pointer;
+  border: none;
+  padding: 8px 16px;
+  transition: opacity .15s, border-color .15s;
+  text-decoration: none;
+}
+
+.ns-btn-primary {
+  background: var(--red);
+  color: #fff;
+}
+.ns-btn-primary:hover { opacity: .88; }
+
+.ns-btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+.ns-btn-secondary:hover { border-color: var(--ink-3); }
+
+.ns-btn-ghost {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+.ns-btn-ghost:hover { background: var(--red-light); }
+
+.ns-btn-sm {
+  font-size: 11px;
+  padding: 5px 11px;
+}
+
+/* ── Badges ── */
+.ns-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+}
+
+/* Positive: on track, completed, Phase 2, Phase 3 */
+.ns-badge-positive {
+  background: var(--tint-positive);
+  color: var(--ink-2);
+}
+[data-theme="dark"] .ns-badge-positive {
+  color: #9dcfb5;
+}
+
+/* Attention: at risk, Phase 1 */
+.ns-badge-attention {
+  background: var(--tint-attention);
+  color: var(--red-dark);
+}
+[data-theme="dark"] .ns-badge-attention {
+  color: #ff7a5a;
+}
+
+/* Warning: needs review */
+.ns-badge-warning {
+  background: var(--tint-warning-bg);
+  color: var(--tint-warning-text);
+}
+
+/* ── Cards ── */
+.ns-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+/* ── Program card ── */
+.ns-prog-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.ns-prog-card:hover { border-color: var(--ink-4); }
+
+.ns-prog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 10px;
+}
+
+.ns-prog-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ns-prog-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  flex: 1;
+}
+
+.ns-prog-pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+}
+
+.ns-prog-body {
+  padding: 0 20px 16px;
+}
+
+/* Phase progress track */
+.ns-prog-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 2px;
+}
+
+.ns-prog-seg {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* Step dot row */
+.ns-step-row {
+  display: flex;
+}
+
+.ns-step-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.ns-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rule);
+  transition: background .2s;
+}
+
+.ns-step-dot.done {
+  background: var(--red);
+}
+
+.ns-step-dot.active {
+  background: var(--red);
+  box-shadow: 0 0 0 2px var(--red-light);
+}
+
+.ns-step-lbl {
+  font-size: 8px;
+  color: var(--ink-4);
+  text-align: center;
+}
+
+.ns-step-lbl.active {
+  color: var(--red);
+  font-weight: 500;
+}
+
+.ns-step-lbl.done {
+  color: var(--ink-3);
+}
+
+.ns-prog-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+/* ── Stat cards ── */
+.ns-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.ns-stat {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+}
+
+.ns-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+
+.ns-stat-value {
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.ns-stat-value.accent { color: var(--red); }
+
+.ns-stat-sub {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+/* ── Divider ── */
+.ns-divider {
+  height: 1px;
+  background: var(--rule);
+  margin: 20px 0;
+}
+
+/* ── Theme toggle ── */
+.ns-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--ink-2);
+  transition: border-color .15s;
+}
+.ns-toggle:hover { border-color: var(--ink-3); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .ns-stats { grid-template-columns: repeat(2, 1fr); }
+}

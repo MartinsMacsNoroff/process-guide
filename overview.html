@@ -4,216 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Program Overview — Noroff</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="noroff-style.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { padding: 28px 24px 48px; min-height: 100vh; }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0f0f0f;
-    color: #f4f1eb;
-    min-height: 100vh;
-    padding: 28px 24px 40px;
-  }
-
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #222;
-  }
-
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
   .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
 
-  .logo {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: #D85A30;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
-  }
+  .logo { width: 30px; height: 30px; border-radius: var(--r); background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .title { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .subtitle { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
 
-  .title { font-size: 16px; font-weight: 600; color: #f4f1eb; }
-  .subtitle { font-size: 11px; color: #666; margin-top: 1px; }
-
-  .topbar-right { display: flex; align-items: center; gap: 16px; }
-
-  .refresh-info { font-size: 11px; color: #555; display: flex; align-items: center; gap: 6px; }
-  .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: #1D9E75; animation: pulse 2s infinite; flex-shrink: 0; }
+  .refresh-info { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-3); }
+  .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: #1D7A4A; flex-shrink: 0; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 28px;
-  }
+  .programs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
 
-  .stat {
-    background: #1a1a1a;
-    border: 1px solid #222;
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-  .stat-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
-  .stat-value { font-size: 28px; font-weight: 600; color: #f4f1eb; line-height: 1; }
-  .stat-sub { font-size: 11px; color: #555; margin-top: 4px; }
-  .stat-value.accent { color: #D85A30; }
+  .phase-legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-3); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-  .section-label {
-    font-size: 10px; font-weight: 600; color: #444;
-    text-transform: uppercase; letter-spacing: .08em;
-    margin-bottom: 10px;
-  }
+  .empty { background: var(--surface); border: 1px dashed var(--rule); border-radius: var(--r-lg); padding: 40px; text-align: center; color: var(--ink-3); font-size: 13px; line-height: 1.8; }
 
-  .programs { display: flex; flex-direction: column; gap: 8px; }
-
-  .prog-card {
-    background: #1a1a1a;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: border-color .15s;
-  }
-  .prog-card:hover { border-color: #333; }
-
-  .prog-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px 10px;
-  }
-
-  .prog-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  .prog-name { font-size: 14px; font-weight: 600; color: #f4f1eb; flex: 1; }
-
-  .prog-badge {
-    font-size: 10px; padding: 2px 9px; border-radius: 20px;
-    font-weight: 500; white-space: nowrap;
-  }
-
-  .prog-date { font-size: 11px; color: #555; white-space: nowrap; }
-  .prog-pct { font-size: 13px; font-weight: 600; color: #D85A30; min-width: 36px; text-align: right; }
-
-  .prog-body { padding: 0 20px 14px; }
-
-  /* Phase progress bar */
-  .phase-track {
-    height: 4px;
-    border-radius: 3px;
-    display: flex;
-    gap: 2px;
-    background: #2a2a2a;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  .phase-seg { height: 100%; border-radius: 2px; }
-
-  /* Step dots row */
-  .step-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-  }
-
-  .step-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    position: relative;
-  }
-
-  .step-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    width: 100%;
-    height: 1px;
-    background: #2a2a2a;
-    z-index: 0;
-  }
-
-  .step-item.done::after { background: #D85A30; }
-
-  .step-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: #2a2a2a;
-    position: relative; z-index: 1;
-    flex-shrink: 0;
-    transition: background .2s;
-  }
-  .step-dot.done { background: #D85A30; }
-  .step-dot.active {
-    background: #D85A30;
-    box-shadow: 0 0 0 3px rgba(216,90,48,.25);
-  }
-
-  .step-label {
-    font-size: 8px;
-    color: #444;
-    text-align: center;
-    white-space: nowrap;
-    line-height: 1.2;
-  }
-  .step-label.active { color: #D85A30; font-weight: 600; }
-  .step-label.done { color: #666; }
-
-  .prog-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-  }
-  .prog-footer span { font-size: 10px; color: #555; }
-
-  /* Phase legend */
-  .phase-legend {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .legend-item {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 10px; color: #555;
-  }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  .empty {
-    background: #1a1a1a;
-    border: 1px dashed #222;
-    border-radius: 12px;
-    padding: 48px;
-    text-align: center;
-    color: #444;
-    font-size: 13px;
-    line-height: 1.8;
-  }
-
-  .loading {
-    display: flex; align-items: center; gap: 10px;
-    color: #555; font-size: 13px;
-    padding: 48px 0;
-    justify-content: center;
-  }
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid #333;
-    border-top-color: #D85A30;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    flex-shrink: 0;
-  }
+  .loading { display: flex; align-items: center; gap: 10px; color: var(--ink-3); font-size: 13px; padding: 40px 0; justify-content: center; }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--rule); border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* Step connector line */
+  .ns-step-item { position: relative; }
+  .ns-step-item:not(:last-child)::after { content: ''; position: absolute; top: 3px; left: 50%; width: 100%; height: 1px; background: var(--rule); z-index: 0; }
+  .ns-step-item.done::after { background: var(--red); }
+  .ns-step-dot { position: relative; z-index: 1; }
+
   @media (max-width: 600px) {
-    .stats { grid-template-columns: repeat(2,1fr); }
-    .step-label { display: none; }
+    .ns-stats { grid-template-columns: repeat(2,1fr); }
+    .ns-step-lbl { display: none; }
   }
 </style>
 </head>
@@ -232,72 +60,136 @@
       <div class="refresh-dot"></div>
       <span id="last-updated">Loading...</span>
     </div>
+    <button class="ns-toggle" onclick="toggleTheme()">
+      <span id="toggle-icon">○</span>
+      <span id="toggle-label">Light</span>
+    </button>
   </div>
 </div>
 
-<div class="stats">
-  <div class="stat">
-    <div class="stat-label">Active programs</div>
-    <div class="stat-value" id="s-active">—</div>
-    <div class="stat-sub" id="s-active-sub">—</div>
+<div class="ns-stats" style="margin-bottom:28px">
+  <div class="ns-stat">
+    <div class="ns-stat-label">Active programs</div>
+    <div class="ns-stat-value" id="s-active">—</div>
+    <div class="ns-stat-sub" id="s-active-sub">—</div>
   </div>
-  <div class="stat">
-    <div class="stat-label">Completed</div>
-    <div class="stat-value" id="s-done">—</div>
-    <div class="stat-sub">NOKUT submitted</div>
+  <div class="ns-stat">
+    <div class="ns-stat-label">Completed</div>
+    <div class="ns-stat-value" id="s-done">—</div>
+    <div class="ns-stat-sub">NOKUT submitted</div>
   </div>
-  <div class="stat">
-    <div class="stat-label">At risk</div>
-    <div class="stat-value accent" id="s-risk">—</div>
-    <div class="stat-sub">Needs attention</div>
+  <div class="ns-stat">
+    <div class="ns-stat-label">At risk</div>
+    <div class="ns-stat-value accent" id="s-risk">—</div>
+    <div class="ns-stat-sub">Needs attention</div>
   </div>
-  <div class="stat">
-    <div class="stat-label">Total programs</div>
-    <div class="stat-value" id="s-total">—</div>
-    <div class="stat-sub">In portfolio</div>
+  <div class="ns-stat">
+    <div class="ns-stat-label">Total programs</div>
+    <div class="ns-stat-value" id="s-total">—</div>
+    <div class="ns-stat-sub">In portfolio</div>
   </div>
 </div>
 
 <div class="phase-legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Phase 1 — Strategy & Planning</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>Phase 2 — Program Development</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div>Phase 3 — Accreditation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-1)"></div>Phase 1 — Strategy & Planning</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-2)"></div>Phase 2 — Program Development</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-3)"></div>Phase 3 — Accreditation</div>
 </div>
 
-<div class="section-label">Active programs</div>
+<div class="ns-label" style="margin-bottom:10px">Active programs</div>
 <div class="programs" id="active-list">
   <div class="loading"><div class="spinner"></div> Loading programs...</div>
 </div>
 
-<div class="section-label" style="margin-top:24px">Completed</div>
+<div class="ns-label" style="margin-top:28px;margin-bottom:10px">Completed</div>
 <div class="programs" id="done-list">
-  <p style="font-size:12px;color:#444;padding:4px 0">None yet.</p>
+  <p style="font-size:12px;color:var(--ink-3);padding:4px 0">None yet.</p>
 </div>
 
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
-const REFRESH_INTERVAL = 60000; // 1 minute
-
+const REFRESH_INTERVAL = 60000;
 const STEP_LABELS = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
-const PHASE_COLORS = ['#D85A30','#1D9E75','#378ADD'];
-const STEP_PHASES = [0,0,0,1,1,1,1,2]; // which phase each step belongs to
+const PHASE_COLORS = ['#FF2F02','#1D7A4A','#378ADD'];
+const STEP_PHASES = [0,0,0,1,1,1,1,2];
+
+let dark = false;
+function toggleTheme() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
+  document.getElementById('toggle-icon').textContent = dark ? '●' : '○';
+  document.getElementById('toggle-label').textContent = dark ? 'Dark' : 'Light';
+}
 
 async function loadPrograms() {
   try {
     const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
     const data = await res.json();
     return data.value ? JSON.parse(data.value) : {};
-  } catch(e) {
-    console.error('Load error:', e);
-    return {};
-  }
+  } catch(e) { return {}; }
+}
+
+function badgeClass(status) {
+  if (status === 'at-risk') return 'ns-badge ns-badge-attention';
+  if (status === 'done') return 'ns-badge ns-badge-positive';
+  return 'ns-badge ns-badge-positive';
+}
+
+function badgeText(status) {
+  if (status === 'done') return 'Completed';
+  if (status === 'at-risk') return 'At risk';
+  return 'On track';
+}
+
+function makeCard(p) {
+  const step = p.currentStep || 1;
+  const pct = Math.round(step / 8 * 100);
+  const dotColor = p.status === 'at-risk' ? '#FF2F02' : p.status === 'done' ? '#1D7A4A' : '#FF2F02';
+
+  const phaseDefs = [{n:3,c:'#FF2F02'},{n:4,c:'#1D7A4A'},{n:1,c:'#378ADD'}];
+  const segs = phaseDefs.map((ph, pi) => {
+    const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
+    const filled = Math.max(0, Math.min(step - start, ph.n));
+    return `<div class="ns-prog-seg" style="flex:${ph.n};background:${filled>0?ph.c:'var(--rule)'}"></div>`;
+  }).join('');
+
+  const dots = STEP_LABELS.map((label, i) => {
+    const done = i < step - 1;
+    const active = i === step - 1;
+    const cls = done ? 'done' : active ? 'active' : '';
+    const lblCls = done ? 'done' : active ? 'active' : '';
+    const itemCls = done ? 'done' : '';
+    return `<div class="ns-step-item ${itemCls}">
+      <div class="ns-step-dot ${cls}"></div>
+      <span class="ns-step-lbl ${lblCls}">${label}</span>
+    </div>`;
+  }).join('');
+
+  const card = document.createElement('div');
+  card.className = 'ns-prog-card';
+  card.innerHTML = `
+    <div class="ns-prog-header">
+      <div class="ns-prog-dot" style="background:${dotColor}"></div>
+      <span class="ns-prog-name">${p.name}</span>
+      <span class="${badgeClass(p.status)}" style="margin-right:8px">${badgeText(p.status)}</span>
+      <span class="ns-meta" style="margin-right:8px">${p.created || '—'}</span>
+      <span class="ns-prog-pct">${pct}%</span>
+    </div>
+    <div class="ns-prog-body">
+      <div class="ns-prog-track">${segs}</div>
+      <div class="ns-step-row">${dots}</div>
+      <div class="ns-prog-footer">
+        <span>Step ${step} of 8 — ${STEP_LABELS[step-1]}</span>
+        <span>${pct}% complete</span>
+      </div>
+    </div>`;
+  return card;
 }
 
 function renderStats(progs) {
   const active = progs.filter(p => p.status !== 'done');
   const done = progs.filter(p => p.status === 'done');
   const risk = progs.filter(p => p.status === 'at-risk');
-
   document.getElementById('s-active').textContent = active.length;
   document.getElementById('s-done').textContent = done.length;
   document.getElementById('s-risk').textContent = risk.length;
@@ -307,67 +199,13 @@ function renderStats(progs) {
     active.length > 0 ? 'All on track' : 'No programs yet';
 }
 
-function makeCard(p) {
-  const step = (p.currentStep || 1);
-  const pct = Math.round(step / 8 * 100);
-  const statusColor = p.status === 'at-risk' ? '#BA7517' : '#D85A30';
-  const badgeBg = p.status === 'done' ? '#222' : p.status === 'at-risk' ? '#2a1f0a' : '#2a1410';
-  const badgeColor = p.status === 'done' ? '#666' : p.status === 'at-risk' ? '#BA7517' : '#D85A30';
-  const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
-
-  // Phase progress bar segments
-  const phaseDefs = [{n:3,c:'#D85A30'},{n:4,c:'#1D9E75'},{n:1,c:'#378ADD'}];
-  const segs = phaseDefs.map((ph, pi) => {
-    const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
-    const filled = Math.max(0, Math.min(step - start, ph.n));
-    return `<div class="phase-seg" style="flex:${ph.n};background:${filled>0?ph.c:'#2a2a2a'}"></div>`;
-  }).join('');
-
-  // Step dots
-  const dots = STEP_LABELS.map((label, i) => {
-    const done = i < step - 1;
-    const active = i === step - 1;
-    const phColor = PHASE_COLORS[STEP_PHASES[i]];
-    const dotClass = done ? 'done' : active ? 'active' : '';
-    const labelClass = done ? 'done' : active ? 'active' : '';
-    const itemClass = done ? 'done' : '';
-    return `<div class="step-item ${itemClass}">
-      <div class="step-dot ${dotClass}" style="${active?`background:${phColor};box-shadow:0 0 0 3px ${phColor}33`:done?`background:${phColor}`:''}"></div>
-      <span class="step-label ${labelClass}">${label}</span>
-    </div>`;
-  }).join('');
-
-  const card = document.createElement('div');
-  card.className = 'prog-card';
-  card.innerHTML = `
-    <div class="prog-header">
-      <div class="prog-dot" style="background:${statusColor}"></div>
-      <span class="prog-name">${p.name}</span>
-      <span class="prog-badge" style="background:${badgeBg};color:${badgeColor}">${badgeText}</span>
-      <span class="prog-date">${p.created || '—'}</span>
-      <span class="prog-pct">${pct}%</span>
-    </div>
-    <div class="prog-body">
-      <div class="phase-track">${segs}</div>
-      <div class="step-row">${dots}</div>
-      <div class="prog-footer">
-        <span>Step ${step} of 8 — ${STEP_LABELS[step-1]}</span>
-        <span>${pct}% complete</span>
-      </div>
-    </div>`;
-  return card;
-}
-
 function renderPrograms(programs) {
   const progs = Object.values(programs);
   const active = progs.filter(p => p.status !== 'done');
   const done = progs.filter(p => p.status === 'done');
-
   renderStats(progs);
 
   const activeList = document.getElementById('active-list');
-  const doneList = document.getElementById('done-list');
-
   activeList.innerHTML = '';
   if (!active.length) {
     activeList.innerHTML = '<div class="empty">No active programs yet.</div>';
@@ -375,9 +213,10 @@ function renderPrograms(programs) {
     active.forEach(p => activeList.appendChild(makeCard(p)));
   }
 
+  const doneList = document.getElementById('done-list');
   doneList.innerHTML = '';
   if (!done.length) {
-    doneList.innerHTML = '<p style="font-size:12px;color:#444;padding:4px 0">None yet.</p>';
+    doneList.innerHTML = `<p style="font-size:12px;color:var(--ink-3);padding:4px 0">None yet.</p>`;
   } else {
     done.forEach(p => doneList.appendChild(makeCard(p)));
   }
