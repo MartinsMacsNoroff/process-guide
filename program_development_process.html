@@ -1128,4 +1128,337 @@ const stepInstructions = [
 ];
 
 let cur = 0;
-t
+let _dark = false;
+function toggleTheme() {
+  _dark = !_dark;
+  document.documentElement.setAttribute('data-theme', _dark ? 'dark' : '');
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = _dark ? '● Dark' : '○ Light';
+}
+
+const TOTAL_STEPS = 15;
+
+const phases = [
+  { label:'Strategy & Planning',    num:'Phase 1', steps:[0,1,2],            color:'var(--red)' },
+  { label:'Study Plan Development', num:'Phase 2', steps:[3,4,5,6,7,8],      color:'#1D7A4A' },
+  { label:'Approval',               num:'Phase 3', steps:[9,10,11,12,13,14], color:'#378ADD' },
+];
+
+function showDashboard() {
+  document.getElementById('view-dashboard').classList.add('active');
+  document.getElementById('view-guide').classList.remove('active');
+  renderDashboard();
+}
+
+function showGuide(programId) {
+  currentProgramId = programId;
+  document.getElementById('view-dashboard').classList.remove('active');
+  document.getElementById('view-guide').classList.add('active');
+  const p = programs[programId];
+  document.getElementById('guide-prog-name').textContent = p ? p.name : '';
+  if (p && (p.rationale || p.approvedBy)) {
+    document.getElementById('sc-rationale').textContent = p.rationale || '—';
+    document.getElementById('sc-approved-by').textContent = p.approvedBy || '—';
+    document.getElementById('sc-approved-date').textContent = p.approvedDate || '—';
+    document.getElementById('strategic-context').style.display = 'block';
+  } else {
+    document.getElementById('strategic-context').style.display = 'none';
+  }
+  cur = (p && p.currentStep) ? p.currentStep - 1 : 0;
+  render();
+}
+
+function dashNewProgram() {
+  ['cm-name','cm-rationale','cm-approved-by','cm-approved-date','cm-summary'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('modal-step-1').style.display = 'block';
+  document.getElementById('modal-step-2').style.display = 'none';
+  document.getElementById('create-modal').classList.add('open');
+  setTimeout(() => document.getElementById('cm-name').focus(), 100);
+}
+
+function closeCreateModal() { document.getElementById('create-modal').classList.remove('open'); }
+
+function goToModalStep2() {
+  if (!document.getElementById('cm-name').value.trim()) { document.getElementById('cm-name').focus(); return; }
+  document.getElementById('modal-step-1').style.display = 'none';
+  document.getElementById('modal-step-2').style.display = 'block';
+}
+
+function backToModalStep1() {
+  document.getElementById('modal-step-1').style.display = 'block';
+  document.getElementById('modal-step-2').style.display = 'none';
+}
+
+function submitCreateModal() {
+  const name = document.getElementById('cm-name').value.trim();
+  if (!name) return;
+  const id = 'prog_' + Date.now();
+  programs[id] = {
+    id, name,
+    rationale: document.getElementById('cm-rationale').value.trim() || 'To be confirmed',
+    approvedBy: document.getElementById('cm-approved-by').value.trim() || 'To be confirmed',
+    approvedDate: document.getElementById('cm-approved-date').value.trim() || 'To be confirmed',
+    created: new Date().toISOString().split('T')[0],
+    summary: document.getElementById('cm-summary') ? document.getElementById('cm-summary').value.trim() : '',
+    mandate: '', plan: '', miroBoard: '',
+    currentStep: 1, status: 'on-track'
+  };
+  currentProgramId = id;
+  savePrograms();
+  closeCreateModal();
+  showGuide(id);
+}
+
+async function deleteProgram(id) {
+  const p = programs[id];
+  if (!p || !confirm(`Delete "${p.name}"?\n\nThis cannot be undone.`)) return;
+  delete programs[id];
+  await savePrograms();
+  renderDashboard();
+}
+
+async function linkMiroBoard(programId) {
+  const url = prompt('Paste the Miro board URL for this program:');
+  if (!url || !url.includes('miro.com')) return;
+  programs[programId].miroBoard = url;
+  await savePrograms();
+  renderDashboard();
+}
+
+function toggleWelcome() {
+  const more = document.getElementById('welcome-more');
+  const chev = document.getElementById('welcome-chev');
+  const isOpen = more.style.display !== 'none';
+  more.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function renderDashboard() {
+  const progs = Object.values(programs);
+  const active = progs.filter(p => p.status !== 'done');
+  const done = progs.filter(p => p.status === 'done');
+  const risk = progs.filter(p => p.status === 'at-risk');
+
+  document.getElementById('ds-active').textContent = active.length;
+  document.getElementById('ds-done').textContent = done.length;
+  document.getElementById('ds-risk').textContent = risk.length;
+  document.getElementById('ds-total').textContent = progs.length;
+  document.getElementById('ds-active-sub').textContent = risk.length > 0 ? risk.length + ' at risk' : active.length > 0 ? 'All on track' : 'No programs yet';
+  document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+
+  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
+
+  function renderCards(list, containerId) {
+    const el = document.getElementById(containerId);
+    if (!list.length) {
+      el.innerHTML = containerId === 'dash-active'
+        ? '<div class="dash-empty"><p><strong>No active programs yet</strong><br>Click "Create new program" to get started.</p></div>'
+        : '<p style="color:var(--ink-3);font-size:12px;padding:4px 0">None yet.</p>';
+      return;
+    }
+    el.innerHTML = '';
+    list.forEach(p => {
+      const step = p.currentStep || 1;
+      const pct = Math.round(step / TOTAL_STEPS * 100);
+      const statusColor = p.status === 'at-risk' ? '#FF2F02' : '#FF2F02';
+      const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
+      const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
+      const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
+
+      const phaseDefs = [{n:3,c:'var(--red)'},{n:6,c:'#1D7A4A'},{n:6,c:'#378ADD'}];
+      const segs = phaseDefs.map((ph,pi) => {
+        const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
+        const d = Math.max(0,Math.min(step-start,ph.n));
+        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?ph.c:'var(--rule)'}"></div>`;
+      }).join('');
+
+      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Prog.','LO','Ind.QA','L.design','App.','LOKUT','Review','Statement','Blueprint','Board','Handover'];
+      const dots = shortLabels.map((s,i) => {
+        const d = i<step, a = i===step-1;
+        const phColor = i<3 ? 'var(--red)' : i<9 ? '#1D7A4A' : '#378ADD';
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`;
+      }).join('');
+
+      const hasMiro = p.miroBoard && p.miroBoard.includes('miro.com');
+      const miroBtn = hasMiro
+        ? `<a href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid #FFD02F;border-radius:var(--r);color:#635e00;background:rgba(255,208,47,0.08);text-decoration:none">Open Miro</a>`
+        : `<button onclick="event.stopPropagation();linkMiroBoard('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit">+ Link Miro</button>`;
+
+      const card = document.createElement('div');
+      card.className = 'dash-prog-card';
+      card.innerHTML = `
+        <div class="dash-prog-header">
+          <div class="dash-prog-dot" style="background:${statusColor}"></div>
+          <span class="dash-prog-name">${p.name}</span>
+          <span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span>
+          <span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span>
+          <span class="dash-prog-pct">${pct}%</span>
+        </div>
+        <div class="dash-prog-wrap">
+          <div class="dash-prog-track">${segs}</div>
+          <div style="display:flex;margin-top:6px">${dots}</div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span>
+            <span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap">
+          <button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>
+          ${miroBtn}
+          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button>
+        </div>`;
+      el.appendChild(card);
+    });
+  }
+
+  renderCards(active, 'dash-active');
+  renderCards(done, 'dash-done');
+}
+
+function go(d) { cur = Math.max(0, Math.min(steps.length-1, cur+d)); updateStep(); render(); }
+function goto(i) { cur = i; render(); }
+
+async function updateStep() {
+  if (!currentProgramId) return;
+  programs[currentProgramId].currentStep = cur + 1;
+  await savePrograms();
+}
+
+function toggleInstruction() {
+  document.getElementById('step-instruction-body').classList.toggle('open');
+  document.getElementById('step-instruction-chev').classList.toggle('open');
+}
+
+function renderMiroSection() {
+  const p = currentProgramId && programs[currentProgramId];
+  const step = steps[cur];
+  if (!step || !step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
+  document.getElementById('miro-section').style.display = 'block';
+  const linked = document.getElementById('miro-linked-view');
+  const unlinked = document.getElementById('miro-unlinked-view');
+  if (p && p.miroBoard) {
+    linked.style.display = 'block';
+    unlinked.style.display = 'none';
+    document.getElementById('miro-open-btn').href = p.miroBoard;
+  } else {
+    linked.style.display = 'none';
+    unlinked.style.display = 'block';
+  }
+}
+
+function showMiroLinkForm() {
+  document.getElementById('miro-link-form').classList.add('visible');
+  document.getElementById('miro-url-input').focus();
+}
+function hideMiroLinkForm() {
+  document.getElementById('miro-link-form').classList.remove('visible');
+  document.getElementById('miro-url-input').value = '';
+}
+async function saveMiroBoard() {
+  const url = document.getElementById('miro-url-input').value.trim();
+  if (!url || !url.includes('miro.com')) { alert('Please paste a valid Miro board URL.'); return; }
+  if (!currentProgramId) return;
+  programs[currentProgramId].miroBoard = url;
+  await savePrograms();
+  renderMiroSection();
+  hideMiroLinkForm();
+}
+async function unlinkMiroBoard() {
+  if (!currentProgramId) return;
+  programs[currentProgramId].miroBoard = '';
+  await savePrograms();
+  renderMiroSection();
+}
+
+function render() {
+  const s = steps[cur];
+  const ph = phases[s.phase];
+  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${cur+1} of ${TOTAL_STEPS}`;
+  document.getElementById('step-title').textContent = s.title;
+  document.getElementById('step-intro').textContent = s.intro;
+  const instrEl = document.getElementById('step-instruction-body');
+  if (instrEl) { instrEl.textContent = stepInstructions[cur] || ''; instrEl.classList.remove('open'); }
+  const instrChev = document.getElementById('step-instruction-chev');
+  if (instrChev) instrChev.classList.remove('open');
+  document.getElementById('step-roles').innerHTML = `<span style="font-size:13px;color:var(--ink-2);line-height:1.8">${s.roles.join(', ')}</span>`;
+  document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
+  const respEl = document.getElementById('step-responsible');
+  if (respEl) respEl.innerHTML = `<span style="font-size:13px;color:var(--ink-2)">${s.responsible}</span>`;
+  document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
+  document.getElementById('step-docs').innerHTML = (s.docs||[]).map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon}" style="font-size:16px;color:#3b82f6"></i><div><div style="font-size:13px;color:var(--ink)">${d.label}</div><div style="font-size:10px;color:var(--ink-3)">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:var(--ink-4)"></i></a>`).join('');
+
+  renderMiroSection();
+
+  // Hide all tool sections
+  ['summary-tool-section','mandate-tool-section','plan-tool-section','workshop-tool-section','parallel-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Nav
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').disabled = cur === steps.length - 1;
+  document.getElementById('pip-bar').innerHTML = `<span style="font-size:11px;color:var(--ink-3)">${cur+1} / ${TOTAL_STEPS}</span>`;
+
+  // Phase bar + stepper
+  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
+  const shortStepLabels = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','Ind. QA','L. design','App. docs','LOKUT','Review','Statement','Blueprint','Board','Handover'];
+
+  let phaseHTML = '<div style="display:flex;gap:4px;margin-bottom:8px">';
+  phases.forEach((ph, pi) => {
+    const isActive = ph.steps.includes(cur);
+    const isDone = ph.steps.every(s => s < cur);
+    const bg = isActive ? phaseColors[pi] : isDone ? phaseColors[pi] + 'aa' : '#efefef';
+    const textColor = (isActive || isDone) ? '#fff' : '#aaa';
+    const border = (isActive || isDone) ? 'none' : '1px solid var(--rule)';
+    phaseHTML += `<div style="flex:${ph.steps.length};background:${bg};color:${textColor};border:${border};border-radius:var(--r);padding:5px 8px;text-align:center;cursor:pointer" onclick="goto(${ph.steps[0]})">
+      <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.8">${ph.num}</div>
+      <div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ph.label}</div>
+    </div>`;
+  });
+  phaseHTML += '</div>';
+
+  let dotsHTML = '<div style="display:flex;align-items:flex-start;margin-bottom:20px;overflow-x:auto;padding-bottom:4px">';
+  steps.forEach((st, i) => {
+    const isLast = i === steps.length - 1;
+    const active = i === cur, done = i < cur;
+    const phColor = phaseColors[st.phase];
+    const dotBg = active ? phColor : done ? phColor : 'var(--rule)';
+    const labelColor = active ? phColor : 'var(--ink-4)';
+    const fontWeight = active ? '600' : '400';
+    dotsHTML += `<div style="display:flex;align-items:center;${!isLast?'flex:1':''}min-width:0">`;
+    dotsHTML += `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:36px" onclick="goto(${i})">`;
+    dotsHTML += `<div style="width:8px;height:8px;border-radius:50%;background:${dotBg};${active?`box-shadow:0 0 0 2px ${phColor}33`:''}"></div>`;
+    dotsHTML += `<span style="font-size:8px;color:${labelColor};font-weight:${fontWeight};margin-top:3px;text-align:center;white-space:nowrap;overflow:hidden;max-width:36px;text-overflow:ellipsis">${shortStepLabels[i]}</span>`;
+    dotsHTML += `</div>`;
+    if (!isLast) dotsHTML += `<div style="flex:1;height:1px;background:${done?phColor:'var(--rule)'};min-width:4px;margin-bottom:14px"></div>`;
+    dotsHTML += `</div>`;
+  });
+  dotsHTML += '</div>';
+  document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
+}
+
+async function loadPrograms() {
+  try {
+    const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
+    const data = await res.json();
+    programs = data.value ? JSON.parse(data.value) : {};
+  } catch(e) { programs = {}; }
+  renderDashboard();
+}
+
+async function savePrograms() {
+  await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(programs)
+  });
+}
+
+loadPrograms();
+</script>
+</body>
+</html>
