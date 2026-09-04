@@ -185,12 +185,41 @@
   .dash-gs-header:hover { background: #ede9e2; }
   .dash-gs-title { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; gap: 6px; }
 
+  /* ── Document reader ── */
+  .doc-reader { margin: 16px 0; border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+  .doc-reader-header { background: var(--sage); padding: 10px 14px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 8px; }
+  .doc-reader-title { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .doc-reader-sub { font-size: 11px; color: var(--ink-3); }
+  .doc-reader-body { padding: 14px; }
+  .doc-upload-area { border: 1px dashed var(--rule); border-radius: var(--r); padding: 20px; text-align: center; cursor: pointer; transition: border-color .15s; background: var(--page); }
+  .doc-upload-area:hover { border-color: var(--red); background: var(--red-light); }
+  .doc-upload-area input { display: none; }
+  .doc-upload-label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 6px; }
+  .doc-upload-btn { font-size: 12px; color: var(--red); font-weight: 500; cursor: pointer; }
+  .doc-sharepoint-row { display: flex; gap: 8px; margin-top: 10px; }
+  .doc-sharepoint-input { flex: 1; padding: 7px 10px; border: 1px solid var(--rule); border-radius: var(--r); font-size: 12px; font-family: inherit; outline: none; color: var(--ink); background: var(--surface); }
+  .doc-sharepoint-input:focus { border-color: var(--red); }
+  .doc-sharepoint-save { padding: 7px 14px; background: var(--red); color: #fff; border: none; border-radius: var(--r); font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .doc-sharepoint-save:hover { opacity: .88; }
+  .doc-summary-section { display: none; margin-top: 12px; }
+  .doc-summary-section.visible { display: block; }
+  .doc-summary-box { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: 14px; font-size: 13px; color: var(--ink); line-height: 1.7; }
+  .doc-summary-label { font-size: 10px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .doc-original-link { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--red); margin-top: 10px; text-decoration: none; }
+  .doc-original-link:hover { text-decoration: underline; }
+  .doc-run-btn { width: 100%; padding: 9px; background: var(--red); color: #fff; border: none; border-radius: var(--r); font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .doc-run-btn:hover { opacity: .88; }
+  .doc-run-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .doc-status { display: none; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-3); padding: 6px 0; }
+  .doc-status.visible { display: flex; }
+  .doc-spinner { width: 12px; height: 12px; border: 2px solid var(--rule); border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (max-width: 560px) {
     .container { padding: 20px 16px; }
     .two-col, .parallel-grid { grid-template-columns: 1fr; }
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 
@@ -494,6 +523,76 @@
             </div>
           </div>
           <div class="mandate-editor" id="ws-editor" contenteditable="true"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MANDATE DOCUMENT READER (Step 2) ── -->
+  <div id="mandate-doc-reader" style="display:none">
+    <div class="doc-reader">
+      <div class="doc-reader-header">
+        <i class="ti ti-file-text" style="font-size:15px;color:var(--red)"></i>
+        <div>
+          <div class="doc-reader-title">Project mandate</div>
+          <div class="doc-reader-sub">Upload the Word document to generate a summary</div>
+        </div>
+      </div>
+      <div class="doc-reader-body">
+        <div class="doc-upload-area" onclick="document.getElementById('mandate-file-input').click()">
+          <input type="file" id="mandate-file-input" accept=".docx" onchange="handleDocUpload(event,'mandate')">
+          <span class="doc-upload-label">Drop your .docx file here or</span>
+          <span class="doc-upload-btn">Browse files</span>
+        </div>
+        <div class="doc-sharepoint-row">
+          <input type="text" class="doc-sharepoint-input" id="mandate-sharepoint-url" placeholder="Paste SharePoint/Teams link to original document (optional)">
+          <button class="doc-sharepoint-save" onclick="saveSharePointUrl('mandate')">Save link</button>
+        </div>
+        <button class="doc-run-btn" id="mandate-doc-run-btn" disabled onclick="runDocSummary('mandate')">
+          <i class="ti ti-sparkles" style="font-size:13px"></i> Generate summary from document
+        </button>
+        <div class="doc-status" id="mandate-doc-status"><div class="doc-spinner"></div><span id="mandate-doc-status-text">Reading document...</span></div>
+        <div class="doc-summary-section" id="mandate-summary-section">
+          <div class="doc-summary-label">Document summary</div>
+          <div class="doc-summary-box" id="mandate-summary-box"></div>
+          <a class="doc-original-link" id="mandate-original-link" href="#" target="_blank" rel="noopener" style="display:none">
+            <i class="ti ti-external-link" style="font-size:12px"></i> View original document
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAN DOCUMENT READER (Step 3) ── -->
+  <div id="plan-doc-reader" style="display:none">
+    <div class="doc-reader">
+      <div class="doc-reader-header">
+        <i class="ti ti-calendar-stats" style="font-size:15px;color:var(--red)"></i>
+        <div>
+          <div class="doc-reader-title">Project plan</div>
+          <div class="doc-reader-sub">Upload the Word document to generate a summary</div>
+        </div>
+      </div>
+      <div class="doc-reader-body">
+        <div class="doc-upload-area" onclick="document.getElementById('plan-file-input').click()">
+          <input type="file" id="plan-file-input" accept=".docx" onchange="handleDocUpload(event,'plan')">
+          <span class="doc-upload-label">Drop your .docx file here or</span>
+          <span class="doc-upload-btn">Browse files</span>
+        </div>
+        <div class="doc-sharepoint-row">
+          <input type="text" class="doc-sharepoint-input" id="plan-sharepoint-url" placeholder="Paste SharePoint/Teams link to original document (optional)">
+          <button class="doc-sharepoint-save" onclick="saveSharePointUrl('plan')">Save link</button>
+        </div>
+        <button class="doc-run-btn" id="plan-doc-run-btn" disabled onclick="runDocSummary('plan')">
+          <i class="ti ti-sparkles" style="font-size:13px"></i> Generate summary from document
+        </button>
+        <div class="doc-status" id="plan-doc-status"><div class="doc-spinner"></div><span id="plan-doc-status-text">Reading document...</span></div>
+        <div class="doc-summary-section" id="plan-summary-section">
+          <div class="doc-summary-label">Document summary</div>
+          <div class="doc-summary-box" id="plan-summary-box"></div>
+          <a class="doc-original-link" id="plan-original-link" href="#" target="_blank" rel="noopener" style="display:none">
+            <i class="ti ti-external-link" style="font-size:12px"></i> View original document
+          </a>
         </div>
       </div>
     </div>
@@ -936,6 +1035,11 @@ function render() {
   document.getElementById('step-docs').innerHTML = '';
   renderMiroSection();
   ['summary-tool-section','mandate-tool-section','plan-tool-section','workshop-tool-section','parallel-section'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const mandateReader = document.getElementById('mandate-doc-reader');
+  const planReader = document.getElementById('plan-doc-reader');
+  if (mandateReader) mandateReader.style.display = cur === 1 ? 'block' : 'none';
+  if (planReader) planReader.style.display = cur === 2 ? 'block' : 'none';
+  if (cur === 1 || cur === 2) restoreDocReaders();
   document.getElementById('btn-prev').disabled = cur === 0;
   document.getElementById('btn-next').disabled = cur === steps.length - 1;
   document.getElementById('pip-bar').innerHTML = '<span style="font-size:11px;color:var(--ink-3)">' + (cur+1) + ' / ' + TOTAL_STEPS + '</span>';
