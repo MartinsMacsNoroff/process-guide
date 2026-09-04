@@ -5,250 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Plan Development — Noroff</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="noroff-style.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; margin: 0; padding: 24px 16px; color: #1a1a1a; min-height: 100vh; }
-  .container { max-width: 780px; margin: 0 auto; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; padding: 28px 32px 24px; }
+  body { font-family: var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif); background: var(--page); margin: 0; padding: 24px 16px; color: var(--ink); min-height: 100vh; }
+  .container { max-width: 780px; margin: 0 auto; background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--rule); padding: 28px 32px 24px; }
   .page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
   .page-header h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
   .page-header p { font-size: 13px; color: #666; margin: 0; }
-  .program-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 8px; margin-bottom: 20px; }
-  .program-bar-label { font-size: 11px; font-weight: 600; color: #555; white-space: nowrap; text-transform: uppercase; letter-spacing: .05em; }
-  .program-select { flex: 1; font-size: 13px; padding: 5px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; color: #1a1a1a; outline: none; }
-  .program-select:focus { border-color: #D85A30; }
-  .program-new-btn { font-size: 12px; padding: 5px 12px; border: 1px solid #D85A30; border-radius: 6px; background: transparent; color: #D85A30; cursor: pointer; white-space: nowrap; }
-  .program-new-btn:hover { background: #fdf6f3; }
-  .program-status { font-size: 11px; color: #aaa; white-space: nowrap; }
-  .dot-item { display: flex; align-items: center; flex: 1; }
-  .dot-item:last-child { flex: 0; }
-  .dot-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-  .dot-circle { width: 11px; height: 11px; border-radius: 50%; background: #d0d0d0; transition: background 0.2s; }
-  .dot-circle.active { background: #D85A30; }
-  .dot-circle.done { background: #D85A30; }
-  .dot-label { font-size: 9px; white-space: nowrap; color: #999; }
-  .dot-label.active { color: #D85A30; font-weight: 500; }
-  .dot-line { flex: 1; height: 1px; background: #e0e0e0; margin: 0 4px 14px; }
-  .step-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .step-counter { font-size: 12px; color: #888; }
-
-  .step-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
-  .step-intro { font-size: 14px; color: #555; margin: 0 0 18px; line-height: 1.6; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-  .section-label { font-size: 10px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
-
+  .section-label { font-size: 10px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 7px; }
   .activities { font-size: 12px; color: #555; line-height: 1.7; padding: 0; margin: 0; list-style: none; }
-  .activities li::before { content: "· "; color: #D85A30; }
-  .deliverable { font-size: 12px; padding: 6px 10px; border-left: 3px solid #D85A30; margin: 4px 0; color: #555; background: #fdf6f3; border-radius: 0 5px 5px 0; }
-  .section-divider { height: 1px; background: #f0f0f0; margin: 14px 0; }
+  .activities li::before { content: "· "; color: var(--red); }
+  .deliverable { font-size: 12px; padding: 6px 10px; border-left: 2px solid var(--red); margin: 4px 0; color: var(--ink-2); background: var(--sage); border-radius: 0; }
+  .section-divider { height: 1px; background: var(--rule); margin: 14px 0; }
+
+  /* ── Miro section ── */
   .miro-section { margin-bottom: 16px; }
   .miro-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 8px; border: 1px solid #FFD02F; background: transparent; cursor: pointer; text-decoration: none; width: 100%; transition: background 0.15s; }
   .miro-btn:hover { background: rgba(255,208,47,0.06); }
-
   .miro-title { font-size: 13px; font-weight: 600; color: #050038; display: block; }
   .miro-sub { font-size: 11px; color: #635e00; display: block; }
-  .parallel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; display: inline-block; margin-left: 6px; }
-  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .parallel-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
-  .parallel-head { padding: 7px 12px; font-size: 11px; font-weight: 600; }
-  .parallel-body { padding: 10px 12px; font-size: 11px; color: #555; line-height: 1.55; }
-  .doc-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #e8e8e8; margin: 5px 0; text-decoration: none; transition: border-color 0.15s, background 0.15s; color: inherit; }
-  .doc-row:hover { border-color: #D85A30; background: #f0f7ff; }
-  .doc-icon { font-size: 16px; color: #3b82f6; flex-shrink: 0; }
-  .doc-label { font-size: 13px; color: #1a1a1a; flex: 1; }
-  .doc-sub { font-size: 10px; color: #999; }
+  .miro-unlinked { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 8px; border: 1px dashed #e0e0e0; background: #fafafa; }
+  .miro-unlinked-text { font-size: 12px; color: #aaa; flex: 1; }
+  .miro-link-btn { font-size: 11px; padding: 5px 12px; border: 1px solid var(--red); border-radius: 6px; color: var(--red); background: transparent; cursor: pointer; white-space: nowrap; font-family: inherit; }
+  .miro-link-btn:hover { background: var(--red-light); }
+  .miro-link-form { margin-top: 8px; display: none; }
+  .miro-link-form.visible { display: block; }
+  .miro-link-input { width: 100%; padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; font-family: inherit; outline: none; color: #1a1a1a; margin-bottom: 6px; }
+  .miro-link-input:focus { border-color: var(--red); }
+  .miro-link-actions { display: flex; gap: 6px; }
+  .miro-save-btn { padding: 6px 14px; background: var(--red); color: #fff; border: none; border-radius: 5px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .miro-save-btn:hover { background: var(--red-dark); }
+  .miro-cancel-btn { padding: 6px 10px; background: transparent; color: #888; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+  /* ── Nav ── */
   .nav-bar { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 14px; margin-top: 4px; }
-  .nav-btn { cursor: pointer; padding: 8px 20px; border: 1px solid #d0d0d0; border-radius: 8px; font-size: 13px; background: transparent; color: #333; transition: background 0.15s; font-family: inherit; }
+  .nav-btn { cursor: pointer; padding: 8px 20px; border: 1px solid var(--rule); border-radius: var(--r); font-size: 13px; background: transparent; color: var(--ink); transition: background 0.15s; font-family: inherit; }
   .nav-btn:hover { background: #f5f5f5; }
   .nav-btn:disabled { opacity: 0.3; cursor: default; }
   .pip-bar { display: flex; gap: 6px; align-items: center; }
   .pip { width: 7px; height: 7px; border-radius: 50%; cursor: pointer; background: #d0d0d0; border: none; padding: 0; transition: background 0.2s; }
-  .pip.active { background: #D85A30; }
+  .pip.active { background: var(--red); }
 
-  /* Embedded tool styles */
-  .tool-section { margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; }
-  .tool-header { background: #f8f8f8; padding: 10px 14px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
+  /* ── Tool sections ── */
+  .tool-section { margin: 16px 0; border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+  .tool-header { background: var(--sage); padding: 10px 14px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 8px; }
   .tool-header-title { font-size: 12px; font-weight: 600; color: #333; }
   .tool-header-sub { font-size: 11px; color: #888; }
   .tool-body { padding: 14px; }
   .tool-field { margin-bottom: 12px; }
   .tool-field:last-child { margin-bottom: 0; }
   .tool-label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 4px; display: block; }
-  .tool-hint { font-size: 10px; color: #999; margin-bottom: 4px; }
   .tool-input { width: 100%; font-family: monospace; font-size: 11px; padding: 7px 10px; border: 1px solid #d0d0d0; border-radius: 5px; background: #fafafa; color: #1a1a1a; outline: none; }
-  .tool-input:focus { border-color: #D85A30; }
-  .tool-input-wrap { position: relative; }
-  .tool-input-wrap input { padding-right: 50px; }
-  .tool-show-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; background: none; border: none; color: #999; cursor: pointer; }
-  .tool-run-btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; margin-top: 4px; }
-  .tool-run-btn.orange { background: #D85A30; color: #fff; }
-  .tool-run-btn.orange:hover { background: #c04d24; }
-  .tool-run-btn.blue { background: #D85A30; color: #fff; }
-  .tool-run-btn.blue:hover { background: #c04d24; }
+  .tool-input:focus { border-color: var(--red); }
+  .tool-run-btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; margin-top: 4px; background: var(--red); color: #fff; }
+  .tool-run-btn:hover { background: var(--red-dark); }
   .tool-run-btn:disabled { background: #d0d0d0; cursor: not-allowed; }
   .tool-status { display: none; align-items: center; gap: 8px; font-size: 12px; color: #888; padding: 8px 0; }
   .tool-status.visible { display: flex; }
-  .tool-spinner { width: 14px; height: 14px; border: 2px solid #e0e0e0; border-top-color: #D85A30; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
-  .tool-result { display: none; margin-top: 12px; }
-  .tool-result.visible { display: block; }
-  .tool-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .tool-result-label { font-size: 10px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .05em; }
-  .tool-copy-btn { font-size: 10px; padding: 3px 8px; border: 1px solid #d0d0d0; border-radius: 4px; background: transparent; color: #888; cursor: pointer; }
-  .tool-copy-btn:hover { border-color: #D85A30; color: #D85A30; }
-  .tool-output { background: #fafafa; border: 1px solid #D85A30; border-radius: 8px; padding: 14px; font-size: 12px; line-height: 1.7; color: #1a1a1a; max-height: 280px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
-  .tool-output h2 { font-size: 14px; font-weight: 600; margin: 14px 0 4px; }
-  .tool-output h2:first-child { margin-top: 0; }
-  .tool-output h3 { font-size: 11px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .05em; margin: 10px 0 3px; }
-  .tool-output p { margin-bottom: 8px; }
-  .tool-output ul { padding-left: 16px; margin-bottom: 8px; }
-  .tool-output li { margin-bottom: 3px; }
+  .tool-spinner { width: 14px; height: 14px; border: 2px solid #e0e0e0; border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   .tool-error { background: #fff5f5; border: 1px solid #fca5a5; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #7f1d1d; margin-top: 8px; display: none; }
   .tool-error.visible { display: block; }
-  .tool-success { background: #fdf6f3; border: 1px solid #D85A30; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #8b3a1a; margin-top: 8px; display: none; }
-  .tool-success.visible { display: block; color: #8b3a1a; }
+  .mandate-note { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #555; margin: 10px 0; line-height: 1.5; }
   .mandate-doc-section { display: none; margin-top: 16px; }
   .mandate-doc-section.visible { display: block; }
   .mandate-doc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-  .mandate-doc-title { font-size: 10px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .05em; }
+  .mandate-doc-title { font-size: 10px; font-weight: 600; color: var(--red); text-transform: uppercase; letter-spacing: .05em; }
   .mandate-doc-actions { display: flex; gap: 6px; }
   .mandate-action-btn { font-size: 11px; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: inherit; border: 1px solid #d0d0d0; background: transparent; color: #555; }
   .mandate-action-btn:hover { background: #f0f0f0; }
-  .mandate-action-btn.primary { background: #D85A30; color: #fff; border-color: #D85A30; }
-  .mandate-action-btn.primary:hover { background: #c04d24; }
+  .mandate-action-btn.primary { background: var(--red); color: #fff; border-color: var(--red); }
+  .mandate-action-btn.primary:hover { background: var(--red-dark); }
   .mandate-editor { width: 100%; min-height: 400px; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.6; color: #1a1a1a; background: #fff; outline: none; overflow-y: auto; box-sizing: border-box; }
-  .mandate-editor:focus { border-color: #D85A30; }
-  .mandate-editor h1 { color: #1F3864; font-size: 20px; border-bottom: 2px solid #1F3864; padding-bottom: 4px; margin: 20px 0 8px; }
-  .mandate-editor h2 { color: #2E75B6; font-size: 15px; margin: 16px 0 6px; }
-  .mandate-editor table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-  .mandate-editor th { background: #D5E8F0; padding: 7px 9px; text-align: left; border: 1px solid #aaa; font-size: 12px; }
-  .mandate-editor td { padding: 6px 9px; border: 1px solid #ccc; vertical-align: top; font-size: 12px; }
-  .mandate-editor ul { padding-left: 18px; }
-  .mandate-editor li { margin-bottom: 3px; }
-  .generated-doc-card { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #e0e0e0; background: #fdf6f3; margin: 5px 0; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-  .generated-doc-card:hover { border-color: #D85A30; background: #fdf0eb; }
-  .generated-doc-icon { font-size: 16px; color: #D85A30; flex-shrink: 0; }
-  .generated-doc-label { font-size: 13px; color: #1a1a1a; flex: 1; font-weight: 500; }
-  .generated-doc-sub { font-size: 10px; color: #D85A30; }
-  .generated-doc-download { font-size: 11px; padding: 3px 8px; border: 1px solid #D85A30; border-radius: 4px; background: transparent; color: #D85A30; cursor: pointer; font-family: inherit; }
-  .generated-doc-download:hover { background: #D85A30; color: #fff; }
+  .mandate-editor:focus { border-color: var(--red); }
   .summary-doc-section { display: none; margin-top: 12px; }
   .summary-doc-section.visible { display: block; }
-  .summary-editor { width: 100%; min-height: 200px; border: 1px solid #D85A30; border-radius: 8px; padding: 14px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; line-height: 1.7; color: #1a1a1a; background: #fff; outline: none; overflow-y: auto; box-sizing: border-box; }
-  .summary-editor:focus { border-color: #D85A30; }
-  .phase-bar { display: flex; margin-bottom: 6px; border-radius: 6px; overflow: hidden; border: 1px solid #e0e0e0; }
-  .phase-seg { flex: 1; padding: 4px 8px; font-size: 9px; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: .05em; transition: background 0.3s, color 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mandate-note { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #555; margin: 10px 0; line-height: 1.5; }
+  .summary-editor { width: 100%; min-height: 200px; border: 1px solid var(--red); border-radius: 8px; padding: 14px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; line-height: 1.7; color: #1a1a1a; background: #fff; outline: none; overflow-y: auto; box-sizing: border-box; }
+  .generated-doc-card { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #e0e0e0; background: var(--red-light); margin: 5px 0; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .generated-doc-card:hover { border-color: var(--red); background: #fdf0eb; }
+  .generated-doc-icon { font-size: 16px; color: var(--red); flex-shrink: 0; }
+  .generated-doc-label { font-size: 13px; color: #1a1a1a; flex: 1; font-weight: 500; }
+  .generated-doc-sub { font-size: 10px; color: var(--red); }
+  .generated-doc-download { font-size: 11px; padding: 3px 8px; border: 1px solid var(--red); border-radius: 4px; background: transparent; color: var(--red); cursor: pointer; font-family: inherit; }
+  .generated-doc-download:hover { background: var(--red); color: #fff; }
+  .doc-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; border: 1px solid #e8e8e8; margin: 5px 0; text-decoration: none; transition: border-color 0.15s, background 0.15s; color: inherit; }
+  .doc-row:hover { border-color: var(--red); background: #f0f7ff; }
+  .parallel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; display: inline-block; margin-left: 6px; }
+  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .parallel-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .parallel-head { padding: 7px 12px; font-size: 11px; font-weight: 600; }
+  .parallel-body { padding: 10px 12px; font-size: 11px; color: #555; line-height: 1.55; }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (max-width: 560px) {
-    .container { padding: 20px 16px; }
-    .two-col, .parallel-grid { grid-template-columns: 1fr; }
-  }
-  /* ===== DASHBOARD VIEW ===== */
+  /* ── Dashboard ── */
   .view { display: none; }
   .view.active { display: block; }
-
   .dash-wrap { max-width: 900px; margin: 0 auto; padding: 0; }
-  .dash-topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 16px; border-bottom: 1px solid #2a2a2a; margin-bottom: 20px; }
-  .dash-title { font-size: 17px; font-weight: 600; color: #f4f1eb; }
-  .dash-badge { font-size: 10px; padding: 2px 9px; border-radius: 10px; background: #D85A30; color: #fff; font-weight: 500; margin-left: 8px; }
+  .dash-topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 16px; border-bottom: 1px solid var(--rule); margin-bottom: 20px; }
+  .dash-title { font-size: 17px; font-weight: 600; color: var(--ink); }
+  .dash-badge { font-size: 10px; padding: 2px 9px; border-radius: var(--r-sm); background: var(--red); color: #fff; font-weight: 500; margin-left: 8px; }
   .dash-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 24px; }
-  .dash-stat { background: #f4f1eb; border: 1px solid #e8e2d8; border-radius: 10px; padding: 16px 18px; }
-  .dash-stat-label { font-size: 10px; color: #5F5E5A; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; }
-  .dash-stat-value { font-size: 26px; font-weight: 600; color: #1a1814; }
-  .dash-stat-sub { font-size: 10px; color: #5F5E5A; margin-top: 3px; }
-  .dash-stat-accent { color: #D85A30; }
-  .dash-sec-label { font-size: 10px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
-  .dash-new-btn { display: flex; align-items: center; gap: 8px; padding: 12px 18px; background: #D85A30; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 16px; font-family: inherit; transition: background .15s; }
-  .dash-new-btn:hover { background: #c04d24; }
-  .dash-prog-card { background: #f4f1eb; border: 1px solid #e8e2d8; border-radius: 12px; margin-bottom: 10px; overflow: hidden; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
-  .dash-prog-card:hover { border-color: #D85A30; box-shadow: 0 2px 12px rgba(216,90,48,.1); }
+  .dash-stat { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-lg); padding: 16px 18px; }
+  .dash-stat-label { font-size: 10px; color: var(--ink-3); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; }
+  .dash-stat-value { font-size: 26px; font-weight: 600; color: var(--ink); }
+  .dash-stat-sub { font-size: 10px; color: var(--ink-3); margin-top: 3px; }
+  .dash-stat-accent { color: var(--red); }
+  .dash-sec-label { font-size: 10px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .dash-new-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--red); color: #fff; border: none; border-radius: var(--r); font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 16px; font-family: inherit; transition: opacity .15s; }
+  .dash-new-btn:hover { opacity: .88; }
+  .dash-prog-card { background: #f4f1eb; border: 1px solid #e8e2d8; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
   .dash-prog-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; }
   .dash-prog-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .dash-prog-name { font-size: 14px; font-weight: 600; color: #1a1814; flex: 1; }
-  .dash-prog-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
-  .dash-prog-owner { font-size: 11px; color: #888; white-space: nowrap; }
-  .dash-prog-pct { font-size: 13px; font-weight: 600; color: #D85A30; min-width: 36px; text-align: right; }
+  .dash-prog-name { font-size: 14px; font-weight: 500; color: var(--ink); flex: 1; }
+  .dash-prog-badge { font-size: 10px; padding: 2px 8px; border-radius: var(--r-sm); font-weight: 500; white-space: nowrap; }
+  .dash-prog-pct { font-size: 13px; font-weight: 600; color: var(--red); min-width: 36px; text-align: right; }
   .dash-prog-wrap { padding: 0 18px 14px; }
-  .dash-prog-track { height: 5px; border-radius: 3px; display: flex; gap: 2px; background: #e8e2d8; overflow: hidden; }
+  .dash-prog-track { height: 3px; border-radius: 2px; display: flex; gap: 2px; background: var(--rule); overflow: hidden; }
   .dash-prog-seg { height: 100%; border-radius: 2px; }
-  .dash-prog-foot { display: flex; justify-content: space-between; margin-top:6px; }
-  .dash-prog-foot span { font-size: 10px; color: #888; }
-  .dash-open-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 12px; border: 1px solid #D85A30; border-radius: 6px; color: #D85A30; background: transparent; cursor: pointer; margin: 0 18px 14px; font-family: inherit; }
-  .dash-open-btn:hover { background: #fdf6f3; }
-  .dash-empty { background: #242424; border: 1px dashed #333; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 10px; }
-  .dash-empty p { color: #666; font-size: 13px; line-height: 1.8; }
+  .dash-empty { background: var(--surface); border: 1px dashed var(--rule); border-radius: var(--r-lg); padding: 40px; text-align: center; margin-bottom: 10px; }
+  .dash-empty p { color: var(--ink-3); font-size: 13px; line-height: 1.8; }
   .dash-empty strong { color: #aaa; }
-  .dash-getting-started { background: #242424; border: 1px solid #2a2a2a; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
-  .dash-gs-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; }
-  .dash-gs-header:hover { background: #2a2a2a; }
-  .dash-gs-title { font-size: 13px; font-weight: 500; color: #f4f1eb; display: flex; align-items: center; gap: 8px; }
-  .dash-gs-chev { font-size: 14px; color: #666; transition: transform .2s; }
-  .dash-gs-chev.open { transform: rotate(180deg); }
-  .dash-gs-body { display: none; padding: 0 16px 16px; }
-  .dash-gs-body.open { display: block; }
-  .dash-gs-step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2a2a; }
-  .dash-gs-step:last-child { border-bottom: none; }
-  .dash-gs-num { width: 22px; height: 22px; border-radius: 50%; background: #D85A30; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .dash-gs-text { font-size: 12px; color: #aaa; line-height: 1.6; }
-  .dash-gs-text strong { color: #f4f1eb; }
 
-  /* ===== CREATION MODAL ===== */
+  /* ── Miro badge on program card ── */
+  .miro-card-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 4px 10px; border: 1px solid #FFD02F; border-radius: 6px; color: #635e00; background: rgba(255,208,47,0.08); cursor: pointer; text-decoration: none; font-family: inherit; transition: background .15s; }
+  .miro-card-btn:hover { background: rgba(255,208,47,0.18); }
+  .miro-card-btn.unlinked { border-color: #e0e0e0; color: #aaa; background: transparent; }
+  .miro-card-btn.unlinked:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+
+  /* ── Modal ── */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal-box { background: #fff; border-radius: 14px; padding: 28px; width: 100%; max-width: 500px; margin: 20px; }
+  .modal-box { background: var(--surface); border-radius: var(--r-lg); padding: 28px; width: 100%; max-width: 500px; margin: 20px; }
   .modal-box h2 { font-size: 16px; font-weight: 600; color: #1a1814; margin-bottom: 4px; }
   .modal-box p { font-size: 12px; color: #888; margin-bottom: 20px; line-height: 1.5; }
   .modal-field { margin-bottom: 14px; }
   .modal-field label { display: block; font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
   .modal-field input, .modal-field textarea, .modal-field select { width: 100%; padding: 9px 11px; border: 1px solid #e0e0e0; border-radius: 7px; font-size: 13px; font-family: inherit; outline: none; color: #1a1a1a; background: #fafafa; }
-  .modal-field input:focus, .modal-field textarea:focus { border-color: #D85A30; background: #fff; }
+  .modal-field input:focus, .modal-field textarea:focus { border-color: var(--red); background: #fff; }
   .modal-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
   .modal-field .hint { font-size: 11px; color: #aaa; margin-top: 3px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
-  .modal-cancel { padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 7px; background: transparent; font-size: 13px; cursor: pointer; font-family: inherit; color: #555; }
-  .modal-submit { padding: 8px 20px; background: #D85A30; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .modal-submit:hover { background: #c04d24; }
+  .modal-cancel { padding: 8px 16px; border: 1px solid var(--rule); border-radius: var(--r); background: transparent; font-size: 13px; cursor: pointer; font-family: inherit; color: var(--ink-2); }
+  .modal-submit { padding: 8px 20px; background: var(--red); color: #fff; border: none; border-radius: var(--r); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .modal-submit:hover { background: var(--red-dark); }
 
-  /* ===== STRATEGIC CONTEXT BOX ===== */
-  .strategic-context { background: #fdf6f3; border: 1px solid #f5d0c0; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
-  .strategic-context-label { font-size: 10px; font-weight: 600; color: #D85A30; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  /* ── Guide view ── */
+  .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
+  .back-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-3); background: transparent; border: 1px solid var(--rule); border-radius: var(--r); padding: 5px 12px; cursor: pointer; font-family: inherit; }
+  .back-btn:hover { border-color: var(--ink-3); color: var(--ink); }
+  .guide-prog-name { font-size: 14px; font-weight: 600; color: #1a1814; flex: 1; }
+  .strategic-context { background: var(--sage); border: 1px solid var(--sage-dark); border-radius: var(--r); padding: 14px 16px; margin-bottom: 16px; }
+  .strategic-context-label { font-size: 10px; font-weight: 600; color: var(--red); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
   .strategic-context-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
   .strategic-context-key { color: #888; min-width: 110px; flex-shrink: 0; }
   .strategic-context-val { color: #1a1a1a; line-height: 1.5; }
-
-  /* ===== STEP TIMELINE HEADER ===== */
   .dots-bar { display: block; margin-bottom: 0; }
   .dot-item { display: flex; align-items: center; }
   .dot-inner { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
   .dot-circle { width: 10px; height: 10px; border-radius: 50%; background: #d0d0d0; }
-  .dot-circle.done { background: #D85A30; }
+  .dot-circle.done { background: var(--red); }
   .dot-label { font-size: 9px; color: #999; margin-top: 3px; white-space: nowrap; }
   .dot-line { flex: 1; height: 2px; background: #e0e0e0; min-width: 10px; }
-  .timeline-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 8px; cursor: pointer; margin-bottom: 10px; user-select: none; }
-  .timeline-toggle:hover { background: #f5f5f5; }
-  .timeline-toggle-label { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
-  .timeline-toggle-chev { font-size: 13px; color: #bbb; transition: transform .2s; }
-  .timeline-toggle-chev.open { transform: rotate(180deg); }
-  .timeline-panel { display: none; background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 16px 12px; margin-bottom: 14px; overflow-x: auto; }
-  .timeline-panel.open { display: block; }
-  .tl-phase-row { display: flex; gap: 3px; margin-bottom: 8px; min-width: 600px; }
-  .tl-phase-seg { display: flex; align-items: center; justify-content: center; padding: 5px 8px; border-radius: 5px 5px 0 0; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
-  .tl-track { display: flex; align-items: flex-start; min-width: 600px; padding: 4px 0 8px; }
-  .tl-connector { flex: 1; height: 2px; margin-top: 12px; }
-  .tl-step { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 72px; }
-  .tl-step:hover .tl-dot { transform: scale(1.1); }
-  .tl-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; transition: transform .15s; flex-shrink: 0; }
-  .tl-dot.active { outline: 3px solid #1a1a1a; outline-offset: 2px; }
-  .tl-step-name { font-size: 10px; font-weight: 500; color: #1a1a1a; margin-top: 6px; text-align: center; white-space: nowrap; }
-  .tl-step-sub { font-size: 9px; color: #aaa; text-align: center; white-space: nowrap; }
-
-  /* ===== GUIDE VIEW - back btn ===== */
-  .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
-  .back-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; background: transparent; border: 1px solid #e0e0e0; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-family: inherit; }
-  .back-btn:hover { border-color: #D85A30; color: #D85A30; }
-  .guide-prog-name { font-size: 14px; font-weight: 600; color: #1a1814; }
-
-  /* ===== STEP INSTRUCTIONS ===== */
+  .step-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .step-counter { font-size: 12px; color: #888; }
+  .step-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+  .step-intro { font-size: 14px; color: #555; margin: 0 0 18px; line-height: 1.6; }
   .step-instruction { border: 1px solid #e8e8e8; border-radius: 7px; margin-bottom: 14px; overflow: hidden; }
   .step-instruction-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; background: #fafafa; }
   .step-instruction-header:hover { background: #f5f5f5; }
@@ -257,38 +178,49 @@
   .step-instruction-chev.open { transform: rotate(180deg); }
   .step-instruction-body { display: none; padding: 10px 12px; font-size: 12px; color: #555; line-height: 1.7; background: #fff; border-top: 1px solid #f0f0f0; }
   .step-instruction-body.open { display: block; }
+
+  /* ── Process overview ── */
+  .dash-getting-started { background: #fff; border: 1px solid #e8e2d8; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+  .dash-gs-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; background: #f4f1eb; }
+  .dash-gs-header:hover { background: #ede9e2; }
+  .dash-gs-title { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; gap: 6px; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (max-width: 560px) {
+    .container { padding: 20px 16px; }
+    .two-col, .parallel-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ===== DASHBOARD VIEW ===== -->
+<!-- ===== DASHBOARD ===== -->
 <div id="view-dashboard" class="view active">
   <div class="dash-wrap">
-
     <div class="dash-topbar">
       <div>
         <span class="dash-title">Study Plan Development</span>
         <span class="dash-badge">Noroff Vocational College</span>
       </div>
-      <span style="font-size:11px;color:#555" id="dash-updated"></span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:11px;color:var(--ink-3)" id="dash-updated"></span>
+        <button class="ns-toggle" onclick="toggleTheme()" id="theme-toggle">○ Light</button>
+      </div>
     </div>
 
-    <!-- PROCESS OVERVIEW TIMELINE -->
-    <div style="background:#fff;border:1px solid #e8e2d8;border-radius:10px;margin-bottom:20px;overflow:hidden">
-      <div onclick="toggleWelcome()" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;background:#f4f1eb">
-        <span style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px"><i class="ti ti-timeline" style="font-size:14px;color:#D85A30"></i> Process overview — 8 steps to NOKUT accreditation</span>
+    <!-- Process overview -->
+    <div class="dash-getting-started">
+      <div class="dash-gs-header" onclick="toggleWelcome()">
+        <span class="dash-gs-title"><i class="ti ti-timeline" style="font-size:14px;color:var(--red)"></i> Process overview — 8 steps to NOKUT accreditation</span>
         <i class="ti ti-chevron-down" id="welcome-chev" style="font-size:14px;color:#999;transition:transform .2s"></i>
       </div>
       <div id="welcome-more" style="display:none;padding:16px 16px 12px;overflow-x:auto">
-        <!-- Phase labels -->
         <div style="display:flex;gap:3px;margin-bottom:6px;min-width:700px">
           <div style="flex:3;background:#FAECE7;color:#712B13;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 1 — Strategy &amp; Planning</div>
           <div style="flex:4;background:#E1F5EE;color:#085041;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 2 — Program Development</div>
           <div style="flex:1;background:#E6F1FB;color:#0C447C;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 3 — Accreditation</div>
         </div>
-        <!-- Step track -->
         <div style="display:flex;align-items:flex-start;min-width:700px;padding:8px 0 4px" id="dash-step-track"></div>
-        <!-- Detail panel -->
         <div id="dash-step-detail" style="margin-top:12px;border-top:1px solid #f0f0f0;padding-top:12px;display:none">
           <div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:8px" id="dsd-title"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
@@ -298,12 +230,11 @@
           </div>
           <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#633806;background:#FAEEDA;border:1px solid #FAC775;border-radius:20px;padding:4px 10px;width:fit-content"><i class="ti ti-flag" style="font-size:11px"></i><span id="dsd-gate"></span></div>
         </div>
-        <!-- Legend -->
         <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#D85A30"></div>Phase 1</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>Phase 1</div>
           <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#1D9E75"></div>Phase 2</div>
           <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666"><div style="width:8px;height:8px;border-radius:50%;background:#378ADD"></div>Phase 3</div>
-          <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #D85A30;color:#993C1D;background:#FAECE7">AI generator</div>
+          <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid var(--red);color:#993C1D;background:#FAECE7">AI generator</div>
           <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #F0997B;color:#712B13;background:#FDF1EE">Miro</div>
           <div style="font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid #85B7EB;color:#0C447C;background:#EEF5FC">Document</div>
         </div>
@@ -317,18 +248,14 @@
       <div class="dash-stat"><div class="dash-stat-label">Total programs</div><div class="dash-stat-value" id="ds-total">0</div><div class="dash-stat-sub">In portfolio</div></div>
     </div>
 
-
-
     <button class="dash-new-btn" onclick="dashNewProgram()">
-      <i class="ti ti-plus" style="font-size:16px" aria-hidden="true"></i> Create new program
+      <i class="ti ti-plus" style="font-size:16px"></i> Create new program
     </button>
 
     <div class="dash-sec-label">Active programs</div>
     <div id="dash-active"></div>
-
     <div class="dash-sec-label" style="margin-top:20px">Completed</div>
     <div id="dash-done"></div>
-
   </div>
 </div>
 
@@ -336,38 +263,26 @@
 <div id="view-guide" class="view">
 <div class="container">
   <div class="back-bar">
-    <button class="back-btn" onclick="showDashboard()">
-      <i class="ti ti-arrow-left" style="font-size:13px" aria-hidden="true"></i> Dashboard
-    </button>
+    <button class="back-btn" onclick="showDashboard()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Dashboard</button>
     <span class="guide-prog-name" id="guide-prog-name"></span>
   </div>
+
   <div class="strategic-context" id="strategic-context" style="display:none">
     <div class="strategic-context-label">Strategic context</div>
     <div class="strategic-context-row"><span class="strategic-context-key">Why this program</span><span class="strategic-context-val" id="sc-rationale">—</span></div>
     <div class="strategic-context-row"><span class="strategic-context-key">Approved by</span><span class="strategic-context-val" id="sc-approved-by">—</span></div>
     <div class="strategic-context-row"><span class="strategic-context-key">Approval date</span><span class="strategic-context-val" id="sc-approved-date">—</span></div>
   </div>
-  <!-- STEP TIMELINE HEADER -->
-
-
-
-
-
-
-
 
   <div class="dots-bar" id="dots-bar"></div>
-  <div class="step-meta">
-    <span class="step-counter" id="step-counter"></span>
-  </div>
-
+  <div class="step-meta"><span class="step-counter" id="step-counter"></span></div>
   <h2 class="step-title" id="step-title"></h2>
   <p class="step-intro" id="step-intro"></p>
 
   <div class="step-instruction">
     <div class="step-instruction-header" onclick="toggleInstruction()">
-      <span class="step-instruction-title"><i class="ti ti-list-check" style="font-size:13px;color:#D85A30" aria-hidden="true"></i> Your task at this step</span>
-      <i class="ti ti-chevron-down step-instruction-chev" id="step-instruction-chev" aria-hidden="true"></i>
+      <span class="step-instruction-title"><i class="ti ti-list-check" style="font-size:13px;color:var(--red)"></i> Your task at this step</span>
+      <i class="ti ti-chevron-down step-instruction-chev" id="step-instruction-chev"></i>
     </div>
     <div class="step-instruction-body" id="step-instruction-body"></div>
   </div>
@@ -388,72 +303,80 @@
   </div>
   <div class="section-divider"></div>
 
+  <!-- ── MIRO BOARD SECTION ── -->
   <div id="miro-section" class="miro-section" style="display:none">
     <div class="section-label">Miro board</div>
-    <a class="miro-btn" id="miro-open-btn" href="https://miro.com/app/board/uXjVHRH9-Rw=/" target="_blank" rel="noopener">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg>
-      <div><span class="miro-title">Open ideation board in Miro</span><span class="miro-sub">Strategy &amp; idea development workspace</span></div>
-      <i class="ti ti-external-link" style="font-size:14px;color:#635e00;margin-left:auto"></i>
-    </a>
-
-  </div>
-
-  <!-- EMBEDDED SUMMARY GENERATOR (Step 1) -->
-  <div id="summary-tool-section" style="display:none">
-    <div class="section-label">Summary generator</div>
-    <div class="tool-section">
-      <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <div><div class="tool-header-title">Miro → Program summary</div><div class="tool-header-sub">Reads your Miro ideation board and generates a structured summary</div></div>
+    <div id="miro-linked-view" style="display:none">
+      <a class="miro-btn" id="miro-open-btn" href="#" target="_blank" rel="noopener">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg>
+        <div><span class="miro-title" id="miro-btn-title">Open Miro board</span><span class="miro-sub" id="miro-btn-sub">Click to open in a new tab</span></div>
+        <i class="ti ti-external-link" style="font-size:14px;color:#635e00;margin-left:auto"></i>
+      </a>
+      <button onclick="unlinkMiroBoard()" style="font-size:10px;color:#aaa;background:none;border:none;cursor:pointer;padding:4px 0;margin-top:4px">Change board</button>
+    </div>
+    <div id="miro-unlinked-view">
+      <div class="miro-unlinked">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#e0e0e0"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#999"/></svg>
+        <span class="miro-unlinked-text">No Miro board linked to this program yet.</span>
+        <button class="miro-link-btn" onclick="showMiroLinkForm()">+ Link board</button>
       </div>
-      <div class="tool-body">
-
-
-        <button class="tool-run-btn orange" id="summary-run-btn" onclick="runSummary()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Read Miro board and generate summary
-        </button>
-        <div class="tool-status" id="summary-status"><div class="tool-spinner"></div><span id="summary-status-text">Connecting...</span></div>
-        <div class="tool-error" id="summary-error"></div>
-<div id="summary-result" style="display:none"><div id="summary-output"></div></div>
-        <div class="summary-doc-section" id="summary-doc-section">
-          <div class="mandate-doc-header" style="margin-top:10px">
-            <span class="mandate-doc-title" style="color:#D85A30">Editable summary</span>
-            <div class="mandate-doc-actions">
-              <button class="mandate-action-btn" onclick="addSummaryToDocuments()">Add to Documents</button>
-            </div>
-          </div>
-          <div class="summary-editor" id="summary-editor" contenteditable="true"></div>
-          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit before saving to Documents.</p>
+      <div class="miro-link-form" id="miro-link-form">
+        <input class="miro-link-input" id="miro-url-input" type="text" placeholder="Paste Miro board URL — e.g. https://miro.com/app/board/uXjVHRH9-Rw=/">
+        <div class="miro-link-actions">
+          <button class="miro-save-btn" onclick="saveMiroBoard()">Save link</button>
+          <button class="miro-cancel-btn" onclick="hideMiroLinkForm()">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- EMBEDDED MANDATE GENERATOR (Step 3) -->
+  <!-- Tool sections -->
+  <div id="summary-tool-section" style="display:none">
+    <div class="section-label">Summary generator</div>
+    <div class="tool-section">
+      <div class="tool-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div><div class="tool-header-title">Miro → Program summary</div><div class="tool-header-sub">Reads your Miro ideation board and generates a structured summary</div></div>
+      </div>
+      <div class="tool-body">
+        <button class="tool-run-btn" id="summary-run-btn" onclick="runSummary()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Read Miro board and generate summary
+        </button>
+        <div class="tool-status" id="summary-status"><div class="tool-spinner"></div><span id="summary-status-text">Connecting...</span></div>
+        <div class="tool-error" id="summary-error"></div>
+        <div id="summary-result" style="display:none"><div id="summary-output"></div></div>
+        <div class="summary-doc-section" id="summary-doc-section">
+          <div class="mandate-doc-header" style="margin-top:10px">
+            <span class="mandate-doc-title" style="color:var(--red)">Editable summary</span>
+            <div class="mandate-doc-actions"><button class="mandate-action-btn" onclick="addSummaryToDocuments()">Add to Documents</button></div>
+          </div>
+          <div class="summary-editor" id="summary-editor" contenteditable="true"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit before saving.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="mandate-tool-section" style="display:none">
     <div class="section-label">Mandate generator</div>
     <div class="tool-section">
       <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <div><div class="tool-header-title">Project mandate generator</div><div class="tool-header-sub">Generates a draft Word-ready mandate from your program summary</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><div class="tool-header-title">Project mandate generator</div><div class="tool-header-sub">Generates a draft mandate from your program summary</div></div>
       </div>
       <div class="tool-body">
-        <div class="mandate-note" id="mandate-summary-note">
-          Uses the summary generated in Step 1. Make sure you have run the summary generator first.
-        </div>
-
+        <div class="mandate-note" id="mandate-summary-note">Uses the summary from Step 1. Run the summary generator first.</div>
         <div class="tool-field">
           <label class="tool-label">Program name</label>
           <input type="text" id="m-program-name" class="tool-input" placeholder="e.g. Film Production — Online Studies">
         </div>
-        <button class="tool-run-btn blue" id="mandate-run-btn" onclick="runMandate()">
+        <button class="tool-run-btn" id="mandate-run-btn" onclick="runMandate()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           Generate project mandate
         </button>
-        <div class="tool-status" id="mandate-status"><div class="tool-spinner" style="border-top-color:#D85A30"></div><span id="mandate-status-text">Generating mandate...</span></div>
+        <div class="tool-status" id="mandate-status"><div class="tool-spinner" style="border-top-color:var(--red)"></div><span id="mandate-status-text">Generating mandate...</span></div>
         <div class="tool-error" id="mandate-error"></div>
-        <div class="tool-error" id="mandate-success" style="display:none"></div>
         <div class="mandate-doc-section" id="mandate-doc-section">
           <div class="mandate-doc-header">
             <span class="mandate-doc-title">Draft project mandate — editable</span>
@@ -463,7 +386,7 @@
             </div>
           </div>
           <div class="mandate-editor" id="mandate-editor" contenteditable="true"></div>
-          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere in the document to edit. Red italic text marks fields to fill in.</p>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click to edit. Red italic = fields to fill in.</p>
         </div>
       </div>
     </div>
@@ -473,67 +396,45 @@
     <div class="section-label">Project plan generator</div>
     <div class="tool-section">
       <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <div><div class="tool-header-title">Project plan generator</div><div class="tool-header-sub">Generates a draft project plan from your mandate</div></div>
       </div>
       <div class="tool-body">
-        <div class="mandate-note" id="plan-mandate-note">Uses the mandate generated in Step 2.</div>
+        <div class="mandate-note" id="plan-mandate-note">Uses the mandate from Step 2.</div>
         <div class="tool-field">
           <label class="tool-label">Program name</label>
-          <input type="text" id="p-program-name" class="tool-input" placeholder="e.g. Film Production - Online Studies">
+          <input type="text" id="p-program-name" class="tool-input" placeholder="e.g. Film Production — Online Studies">
         </div>
-        <button class="tool-run-btn" id="plan-run-btn" onclick="runPlan()" style="background:#D85A30;color:#fff">
+        <button class="tool-run-btn" id="plan-run-btn" onclick="runPlan()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Generate project plan
         </button>
-        <div class="tool-status" id="plan-status"><div class="tool-spinner" style="border-top-color:#D85A30"></div><span id="plan-status-text">Generating plan...</span></div>
+        <div class="tool-status" id="plan-status"><div class="tool-spinner" style="border-top-color:var(--red)"></div><span id="plan-status-text">Generating plan...</span></div>
         <div class="tool-error" id="plan-error"></div>
         <div class="summary-doc-section" id="plan-doc-section">
           <div class="mandate-doc-header" style="margin-top:10px">
-            <span class="mandate-doc-title" style="color:#D85A30">Draft project plan - editable</span>
+            <span class="mandate-doc-title" style="color:var(--red)">Draft project plan — editable</span>
             <div class="mandate-doc-actions">
               <button class="mandate-action-btn" onclick="downloadPlan()">Download .html</button>
-              <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addPlanToDocuments()">Add to Documents</button>
-              <button class="mandate-action-btn primary" style="background:#1a1a1a;border-color:#1a1a1a" onclick="saveToDashboard()">Save to dashboard</button>
+              <button class="mandate-action-btn primary" onclick="addPlanToDocuments()">Add to Documents</button>
             </div>
           </div>
-          <div class="mandate-editor" id="plan-editor" contenteditable="true" style="border-color:#D85A30"></div>
-          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit. Red italic text marks fields to fill in.</p>
+          <div class="mandate-editor" id="plan-editor" contenteditable="true" style="border-color:var(--red)"></div>
+          <p style="font-size:11px;color:#888;margin-top:6px">Click to edit. Red italic = fields to fill in.</p>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WORKSHOP TOOLS (Step 6) -->
-  <!-- SUMMARY DISPLAY (Step 1) -->
-  <div id="summary-display-section" style="display:none">
-    <div class="section-label">Program summary</div>
-    <div class="tool-section">
-      <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <div><div class="tool-header-title">Program summary</div><div class="tool-header-sub">Generated during program setup — used to create the project mandate</div></div>
-      </div>
-      <div class="tool-body">
-        <div id="summary-display-content" style="font-size:13px;color:#555;line-height:1.7;white-space:pre-wrap;word-break:break-word"></div>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="mandate-action-btn" onclick="editSummaryDisplay()">Edit summary</button>
-        </div>
-        <textarea id="summary-display-editor" style="display:none;width:100%;min-height:160px;font-family:inherit;font-size:13px;padding:10px;border:1px solid #D85A30;border-radius:6px;margin-top:8px;outline:none;line-height:1.7" onblur="saveSummaryEdit()"></textarea>
       </div>
     </div>
   </div>
 
   <div id="workshop-tool-section" style="display:none">
-
-    <!-- Tool 1: Partner brief -->
     <div class="section-label">Industry partner brief</div>
     <div class="tool-section">
       <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
-        <div><div class="tool-header-title">Workshop brief generator</div><div class="tool-header-sub">Generates a short brief to share with industry partners before the workshop</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+        <div><div class="tool-header-title">Workshop brief generator</div><div class="tool-header-sub">Generates a brief to share with industry partners before the workshop</div></div>
       </div>
       <div class="tool-body">
-        <div class="mandate-note" id="brief-summary-note">Uses the program summary from Step 1. Make sure you have run the summary generator first.</div>
+        <div class="mandate-note" id="brief-summary-note">Uses the program summary from Step 1.</div>
         <div class="tool-field">
           <label class="tool-label">Workshop number</label>
           <select id="brief-workshop-num" class="tool-input" style="font-family:inherit">
@@ -545,7 +446,7 @@
           <label class="tool-label">Workshop date</label>
           <input type="text" id="brief-date" class="tool-input" placeholder="e.g. 15 June 2026">
         </div>
-        <button class="tool-run-btn orange" id="brief-run-btn" onclick="runBrief()">
+        <button class="tool-run-btn" id="brief-run-btn" onclick="runBrief()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Generate partner brief
         </button>
@@ -553,46 +454,21 @@
         <div class="tool-error" id="brief-error"></div>
         <div class="summary-doc-section" id="brief-doc-section">
           <div class="mandate-doc-header" style="margin-top:10px">
-            <span class="mandate-doc-title" style="color:#D85A30">Partner brief — editable</span>
+            <span class="mandate-doc-title" style="color:var(--red)">Partner brief — editable</span>
             <div class="mandate-doc-actions">
               <button class="mandate-action-btn" onclick="downloadBrief()">Download .html</button>
-              <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addBriefToDocuments()">Add to Documents</button>
+              <button class="mandate-action-btn primary" style="background:var(--red);border-color:var(--red)" onclick="addBriefToDocuments()">Add to Documents</button>
             </div>
           </div>
           <div class="mandate-editor" id="brief-editor" contenteditable="true"></div>
-          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit before sharing.</p>
         </div>
       </div>
     </div>
 
-    <!-- Tool 2: Miro template download -->
-    <div class="section-label" style="margin-top:16px">Miro workshop template</div>
-    <div class="tool-section">
-      <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect width="16" height="16" x="4" y="4" rx="2" fill="#FFD02F"/><path d="M13.5 6h-2l1.5 2.5-2 .5 1.5 4.5 1.5-2.5 1.5 1.5-2-6zM10.5 6l2 5-1.5-1-1.5 4-1.5-4.5-2-.5 1.5-3z" fill="#050038"/></svg>
-        <div><div class="tool-header-title">Miro workshop template</div><div class="tool-header-sub">Download a ready-to-use Miro board template for your workshop</div></div>
-      </div>
-      <div class="tool-body">
-        <div class="mandate-note" style="margin-bottom:10px">Download the template, then import it into Miro via Board menu → Import → Upload backup. The template includes frames for all workshop sections.</div>
-        <div class="tool-field">
-          <label class="tool-label">Workshop number</label>
-          <select id="template-workshop-num" class="tool-input" style="font-family:inherit">
-            <option value="1">Workshop 1 — Program scope and structure</option>
-            <option value="2">Workshop 2 — Course structure and topics</option>
-          </select>
-        </div>
-        <button class="tool-run-btn orange" onclick="downloadMiroTemplate()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download Miro template (.rtb)
-        </button>
-      </div>
-    </div>
-
-    <!-- Tool 3: Workshop summary -->
     <div class="section-label" style="margin-top:16px">Workshop summary</div>
     <div class="tool-section">
       <div class="tool-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         <div><div class="tool-header-title">Miro → Workshop summary</div><div class="tool-header-sub">Reads your workshop Miro board and generates a structured summary</div></div>
       </div>
       <div class="tool-body">
@@ -603,7 +479,7 @@
             <option value="2">Workshop 2 — Course structure and topics</option>
           </select>
         </div>
-        <button class="tool-run-btn orange" id="ws-run-btn" onclick="runWorkshopSummary()">
+        <button class="tool-run-btn" id="ws-run-btn" onclick="runWorkshopSummary()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Read Miro board and generate workshop summary
         </button>
@@ -611,14 +487,13 @@
         <div class="tool-error" id="ws-error"></div>
         <div class="summary-doc-section" id="ws-doc-section">
           <div class="mandate-doc-header" style="margin-top:10px">
-            <span class="mandate-doc-title" style="color:#D85A30">Workshop summary — editable</span>
+            <span class="mandate-doc-title" style="color:var(--red)">Workshop summary — editable</span>
             <div class="mandate-doc-actions">
               <button class="mandate-action-btn" onclick="downloadWsSummary()">Download .html</button>
-              <button class="mandate-action-btn primary" style="background:#D85A30;border-color:#D85A30" onclick="addWsToDocuments()">Add to Documents</button>
+              <button class="mandate-action-btn primary" style="background:var(--red);border-color:var(--red)" onclick="addWsToDocuments()">Add to Documents</button>
             </div>
           </div>
           <div class="mandate-editor" id="ws-editor" contenteditable="true"></div>
-          <p style="font-size:11px;color:#888;margin-top:6px">Click anywhere to edit. Review before sharing.</p>
         </div>
       </div>
     </div>
@@ -658,6 +533,65 @@
     <button class="nav-btn" id="btn-next" onclick="go(1)">Next →</button>
   </div>
 </div>
+</div>
+
+<!-- ===== CREATION MODAL ===== -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-box" style="max-width:560px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">
+      <div id="modal-step-1-dot" style="width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div id="modal-step-1-label" style="font-size:12px;font-weight:600;color:var(--red)">Strategic context</div>
+      <div style="flex:1;height:1px;background:#e0e0e0;margin:0 4px"></div>
+      <div id="modal-step-2-dot" style="width:24px;height:24px;border-radius:50%;background:#e0e0e0;color:#aaa;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div id="modal-step-2-label" style="font-size:12px;color:#aaa">Program summary</div>
+    </div>
+    <div id="modal-step-1">
+      <h2>Create new program</h2>
+      <p>Fill in the strategic context. Visible to the whole project team.</p>
+      <div class="modal-field"><label>Program name *</label><input type="text" id="cm-name" placeholder="e.g. Film Production — Online Studies"></div>
+      <div class="modal-field"><label>Strategic rationale</label><textarea id="cm-rationale" placeholder="Why was this program approved?"></textarea><div class="hint">2–4 sentences. Visible to the whole project team.</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="modal-field"><label>Approved by</label><input type="text" id="cm-approved-by" placeholder="e.g. Head of Development"></div>
+        <div class="modal-field"><label>Approval date</label><input type="text" id="cm-approved-date" placeholder="e.g. May 2026"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
+        <button class="modal-submit" onclick="goToModalStep2()">Next → Program summary</button>
+      </div>
+    </div>
+    <div id="modal-step-2" style="display:none">
+      <h2>Program summary</h2>
+      <p>Generate from Miro or write manually. Used to generate the project mandate.</p>
+      <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin-bottom:12px">
+        <div style="background:#f8f8f8;padding:8px 12px;border-bottom:1px solid #e0e0e0;font-size:11px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate from Miro board
+        </div>
+        <div style="padding:12px">
+          <button onclick="runModalSummary()" id="modal-miro-btn" style="width:100%;padding:9px;background:var(--red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Read Miro board and generate summary
+          </button>
+          <div id="modal-miro-status" style="display:none;align-items:center;gap:8px;font-size:11px;color:#888;padding:6px 0">
+            <div style="width:12px;height:12px;border:2px solid #e0e0e0;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
+            <span id="modal-miro-status-text">Reading Miro board...</span>
+          </div>
+          <div id="modal-miro-error" style="font-size:11px;color:#cc3333;margin-top:6px;display:none"></div>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Program summary <span style="font-weight:400;color:#aaa">(edit or write manually)</span></label>
+        <textarea id="cm-summary" style="min-height:140px" placeholder="Describe the program — target audience, rationale, scope, industry relevance."></textarea>
+        <div class="hint">Required for mandate generation.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="backToModalStep1()">← Back</button>
+        <button style="padding:8px 16px;border:1px solid #e0e0e0;border-radius:7px;background:transparent;font-size:13px;cursor:pointer;font-family:inherit;color:#555" onclick="submitCreateModal(false)">Skip for now</button>
+        <button class="modal-submit" onclick="submitCreateModal(true)">Create program</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
@@ -666,7 +600,67 @@ let generatedMandate = '';
 let currentProgramId = null;
 let programs = {};
 
+// ── Miro board helpers ──
+function getMiroBoardId(program) {
+  if (!program || !program.miroBoard) return null;
+  const url = program.miroBoard;
+  const m = url.match(/board\/([^/?#]+)/);
+  return m ? m[1] : null;
+}
 
+function showMiroLinkForm() {
+  document.getElementById('miro-link-form').classList.add('visible');
+  document.getElementById('miro-url-input').focus();
+}
+function hideMiroLinkForm() {
+  document.getElementById('miro-link-form').classList.remove('visible');
+  document.getElementById('miro-url-input').value = '';
+}
+
+async function saveMiroBoard() {
+  const url = document.getElementById('miro-url-input').value.trim();
+  if (!url || !url.includes('miro.com')) {
+    alert('Please paste a valid Miro board URL.');
+    return;
+  }
+  if (!currentProgramId) return;
+  programs[currentProgramId].miroBoard = url;
+  await savePrograms();
+  renderMiroSection();
+  hideMiroLinkForm();
+}
+
+async function unlinkMiroBoard() {
+  if (!currentProgramId) return;
+  programs[currentProgramId].miroBoard = '';
+  await savePrograms();
+  renderMiroSection();
+}
+
+function renderMiroSection() {
+  const p = currentProgramId && programs[currentProgramId];
+  const step = steps[cur];
+  if (!step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
+  document.getElementById('miro-section').style.display = 'block';
+
+  const linked = document.getElementById('miro-linked-view');
+  const unlinked = document.getElementById('miro-unlinked-view');
+
+  if (p && p.miroBoard) {
+    linked.style.display = 'block';
+    unlinked.style.display = 'none';
+    document.getElementById('miro-open-btn').href = p.miroBoard;
+    const isStep4 = cur === 3;
+    document.getElementById('miro-btn-title').textContent = isStep4 ? 'Open workshop board in Miro' : 'Open Miro board';
+    document.getElementById('miro-btn-sub').textContent = isStep4 ? 'Industry partner workshop workspace' : 'Strategy & idea development workspace';
+  } else {
+    linked.style.display = 'none';
+    unlinked.style.display = 'block';
+    hideMiroLinkForm();
+  }
+}
+
+// ── Dashboard ──
 function showDashboard() {
   document.getElementById('view-dashboard').classList.add('active');
   document.getElementById('view-guide').classList.remove('active');
@@ -679,8 +673,6 @@ function showGuide(programId) {
   document.getElementById('view-guide').classList.add('active');
   const p = programs[programId];
   document.getElementById('guide-prog-name').textContent = p ? p.name : '';
-
-  // Show strategic context
   if (p && (p.rationale || p.approvedBy)) {
     document.getElementById('sc-rationale').textContent = p.rationale || '—';
     document.getElementById('sc-approved-by').textContent = p.approvedBy || '—';
@@ -689,157 +681,90 @@ function showGuide(programId) {
   } else {
     document.getElementById('strategic-context').style.display = 'none';
   }
-
+  cur = (p && p.currentStep) ? p.currentStep - 1 : 0;
   clearDocuments();
   restoreDocuments();
   render();
 }
 
 function dashNewProgram() {
-  document.getElementById('cm-name').value = '';
-  document.getElementById('cm-rationale').value = '';
-  document.getElementById('cm-approved-by').value = '';
-  document.getElementById('cm-approved-date').value = '';
-  document.getElementById('cm-summary').value = '';
+  ['cm-name','cm-rationale','cm-approved-by','cm-approved-date','cm-summary'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   document.getElementById('modal-miro-error').style.display = 'none';
   document.getElementById('modal-miro-status').style.display = 'none';
   document.getElementById('modal-step-1').style.display = 'block';
   document.getElementById('modal-step-2').style.display = 'none';
-  document.getElementById('modal-step-1-dot').style.background = '#D85A30';
+  document.getElementById('modal-step-1-dot').style.background = 'var(--red)';
   document.getElementById('modal-step-1-dot').style.color = '#fff';
-  document.getElementById('modal-step-1-label').style.color = '#D85A30';
+  document.getElementById('modal-step-1-label').style.color = 'var(--red)';
   document.getElementById('modal-step-2-dot').style.background = '#e0e0e0';
   document.getElementById('modal-step-2-dot').style.color = '#aaa';
   document.getElementById('modal-step-2-label').style.color = '#aaa';
   document.getElementById('create-modal').classList.add('open');
   setTimeout(() => document.getElementById('cm-name').focus(), 100);
 }
-
-function closeCreateModal() {
-  document.getElementById('create-modal').classList.remove('open');
-}
-
+function closeCreateModal() { document.getElementById('create-modal').classList.remove('open'); }
 function goToModalStep2() {
-  const name = document.getElementById('cm-name').value.trim();
-  if (!name) { document.getElementById('cm-name').focus(); return; }
+  if (!document.getElementById('cm-name').value.trim()) { document.getElementById('cm-name').focus(); return; }
   document.getElementById('modal-step-1').style.display = 'none';
   document.getElementById('modal-step-2').style.display = 'block';
   document.getElementById('modal-step-1-dot').style.background = '#5DCAA5';
   document.getElementById('modal-step-1-label').style.color = '#555';
-  document.getElementById('modal-step-2-dot').style.background = '#D85A30';
+  document.getElementById('modal-step-2-dot').style.background = 'var(--red)';
   document.getElementById('modal-step-2-dot').style.color = '#fff';
-  document.getElementById('modal-step-2-label').style.color = '#D85A30';
+  document.getElementById('modal-step-2-label').style.color = 'var(--red)';
 }
-
 function backToModalStep1() {
   document.getElementById('modal-step-1').style.display = 'block';
   document.getElementById('modal-step-2').style.display = 'none';
-  document.getElementById('modal-step-1-dot').style.background = '#D85A30';
-  document.getElementById('modal-step-1-label').style.color = '#D85A30';
+  document.getElementById('modal-step-1-dot').style.background = 'var(--red)';
+  document.getElementById('modal-step-1-label').style.color = 'var(--red)';
   document.getElementById('modal-step-2-dot').style.background = '#e0e0e0';
   document.getElementById('modal-step-2-dot').style.color = '#aaa';
   document.getElementById('modal-step-2-label').style.color = '#aaa';
 }
 
-async function runModalSummary() {
-  const btn = document.getElementById('modal-miro-btn');
-  const statusEl = document.getElementById('modal-miro-status');
-  const statusText = document.getElementById('modal-miro-status-text');
-  const errEl = document.getElementById('modal-miro-error');
-  const boardId = 'uXjVHRH9-Rw=';
-
-  btn.disabled = true;
-  statusEl.style.display = 'flex';
-  errEl.style.display = 'none';
-
-  try {
-    statusText.textContent = 'Reading Miro board...';
-    let allItems = [], cursor = null;
-    do {
-      const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
-      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}`);
-      if (!res.ok) throw new Error('Miro error ' + res.status);
-      const data = await res.json();
-      allItems = allItems.concat(data.data || []);
-      cursor = data.cursor || null;
-    } while (cursor);
-
-    if (!allItems.length) throw new Error('No items found on this board.');
-    statusText.textContent = `Found ${allItems.length} items — generating summary...`;
-
-    const sections = {}, loose = [];
-    allItems.forEach(item => {
-      let text = null;
-      if (item.data?.content) text = item.data.content.replace(/<[^>]*>/g,'').trim();
-      else if (item.data?.title) text = item.data.title.trim();
-      else if (item.data?.body) text = item.data.body.replace(/<[^>]*>/g,'').trim();
-      if (!text) return;
-      const frameId = item.parent?.id;
-      if (frameId) { if (!sections[frameId]) sections[frameId]={title:'',items:[]}; sections[frameId].items.push({type:item.type,text}); }
-      else if (item.type==='frame') { if (!sections[item.id]) sections[item.id]={title:'',items:[]}; sections[item.id].title=text; }
-      else loose.push({type:item.type,text});
-    });
-    let boardContent = '';
-    Object.values(sections).forEach(s => { if(s.title) boardContent+='\n[Section: '+s.title+']\n'; s.items.forEach(i=>{boardContent+='- '+i.text+'\n';}); });
-    if (loose.length) { boardContent+='\n[Ungrouped]\n'; loose.forEach(i=>{boardContent+='- '+i.text+'\n';}); }
-
-    const summary = await callAI('You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n' + boardContent + '\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section.');
-
-    document.getElementById('cm-summary').value = summary;
-    statusEl.style.display = 'none';
-
-  } catch(err) {
-    statusEl.style.display = 'none';
-    errEl.textContent = err.message;
-    errEl.style.display = 'block';
-  }
-  btn.disabled = false;
-}
-
-function submitCreateModal(hasSummary) {
+function submitCreateModal() {
   const name = document.getElementById('cm-name').value.trim();
   if (!name) return;
-  const rationale = document.getElementById('cm-rationale').value.trim();
-  const approvedBy = document.getElementById('cm-approved-by').value.trim();
-  const approvedDate = document.getElementById('cm-approved-date').value.trim();
-  const summaryText = document.getElementById('cm-summary').value.trim();
   const id = 'prog_' + Date.now();
   programs[id] = {
     id, name,
-    rationale: rationale || 'To be confirmed',
-    approvedBy: approvedBy || 'To be confirmed',
-    approvedDate: approvedDate || 'To be confirmed',
+    rationale: document.getElementById('cm-rationale').value.trim() || 'To be confirmed',
+    approvedBy: document.getElementById('cm-approved-by').value.trim() || 'To be confirmed',
+    approvedDate: document.getElementById('cm-approved-date').value.trim() || 'To be confirmed',
     created: new Date().toISOString().split('T')[0],
-    summary: summaryText || '',
-    mandate:'', plan:'',
-    currentStep:1, status:'on-track'
+    summary: document.getElementById('cm-summary').value.trim() || '',
+    mandate: '', plan: '', miroBoard: '',
+    currentStep: 1, status: 'on-track'
   };
   currentProgramId = id;
-  generatedSummary = summaryText || '';
+  generatedSummary = programs[id].summary;
   savePrograms();
   closeCreateModal();
   showGuide(id);
 }
 
-const dashSteps = [
-  { num:1, name:'Project design', sub:'VOC board decision', color:'#D85A30', line:'#F0997B',
-    tools:['Strategic context review','VOC board preparation'], people:['Head of Development','Director of Strategy','Senior Advisor'], docs:['Project design brief'], gate:'VOC board approves idea to proceed' },
-  { num:2, name:'Project mandate', sub:'Rector approval', color:'#D85A30', line:'#F0997B',
-    tools:['AI mandate generator','Program summary','Risk assessment'], people:['Head of Development','Project Manager'], docs:['Project mandate','Risk register'], gate:'Mandate approved by Rector' },
-  { num:3, name:'Project plan', sub:'Plan approved', color:'#D85A30', line:'#5DCAA5',
-    tools:['AI plan generator','Partner onboarding brief'], people:['Project Manager','Project group','Industry partners'], docs:['Project plan','Partner agreements'], gate:'Plan approved by Head of Development' },
-  { num:4, name:'Industry workshops', sub:'2 workshops in Miro', color:'#1D9E75', line:'#5DCAA5',
-    tools:['Miro workshop board','Teams transcript','AI workshop summary','Partner brief generator'], people:['Project Manager','Industry partners','SMEs'], docs:['Workshop summaries','Partner brief'], gate:'Course overview approved by partners' },
-  { num:5, name:'Learning outcomes', sub:'Industry approved', color:'#1D9E75', line:'#5DCAA5',
-    tools:['AI LO generator','Industry review'], people:['Curriculum Manager','SME','Industry partners'], docs:['Program LOs','Course-level LOs'], gate:'Learning outcomes approved by industry' },
-  { num:6, name:'Course development', sub:'Study plan ready', color:'#1D9E75', line:'#5DCAA5',
-    tools:['Miro learning design','AI course generator'], people:['Curriculum Manager','Learning designer'], docs:['Study plan','Course descriptions'], gate:'Study plan ready for QA' },
-  { num:7, name:'Quality assurance', sub:'QA sign-off', color:'#1D9E75', line:'#85B7EB',
-    tools:['QA checklist','Reference group feedback'], people:['Head of Development','Reference group'], docs:['QA sign-off','Adjusted study plan'], gate:'QA complete · ready for NOKUT' },
-  { num:8, name:'NOKUT application', sub:'Accreditation decision', color:'#378ADD', line:null,
-    tools:['NOKUT portal','Board recommendation'], people:['Head of Development','Academic responsible'], docs:['NOKUT application','Board recommendation'], gate:'Vocational school board final decision' },
-];
+async function deleteProgram(id) {
+  const p = programs[id];
+  if (!p || !confirm(`Delete "${p.name}"?\n\nThis cannot be undone.`)) return;
+  delete programs[id];
+  await savePrograms();
+  renderDashboard();
+}
 
+const dashSteps = [
+  { num:1, name:'Project design', sub:'VOC board decision', color:'var(--red)', line:'#F0997B', tools:['Strategic context review','VOC board preparation'], people:['Head of Development','Director of Strategy','Senior Advisor'], docs:['Project design brief'], gate:'VOC board approves idea to proceed' },
+  { num:2, name:'Project mandate', sub:'Rector approval', color:'var(--red)', line:'#F0997B', tools:['AI mandate generator','Program summary','Risk assessment'], people:['Head of Development','Project Manager'], docs:['Project mandate','Risk register'], gate:'Mandate approved by Rector' },
+  { num:3, name:'Project plan', sub:'Plan approved', color:'var(--red)', line:'#5DCAA5', tools:['AI plan generator','Partner onboarding brief'], people:['Project Manager','Project group','Industry partners'], docs:['Project plan','Partner agreements'], gate:'Plan approved by Head of Development' },
+  { num:4, name:'Industry workshops', sub:'2 workshops in Miro', color:'#1D9E75', line:'#5DCAA5', tools:['Miro workshop board','AI workshop summary','Partner brief generator'], people:['Project Manager','Industry partners','SMEs'], docs:['Workshop summaries','Partner brief'], gate:'Course overview approved by partners' },
+  { num:5, name:'Learning outcomes', sub:'Industry approved', color:'#1D9E75', line:'#5DCAA5', tools:['AI LO generator','Industry review'], people:['Curriculum Manager','SME','Industry partners'], docs:['Program LOs','Course-level LOs'], gate:'Learning outcomes approved by industry' },
+  { num:6, name:'Course development', sub:'Study plan ready', color:'#1D9E75', line:'#5DCAA5', tools:['Miro learning design','AI course generator'], people:['Curriculum Manager','Learning designer'], docs:['Study plan','Course descriptions'], gate:'Study plan ready for QA' },
+  { num:7, name:'Quality assurance', sub:'QA sign-off', color:'#1D9E75', line:'#85B7EB', tools:['QA checklist','Reference group feedback'], people:['Head of Development','Reference group'], docs:['QA sign-off','Adjusted study plan'], gate:'QA complete · ready for NOKUT' },
+  { num:8, name:'NOKUT application', sub:'Accreditation decision', color:'#378ADD', line:null, tools:['NOKUT portal','Board recommendation'], people:['Head of Development','Academic responsible'], docs:['NOKUT application','Board recommendation'], gate:'Vocational school board final decision' },
+];
 let dashActiveStep = null;
 
 function buildDashTimeline() {
@@ -868,13 +793,12 @@ function showDashStepDetail(i) {
   if (dashActiveStep === null) { detail.style.display = 'none'; return; }
   const s = dashSteps[i];
   document.getElementById('dsd-title').textContent = `Step ${s.num} — ${s.name}`;
-  const aiTools = ['AI mandate generator','AI plan generator','AI workshop summary','AI LO generator','AI course generator','Teams transcript','Partner brief generator'];
-  const miroTools = ['Miro workshop board','Miro learning design'];
+  const aiTools = ['AI mandate generator','AI plan generator','AI workshop summary','AI LO generator','AI course generator','Partner brief generator'];
   document.getElementById('dsd-tools').innerHTML = s.tools.map(t => {
     const isAI = aiTools.some(a => t.includes(a.split(' ')[1]||a));
-    const isMiro = miroTools.some(m => t.includes('Miro'));
+    const isMiro = t.includes('Miro');
     const bg = isMiro ? '#FDF1EE' : isAI ? '#FAECE7' : '#f5f5f5';
-    const border = isMiro ? '#F0997B' : isAI ? '#D85A30' : '#e0e0e0';
+    const border = isMiro ? '#F0997B' : isAI ? 'var(--red)' : '#e0e0e0';
     const color = isMiro ? '#712B13' : isAI ? '#993C1D' : '#555';
     return `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:${bg};border:1px solid ${border};color:${color}">${t}</span>`;
   }).join('');
@@ -893,88 +817,20 @@ function toggleWelcome() {
   if (!isOpen) buildDashTimeline();
 }
 
-function toggleInstruction() {
-  const body = document.getElementById('step-instruction-body');
-  const chev = document.getElementById('step-instruction-chev');
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
-}
-
-function toggleTimeline() {
-  const panel = document.getElementById('timeline-panel');
-  const chev = document.getElementById('timeline-chev');
-  panel.classList.toggle('open');
-  chev.classList.toggle('open');
-}
-
-function buildTimeline() {
-  const phDefs = [
-    {label:'Phase 1 — Strategy & Planning', steps:[0,1,2], color:'#D85A30', bg:'#FAECE7', text:'#712B13', line:'#F0997B'},
-    {label:'Phase 2 — Program Development', steps:[3,4,5,6], color:'#1D9E75', bg:'#E1F5EE', text:'#085041', line:'#5DCAA5'},
-    {label:'Phase 3 — Accreditation', steps:[7], color:'#378ADD', bg:'#E6F1FB', text:'#0C447C', line:'#85B7EB'},
-  ];
-  const stepSubs = ['VOC board','Rector approval','Plan approved','2 workshops','LO approved','Study plan','QA sign-off','Accreditation'];
-
-  const phRow = document.getElementById('tl-phase-row');
-  const track = document.getElementById('tl-track');
-  if (!phRow || !track) return;
-
-  phRow.innerHTML = '';
-  track.innerHTML = '';
-
-  phDefs.forEach(ph => {
-    const seg = document.createElement('div');
-    seg.className = 'tl-phase-seg';
-    seg.style.flex = ph.steps.length;
-    seg.style.background = ph.bg;
-    seg.style.color = ph.text;
-    seg.textContent = ph.label;
-    phRow.appendChild(seg);
-  });
-
-  steps.forEach((s, i) => {
-    if (i > 0) {
-      const ph = phDefs.find(p => p.steps.includes(i));
-      const conn = document.createElement('div');
-      conn.className = 'tl-connector';
-      conn.style.background = ph ? ph.line : '#e0e0e0';
-      track.appendChild(conn);
-    }
-    const ph = phDefs.find(p => p.steps.includes(i));
-    const wrap = document.createElement('div');
-    wrap.className = 'tl-step';
-    const activeCls = i === cur ? ' active' : '';
-    wrap.innerHTML = `<div class="tl-dot${activeCls}" style="background:${ph?ph.color:'#ccc'}">${i+1}</div><div class="tl-step-name">${s.title}</div><div class="tl-step-sub">${stepSubs[i]||''}</div>`;
-    wrap.onclick = () => goto(i);
-    track.appendChild(wrap);
-  });
-}
-
-async function deleteProgram(id) {
-  const p = programs[id];
-  if (!p) return;
-  if (!confirm(`Delete "${p.name}"?\n\nThis will permanently remove the program and all its saved documents.`)) return;
-  delete programs[id];
-  await savePrograms();
-  renderDashboard();
-}
-
 function renderDashboard() {
   const progs = Object.values(programs);
   const active = progs.filter(p => p.status !== 'done');
   const done = progs.filter(p => p.status === 'done');
   const risk = progs.filter(p => p.status === 'at-risk');
-
   document.getElementById('ds-active').textContent = active.length;
   document.getElementById('ds-done').textContent = done.length;
   document.getElementById('ds-risk').textContent = risk.length;
   document.getElementById('ds-total').textContent = progs.length;
   document.getElementById('ds-active-sub').textContent = risk.length > 0 ? risk.length + ' at risk' : active.length > 0 ? 'All on track' : 'No programs yet';
   document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
 
-  const phaseColors = ['#D85A30','#c04d24','#712B13'];
-
-  function renderProgCards(list, containerId) {
+  function renderCards(list, containerId) {
     const el = document.getElementById(containerId);
     if (!list.length) {
       el.innerHTML = containerId === 'dash-active'
@@ -986,23 +842,27 @@ function renderDashboard() {
     list.forEach(p => {
       const step = p.currentStep || 1;
       const pct = Math.round(step / 8 * 100);
-      const statusColor = p.status === 'at-risk' ? '#BA7517' : '#D85A30';
-      const badgeBg = p.status === 'done' ? '#f5f5f5' : p.status === 'at-risk' ? '#FAEEDA' : '#FAECE7';
-      const badgeColor = p.status === 'done' ? '#666' : p.status === 'at-risk' ? '#633806' : '#712B13';
+      const statusColor = p.status === 'at-risk' ? '#BA7517' : 'var(--red)';
+      const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
+      const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
       const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
-
       const phaseDefs = [{n:3},{n:4},{n:1}];
-      let segs = phaseDefs.map((ph,pi) => {
+      const segs = phaseDefs.map((ph,pi) => {
         const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
         const d = Math.max(0,Math.min(step-start,ph.n));
-        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?phaseColors[pi]:'#e8e2d8'}"></div>`;
+        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?phaseColors[pi]:'var(--rule)'}"></div>`;
       }).join('');
-
       const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
       const dots = shortLabels.map((s,i) => {
         const d = i<step, a = i===step-1;
-        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:50%;background:${d||a?'#D85A30':'#d0d0d0'};opacity:${!d&&!a?0.3:1}"></div><div style="font-size:8px;color:#bbb">${s.split(' ')[0]}</div></div>`;
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:50%;background:${d||a?'var(--red)':'var(--rule)'};opacity:${!d&&!a?0.3:1}"></div><div style="font-size:8px;color:var(--ink-4)">${s.split(' ')[0]}</div></div>`;
       }).join('');
+
+      // Miro button
+      const hasMiro = p.miroBoard && p.miroBoard.includes('miro.com');
+      const miroBtn = hasMiro
+        ? `<a class="miro-card-btn" href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg> Open Miro</a>`
+        : `<button class="miro-card-btn unlinked" onclick="event.stopPropagation();linkMiroFromDash('${p.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#e0e0e0"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#999"/></svg> Link Miro board</button>`;
 
       const card = document.createElement('div');
       card.className = 'dash-prog-card';
@@ -1011,1066 +871,88 @@ function renderDashboard() {
           <div class="dash-prog-dot" style="background:${statusColor}"></div>
           <span class="dash-prog-name">${p.name}</span>
           <span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor}">${badgeText}</span>
-          <span class="dash-prog-owner"><i class="ti ti-calendar" style="font-size:11px" aria-hidden="true"></i> ${p.created||'—'}</span>
+          <span style="font-size:11px;color:#888"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span>
           <span class="dash-prog-pct">${pct}%</span>
         </div>
         <div class="dash-prog-wrap">
           <div class="dash-prog-track">${segs}</div>
           <div style="display:flex;margin-top:6px">${dots}</div>
-          <div class="dash-prog-foot"><span>Step ${step} of 8</span><span>${pct}% complete</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:#888">Step ${step} of 8</span><span style="font-size:10px;color:#888">${pct}% complete</span></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px">
-          <button class="dash-open-btn" style="margin:0" onclick="showGuide('${p.id}')">
-            <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i> Open program
-          </button>
-          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent;color:#aaa;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px" onmouseover="this.style.borderColor='#cc3333';this.style.color='#cc3333'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#aaa'">
-            <i class="ti ti-trash" style="font-size:12px" aria-hidden="true"></i> Delete
-          </button>
+        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap">
+          <button style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--red);border-radius:6px;color:var(--red);background:transparent;cursor:pointer;font-family:inherit" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>
+          ${miroBtn}
+          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent;color:#aaa;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px" onmouseover="this.style.borderColor='#cc3333';this.style.color='#cc3333'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#aaa'"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button>
         </div>`;
       el.appendChild(card);
     });
   }
+  renderCards(active, 'dash-active');
+  renderCards(done, 'dash-done');
+}
 
-  renderProgCards(active, 'dash-active');
-  renderProgCards(done, 'dash-done');
+async function linkMiroFromDash(programId) {
+  const url = prompt('Paste the Miro board URL for this program:');
+  if (!url || !url.includes('miro.com')) return;
+  programs[programId].miroBoard = url;
+  await savePrograms();
+  renderDashboard();
 }
 
 async function loadPrograms() {
   try {
     const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
-    if (!res.ok) throw new Error('KV fetch failed: ' + res.status);
     const data = await res.json();
     programs = data.value ? JSON.parse(data.value) : {};
-    console.log('Loaded programs:', Object.keys(programs).length);
-  } catch(e) {
-    console.error('loadPrograms error:', e);
-    programs = {};
-  }
-  updateProgramSelector();
+  } catch(e) { programs = {}; }
   renderDashboard();
 }
 
 async function savePrograms() {
-  try {
-    const res = await fetch(`${PROXY}/?action=kv-put&key=programs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(programs)
-    });
-    const data = await res.json();
-    console.log('Saved programs:', data);
-  } catch(e) { console.error('savePrograms error:', e); }
+  await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(programs)
+  });
 }
 
-function updateProgramSelector() {
-  const sel = document.getElementById('program-select');
-  if (sel) {
-    const keys = Object.keys(programs);
-    sel.innerHTML = '<option value="">— Select or create a program —</option>' +
-      keys.map(k => `<option value="${k}" ${k===currentProgramId?'selected':''}>${programs[k].name}</option>`).join('');
-  }
-  updateProgramStatus();
-}
-
-function updateProgramStatus() {
-  const el = document.getElementById('program-status');
-  if (!el) return;
-  if (!currentProgramId || !programs[currentProgramId]) { el.textContent = ''; return; }
-  const p = programs[currentProgramId];
-  const count = [p.summary, p.mandate, p.plan].filter(Boolean).length;
-  el.textContent = count + ' document' + (count!==1?'s':'') + ' saved';
-}
-
-function newProgram() {
-  const name = prompt('Program name:', 'e.g. Film Production — Online Studies');
-  if (!name || !name.trim()) return;
-  const id = 'prog_' + Date.now();
-  programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'' };
-  currentProgramId = id;
-  savePrograms();
-  updateProgramSelector();
-  clearDocuments();
-  document.getElementById('program-status').textContent = 'New program created';
-}
-
-function switchProgram() {
-  const sel = document.getElementById('program-select');
-  currentProgramId = sel.value || null;
-  if (!currentProgramId) { clearDocuments(); return; }
-  restoreDocuments();
-  updateProgramStatus();
-}
-
+// ── Documents ──
 function clearDocuments() {
   generatedSummary = '';
   generatedMandate = '';
-  const se = document.getElementById('summary-editor');
-  if (se) se.innerHTML = '';
-  const sds = document.getElementById('summary-doc-section');
-  if (sds) sds.classList.remove('visible');
-  const me = document.getElementById('mandate-editor');
-  if (me) me.innerHTML = '';
-  const mds = document.getElementById('mandate-doc-section');
-  if (mds) mds.classList.remove('visible');
-  const pe = document.getElementById('plan-editor');
-  if (pe) pe.innerHTML = '';
-  const pds = document.getElementById('plan-doc-section');
-  if (pds) pds.classList.remove('visible');
-  document.getElementById('mandate-run-btn') && (document.getElementById('mandate-run-btn').style.display = '');
-  document.getElementById('plan-run-btn') && (document.getElementById('plan-run-btn').style.display = '');
+  ['summary-editor','mandate-editor','plan-editor'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  ['summary-doc-section','mandate-doc-section','plan-doc-section'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('visible'); });
   document.getElementById('generated-docs').innerHTML = '';
 }
 
 function restoreDocuments() {
   if (!currentProgramId || !programs[currentProgramId]) return;
   const p = programs[currentProgramId];
-
-  // Always restore generatedSummary from program data so mandate generator works
-  if (p.summary) generatedSummary = p.summary;
-  else generatedSummary = '';
-
   if (p.summary) {
     generatedSummary = p.summary;
     const editor = document.getElementById('summary-editor');
-    if (editor) {
-      editor.innerHTML = p.summary;
-      document.getElementById('summary-doc-section').classList.add('visible');
-    autosaveDocument('summary', editor.innerHTML);
-    }
+    if (editor) { editor.innerHTML = p.summary; document.getElementById('summary-doc-section').classList.add('visible'); }
   }
-
   if (p.mandate) {
     generatedMandate = p.mandate;
     const editor = document.getElementById('mandate-editor');
-    if (editor) {
-      editor.innerHTML = p.mandate;
-      document.getElementById('mandate-doc-section').classList.add('visible');
-      document.getElementById('mandate-run-btn').style.display = 'none';
-      document.getElementById('mandate-summary-note').style.display = 'none';
-    }
+    if (editor) { editor.innerHTML = p.mandate; document.getElementById('mandate-doc-section').classList.add('visible'); document.getElementById('mandate-run-btn').style.display = 'none'; }
   }
-
   if (p.plan) {
     const editor = document.getElementById('plan-editor');
-    if (editor) {
-      editor.innerHTML = p.plan;
-      document.getElementById('plan-doc-section').classList.add('visible');
-      document.getElementById('plan-run-btn').style.display = 'none';
-      document.getElementById('plan-mandate-note').style.display = 'none';
-    }
+    if (editor) { editor.innerHTML = p.plan; document.getElementById('plan-doc-section').classList.add('visible'); document.getElementById('plan-run-btn').style.display = 'none'; }
   }
-
   rebuildDocCards(p);
-  updateProgramStatus();
-  render();
 }
 
 function rebuildDocCards(p) {
   const container = document.getElementById('generated-docs');
   container.innerHTML = '';
-  const today = new Date().toLocaleDateString('en-GB');
-
-  if (p.summary) {
-    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Program Summary</title></head><body>${p.summary}</body></html>`],{type:'text/html'});
+  const makeCard = (type, icon, label) => {
+    if (!p[type]) return;
+    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${p[type]}</body></html>`],{type:'text/html'});
     const url = URL.createObjectURL(blob);
     const card = document.createElement('div');
     card.className = 'generated-doc-card';
-    card.setAttribute('data-name','summary');
-    card.innerHTML = `<i class="ti ti-file-description generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Program Summary</div><div class="generated-doc-sub" style="color:#888">Saved · Draft summary</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Program_Summary')">Download</button>`;
-    card.onclick = () => { const sec = document.getElementById('summary-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('summary-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
-    container.appendChild(card);
-  }
-
-  if (p.mandate) {
-    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title></head><body>${p.mandate}</body></html>`],{type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const card = document.createElement('div');
-    card.className = 'generated-doc-card';
-    card.setAttribute('data-name','mandate');
-    card.innerHTML = `<i class="ti ti-file-text generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Project Mandate</div><div class="generated-doc-sub" style="color:#888">Saved · Draft mandate</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Project_Mandate')">Download</button>`;
-    card.onclick = () => { const sec = document.getElementById('mandate-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
-    container.appendChild(card);
-  }
-
-  if (p.plan) {
-    const blob = new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title></head><body>${p.plan}</body></html>`],{type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const card = document.createElement('div');
-    card.className = 'generated-doc-card';
-    card.setAttribute('data-name','plan');
-    card.innerHTML = `<i class="ti ti-calendar-stats generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${p.name} — Project Plan</div><div class="generated-doc-sub" style="color:#888">Saved · Draft plan</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','Project_Plan')">Download</button>`;
-    card.onclick = () => { const sec = document.getElementById('plan-doc-section'); sec.classList.toggle('visible'); if(sec.classList.contains('visible')) document.getElementById('plan-editor').scrollIntoView({behavior:'smooth',block:'start'}); };
-    container.appendChild(card);
-  }
-}
-
-async function autosaveDocument(type, content) {
-  if (!currentProgramId) {
-    const name = prompt('Name this program to save documents:', 'e.g. Film Production — Online Studies');
-    if (!name || !name.trim()) return;
-    const id = 'prog_' + Date.now();
-    programs[id] = { name: name.trim(), created: new Date().toISOString().split('T')[0], summary:'', mandate:'', plan:'' };
-    currentProgramId = id;
-    updateProgramSelector();
-  }
-  programs[currentProgramId][type] = content;
-  await savePrograms();
-  updateProgramStatus();
-}
-
-const stepInstructions = [
-  'Review the strategic rationale for this program — it was set when the project was created. Design the project structure, identify who needs to be involved, and prepare the documentation for the VOC board decision.',
-  'Use the program summary to generate a draft Project Mandate. Review it carefully, fill in the red placeholders (names, dates, budget), and get it approved by the Rector before moving on.',
-  'Generate a Project Plan from the mandate. Fill in specific activities, deadlines, and team member names. This plan guides the whole project — make sure it is approved by the Head of Development.',
-  'Run two industry partner workshops using Miro and Teams. Use the tools below to generate a partner brief before each workshop and a summary after. The brief tells partners what to expect. The summary captures what was agreed.',
-  'Draft the overall program learning outcomes and course-level learning outcomes based on the workshop results. Review with industry partners and get their approval before moving on.',
-  'Develop the full study plan and learning design — course descriptions, topics, learning activities, and assessments. This is the core academic content of the program.',
-  'Run quality assurance in parallel with finalising course development. The reference group reviews the program and gives feedback. Both workstreams must be complete before submitting to NOKUT.',
-  'Assess the study plan against laws and regulations. Write a recommendation to the vocational school board and submit the formal application to NOKUT for accreditation.',
-];
-
-const phases = [
-  { label: 'Strategy & Planning', num: 'Phase 1', steps: [0,1,2], color: '#D85A30' },
-  { label: 'Program Development', num: 'Phase 2', steps: [3,4,5,6], color: '#D85A30' },
-  { label: 'Accreditation', num: 'Phase 3', steps: [7], color: '#9d174d' },
-];
-
-const steps = [
-  {
-    num:'1', title:'Project Design',
-    phase: 0,
-    badge:{label:'Ideation', bg:'#e0e7ff', color:'#3730a3'},
-    intro:'Design the project structure based on the approved strategic idea. Identify key competencies, assemble the project team, and prepare for the VOC board decision.',
-    roles:['Head of Development','Director of Strategy','Senior Advisor (Dev Dept)','Internal expert','External expert'],
-    activities:['Review and confirm strategic rationale','Design project structure and scope','Identify key competencies needed','Prepare for VOC board decision'],
-    responsible: 'Head of Development',
-    deliverables:['Decision in the VOC board on prioritised ideas'],
-    docs:[],
-  },
-  {
-    num:'2', title:'Project Mandate',
-    phase: 0,
-    badge:{label:'Approval', bg:'#fef3c7', color:'#92400e'},
-    intro:'Head of Development and Project Manager produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget. Industry partners are identified and onboarding agreements are prepared.',
-    roles:['Head of Development','Project Manager','Director of Strategy','Industry Partners'],
-    activities:['Define purpose and milestones','Conduct risk assessment','Set development budget','Define project organisation','Identify and approach industry partners','Prepare partnership agreements'],
-    responsible: 'Head of Development + Project Manager',
-    deliverables:['Project mandate finalised and approved by Rector','Industry partner agreements signed'],
-    docs:[],
-    mandateTool:true
-  },
-  {
-    num:'3', title:'Project Plan',
-    phase: 0,
-    badge:{label:'Execution prep', bg:'#fdf0eb', color:'#8b3a1a'},
-    intro:'The project manager develops a detailed project plan with clear activities, timeline and responsibilities. Industry partners are formally onboarded and the full project group is assembled.',
-    roles:['Project Manager','Project group','Industry Partners'],
-    activities:['Define all project activities and timeline','Clarify responsibilities and expectations','Establish status meeting cadence','Industry partner kick-off and onboarding','Align expectations with all stakeholders'],
-    responsible: 'Project Manager',
-    deliverables:['Project plan approved by Head of Development','Project group onboarded','Industry partners onboarded'],
-    docs:[],
-    planTool:true
-  },
-  {
-    num:'4', title:'Industry Workshops',
-    phase: 1,
-    badge:{label:'Co-creation', bg:'#d1fae5', color:'#065f46'},
-    intro:'Collaborative workshops with industry partners shape the program structure, topics, and learning outcomes. Run in Miro with Teams meeting recording for full documentation.',
-    roles:['Project Manager','Industry Partners','Subject Matter Experts','Pedagogic Advisor'],
-    activities:['Workshop 1: program scope and overall structure','Workshop 2: course structure and topics','Capture industry input and feedback in Miro','Document workshop outcomes'],
-    responsible: 'Project Manager',
-    deliverables:['Course overview table','Industry feedback documented','Workshop meeting minutes'],
-    docs:[],
-    miro:true, summaryTool:true, workshopTool:true
-  },
-  {
-    num:'5', title:'Learning Outcomes',
-    phase: 1,
-    badge:{label:'Academic', bg:'#fef3c7', color:'#92400e'},
-    intro:'Define and finalise the overall program learning outcomes and course-level learning outcomes. Reviewed and approved by industry partners and academic staff.',
-    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Industry Partners'],
-    activities:['Draft overall program learning outcomes','Draft course-level learning outcomes','Industry partner review and feedback','Finalise and approve learning outcomes'],
-    responsible: 'Curriculum Manager',
-    deliverables:['Overall learning outcomes document','Course-level learning outcomes','Industry approval'],
-    docs:[]
-  },
-  {
-    num:'6', title:'Course Development',
-    phase: 1,
-    badge:{label:'Build', bg:'#d1fae5', color:'#065f46'},
-    intro:'Finalise the study plan and develop the full learning design — topics, learning activities, assessments, and tools for each course.',
-    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Learning Designer'],
-    activities:['Finalise course descriptions and study plan','Define topics and learning activities (LAA)','Design assessments','Specify tools and software requirements'],
-    responsible: 'Curriculum Manager',
-    deliverables:['Completed study plan','Learning design document','Course descriptions'],
-    docs:[]
-  },
-  {
-    num:'7', title:'Quality Assurance',
-    phase: 1,
-    badge:{label:'QA', bg:'#ffedd5', color:'#9a3412'},
-    intro:'Two workstreams run simultaneously: quality assurance reviews the program against formal requirements, while course development is finalised. Reference group gives feedback.',
-    roles:['Reference group','Head of Development','Course developers','Pedagogic advisor','Academic responsible (faglig ansvarlig)'],
-    activities:['QA: review program name, outcomes, industry integration','Reference group feedback and adjustments','Finalise requirement specs for academic staff','Sign off on study plan and learning design'],
-    responsible: 'Head of Development',
-    deliverables:['QA sign-off','Study plan and learning design ready for content development'],
-    docs:[],
-    parallel:true
-  },
-  {
-    num:'8', title:'LOKUT / NOKUT Application',
-    phase: 2,
-    badge:{label:'Accreditation', bg:'#fce7f3', color:'#9d174d'},
-    intro:'Assess the study plan in accordance with laws and regulations. Write a recommendation to the vocational school board, then submit the formal application to NOKUT.',
-    roles:['Head of Development','Academic responsible','Legal/compliance advisor'],
-    activities:['Assess study plan against laws and regulations','Write recommendation to vocational school board','Submit application to NOKUT'],
-    responsible: 'Head of Development',
-    deliverables:['Vocational school board makes final decision on accreditation'],
-    docs:[
-      {icon:'ti-external-link', label:'NOKUT portal', sub:'External · nokut.no', href:'https://www.nokut.no'},
-    ]
-  }
-];
-
-let cur = 0;
-
-function render() {
-  const s = steps[cur];
-  const ph = phases[s.phase];
-  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${cur+1} of 8`;
-  document.getElementById('step-title').textContent = s.title;
-  document.getElementById('step-intro').textContent = s.intro;
-
-  // Step instruction
-  const instrEl = document.getElementById('step-instruction-body');
-  if (instrEl) instrEl.textContent = stepInstructions[cur] || '';
-  const instrChev = document.getElementById('step-instruction-chev');
-  if (instrChev) { instrChev.classList.remove('open'); instrEl.classList.remove('open'); }
-
-  document.getElementById('step-roles').innerHTML = `<span style="font-size:13px;color:#555;line-height:1.8">${s.roles.join(', ')}</span>`;
-  document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
-  const respEl = document.getElementById('step-responsible');
-  if (respEl) {
-    if (s.responsible) {
-      respEl.innerHTML = `<span style="font-size:13px;color:#555">${s.responsible}</span><span style="font-size:10px;color:#aaa;font-style:italic;margin-left:6px">from project plan</span>`;
-      respEl.parentElement.style.display = 'block';
-    } else {
-      respEl.parentElement.style.display = 'none';
-    }
-  }
-  document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
-  document.getElementById('step-docs').innerHTML = s.docs.map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon} doc-icon"></i><div><div class="doc-label">${d.label}</div><div class="doc-sub">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:#ccc"></i></a>`).join('');
-  document.getElementById('miro-section').style.display = (s.miro && s.num !== '1') ? 'block' : 'none';
-  if (s.miro && s.num === '6') {
-    document.querySelector('.miro-title').textContent = 'Open workshop board in Miro';
-    document.querySelector('.miro-sub').textContent = 'Industry partner workshop workspace';
-    document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
-  } else if (s.miro) {
-    document.querySelector('.miro-title').textContent = 'Open ideation board in Miro';
-    document.querySelector('.miro-sub').textContent = 'Strategy & idea development workspace';
-    document.getElementById('miro-open-btn').href = 'https://miro.com/app/board/uXjVHRH9-Rw=/';
-  }
-  document.getElementById('summary-tool-section').style.display = s.summaryTool ? 'block' : 'none';
-  const sds = document.getElementById('summary-display-section');
-  if (sds) {
-    if (s.summaryDisplay) {
-      sds.style.display = 'block';
-      const p = currentProgramId && programs[currentProgramId];
-      const summaryText = (p && p.summary) ? p.summary : generatedSummary || '';
-      const displayEl = document.getElementById('summary-display-content');
-      if (displayEl) displayEl.textContent = summaryText || 'No summary yet. Create a new program and generate a summary in the setup step.';
-    } else {
-      sds.style.display = 'none';
-    }
-  }
-  document.getElementById('workshop-tool-section').style.display = s.workshopTool ? 'block' : 'none';
-  if (s.workshopTool) {
-    const bnote = document.getElementById('brief-summary-note');
-    if (bnote) {
-      if (generatedSummary) {
-        bnote.style.background = '#fdf6f3'; bnote.style.borderColor = '#D85A30'; bnote.style.color = '#8b3a1a';
-        bnote.textContent = 'Program summary from Step 1 is ready — click to generate the partner brief.';
-      } else {
-        bnote.style.background = '#f9f9f9'; bnote.style.borderColor = '#e0e0e0'; bnote.style.color = '#555';
-        bnote.textContent = 'Uses the program summary from Step 1. Make sure you have run the summary generator first.';
-      }
-    }
-  }
-  document.getElementById('mandate-tool-section').style.display = s.mandateTool ? 'block' : 'none';
-  document.getElementById('plan-tool-section').style.display = s.planTool ? 'block' : 'none';
-  if (s.planTool) {
-    const pnote = document.getElementById('plan-mandate-note');
-    if (pnote) {
-      if (generatedMandate) {
-        pnote.style.background = '#fdf6f3'; pnote.style.borderColor = '#D85A30'; pnote.style.color = '#8b3a1a';
-        pnote.textContent = 'Mandate from Step 2 is ready -- click to generate the project plan.';
-      } else {
-        pnote.style.background = '#f9f9f9'; pnote.style.borderColor = '#f5d0c0'; pnote.style.color = '#8b3a1a';
-        pnote.textContent = 'Uses the mandate generated in Step 2. Make sure you have run the mandate generator first.';
-      }
-    }
-  }
-  document.getElementById('parallel-section').style.display = s.parallel ? 'block' : 'none';
-  document.getElementById('btn-prev').disabled = cur === 0;
-  document.getElementById('btn-next').disabled = cur === steps.length - 1;
-  document.getElementById('pip-bar').innerHTML = steps.map((_,i)=>`<button class="pip${i===cur?' active':''}" onclick="goto(${i})" aria-label="Step ${i+1}"></button>`).join('');
-  // Phase bar + stepper
-  const phaseColors = ['#D85A30','#D85A30','#D85A30'];
-  const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
-
-  // Phase bar — show Phase 1/2/3 number + name
-  let phaseHTML = '<div style="display:flex;gap:4px;margin-bottom:8px">';
-  phases.forEach((ph, pi) => {
-    const isActive = ph.steps.includes(cur);
-    const isDone = ph.steps.every(s => s < cur);
-    const bg = isActive ? phaseColors[pi] : isDone ? '#c04d24' : '#efefef';
-    const textColor = (isActive || isDone) ? '#fff' : '#aaa';
-    const border = (isActive || isDone) ? 'none' : '1px solid #e0e0e0';
-    phaseHTML += `<div style="flex:${ph.steps.length};background:${bg};color:${textColor};border:${border};border-radius:6px;padding:5px 8px;text-align:center;cursor:pointer" onclick="goto(${ph.steps[0]})">
-      <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.8">${ph.num}</div>
-      <div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ph.label}</div>
-    </div>`;
-  });
-  phaseHTML += '</div>';
-
-  // Stepper dots
-  let dotsHTML = '<div style="display:flex;align-items:center;margin-bottom:20px">';
-  steps.forEach((st, i) => {
-    const isLast = i === steps.length - 1;
-    const active = i === cur, done = i < cur;
-    const phColor = phaseColors[st.phase];
-    const dotBg = active ? phColor : done ? '#D85A30' : '#d0d0d0';
-    const labelColor = active ? phColor : '#999';
-    dotsHTML += `<div class="dot-item"><div class="dot-inner" onclick="goto(${i})">`;
-    dotsHTML += `<div class="dot-circle" style="background:${dotBg}"></div>`;
-    dotsHTML += `<span class="dot-label" style="color:${labelColor};font-weight:${active?'600':'400'}">${shortLabels[i]}</span>`;
-    dotsHTML += `</div>${!isLast ? '<div class="dot-line"></div>' : ''}</div>`;
-  });
-  dotsHTML += '</div>';
-  document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
-
-  // Update mandate note
-  if (s.mandateTool) {
-    const note = document.getElementById('mandate-summary-note');
-    if (generatedSummary) {
-      note.style.background = '#fdf6f3';
-      note.style.borderColor = '#f5d0c0';
-      note.style.color = '#8b3a1a';
-      note.textContent = '✓ Summary from Step 1 is ready — click the button to generate the mandate.';
-    } else {
-      note.style.background = '#fdf6f3';
-      note.style.borderColor = '#f5d0c0';
-      note.style.color = '#8b3a1a';
-      note.textContent = 'Uses the summary generated in Step 1. Make sure you have run the summary generator first.';
-    }
-  }
-}
-
-function go(d) { cur = Math.max(0, Math.min(steps.length-1, cur+d)); render(); }
-function goto(i) { cur = i; render(); }
-
-function toggleTool(id, btn) {
-  const input = document.getElementById(id);
-  input.type = input.type === 'password' ? 'text' : 'password';
-  btn.textContent = input.type === 'password' ? 'show' : 'hide';
-}
-
-async function callAI(prompt, maxTokens = 2000) {
-  const proxyUrl = `${PROXY}/?url=${encodeURIComponent('https://api.anthropic.com/v1/messages')}`;
-  const res = await fetch(proxyUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    if (res.status === 401) throw new Error('Invalid Anthropic API key.');
-    throw new Error('AI error: ' + err);
-  }
-  const data = await res.json();
-  return data.content?.[0]?.text || '';
-}
-
-async function runSummary() {
-  const boardId = 'uXjVHRH9-Rw=';
-  const errEl = document.getElementById('summary-error');
-  const statusEl = document.getElementById('summary-status');
-  const statusText = document.getElementById('summary-status-text');
-  const btn = document.getElementById('summary-run-btn');
-
-  errEl.classList.remove('visible');
-
-  btn.disabled = true;
-  statusEl.classList.add('visible');
-  document.getElementById('summary-result').classList.remove('visible');
-
-  try {
-    statusText.textContent = 'Reading Miro board...';
-    let allItems = [], cursor = null;
-    do {
-      const miroUrl = `https://api.miro.com/v2/boards/${encodeURIComponent(boardId)}/items?limit=50` + (cursor ? `&cursor=${cursor}` : '');
-      const res = await fetch(`${PROXY}/?url=${encodeURIComponent(miroUrl)}`);
-      if (!res.ok) throw new Error(res.status === 401 ? 'Invalid Miro token.' : res.status === 404 ? 'Board not found.' : 'Miro error ' + res.status);
-      const data = await res.json();
-      allItems = allItems.concat(data.data || []);
-      cursor = data.cursor || null;
-    } while (cursor);
-
-    if (!allItems.length) throw new Error('No items found on this board.');
-
-    statusText.textContent = `Found ${allItems.length} items — generating summary...`;
-
-    const sections = {}, loose = [];
-    allItems.forEach(item => {
-      let text = null;
-      if (item.data?.content) text = item.data.content.replace(/<[^>]*>/g, '').trim();
-      else if (item.data?.title) text = item.data.title.trim();
-      else if (item.data?.body) text = item.data.body.replace(/<[^>]*>/g, '').trim();
-      if (!text) return;
-      const frameId = item.parent?.id;
-      if (frameId) { if (!sections[frameId]) sections[frameId] = {title:'',items:[]}; sections[frameId].items.push({type:item.type,text}); }
-      else if (item.type==='frame') { if (!sections[item.id]) sections[item.id]={title:'',items:[]}; sections[item.id].title=text; }
-      else loose.push({type:item.type,text});
-    });
-    let boardContent = '';
-    Object.values(sections).forEach(s => { if (s.title) boardContent += `\n[Section: ${s.title}]\n`; s.items.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); });
-    if (loose.length) { boardContent += '\n[Ungrouped items]\n'; loose.forEach(i => { boardContent += `- (${i.type}) ${i.text}\n`; }); }
-
-    const summary = await callAI(`You are helping Noroff (Norwegian vocational college) develop new study programs. Content from Miro ideation board:\n\n${boardContent}\n\nWrite a structured program summary with: Program name, Strategic rationale, Target audience, Industry relevance, Rough scope and duration, Key open questions or risks. Clear headings, professional English, 2-5 sentences per section, missing info as "To be determined".`);
-
-    generatedSummary = summary;
-    autosaveDocument('summary', document.getElementById('summary-editor').innerHTML || summary);
-    const out = document.getElementById('summary-output');
-    let html = summary.replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^\*\*(.+)\*\*$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
-    out.innerHTML = '<p>' + html + '</p>';
-    document.getElementById('summary-result').classList.add('visible');
-    const editor = document.getElementById('summary-editor');
-    editor.innerHTML = '<p>' + html + '</p>';
-    document.getElementById('summary-doc-section').classList.add('visible');
-
-  } catch(err) {
-    errEl.textContent = err.message;
-    errEl.classList.add('visible');
-  }
-  statusEl.classList.remove('visible');
-  btn.disabled = false;
-}
-
-function copySummary() {
-  navigator.clipboard.writeText(generatedSummary).then(() => {
-    const btn = document.querySelector('.tool-copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  });
-}
-
-async function runMandate() {
-  const programName = document.getElementById('m-program-name').value.trim() || 'New Program';
-  const errEl = document.getElementById('mandate-error');
-  const statusEl = document.getElementById('mandate-status');
-  const btn = document.getElementById('mandate-run-btn');
-
-  errEl.classList.remove('visible');
-  document.getElementById('mandate-success').classList.remove('visible');
-
-  if (!generatedSummary) { errEl.textContent = 'No summary found. Please run the summary generator in Step 1 first.'; errEl.classList.add('visible'); return; }
-
-  btn.disabled = true;
-  statusEl.classList.add('visible');
-
-  try {
-    const today = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-    const mandateHTML = await callAI(`Generate a complete Project Mandate HTML document for Noroff (Norwegian vocational college).
-
-PROGRAM: ${programName}
-TODAY: ${today}
-
-PROGRAM SUMMARY:
-${generatedSummary}
-
-Create a complete mandate following Noroff's structure. Use HTML with inline styles. Requirements:
-- Cover: program name in large text (color #1F3864), sponsor: Noroff Vocational School, date: ${today}
-- Change log table
-- Background section using the summary above as source
-- Strategic evaluation table (Strategic fit, Market need, Feasibility, Internal resources — Good/Acceptable/Uncertain)
-- Project objectives: Time, Scope, Quality
-- Risk table with 5+ risks (Impact 1-5, Probability 1-5, Risk management)  
-- Milestones table S1-S6
-- Project organisation table (all standard Noroff roles)
-- Benefits bullet list
-- Approval signatures table
-
-Style: Arial font, tables with border-collapse:collapse, th background #D5E8F0, borders 1px solid #ccc, padding 8px.
-Mark fields needing human input as: <span style="color:#CC0000;font-style:italic">[TO BE FILLED IN]</span>
-Output ONLY the HTML body content, no DOCTYPE or html/head/body tags.`, 3000);
-
-    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Project Mandate</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${mandateHTML}</div></div></body></html>`;
-
-    const editor = document.getElementById('mandate-editor');
-    const cleanHTML = mandateHTML.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
-    editor.innerHTML = cleanHTML;
-    generatedMandate = cleanHTML;
-    autosaveDocument('mandate', cleanHTML);
-    document.getElementById('mandate-doc-section').classList.add('visible');
-    document.getElementById('mandate-run-btn').style.display = 'none';
-    document.getElementById('mandate-summary-note').style.display = 'none';
-    editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  } catch(err) {
-    errEl.textContent = err.message;
-    errEl.classList.add('visible');
-  }
-  statusEl.classList.remove('visible');
-  btn.disabled = false;
-}
-
-async function runPlan() {
-  const programName = document.getElementById('p-program-name').value.trim() || 'New Program';
-  const errEl = document.getElementById('plan-error');
-  const statusEl = document.getElementById('plan-status');
-  const btn = document.getElementById('plan-run-btn');
-  errEl.classList.remove('visible');
-  if (!generatedMandate && !generatedSummary) {
-    errEl.textContent = 'No mandate found. Please run the mandate generator in Step 2 first.';
-    errEl.classList.add('visible'); return;
-  }
-  btn.disabled = true;
-  statusEl.classList.add('visible');
-  try {
-    const today = new Date().toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'});
-    const src = (generatedMandate || generatedSummary).replace(/<[^>]*>/g,'').substring(0,2000);
-    const prompt = `Generate a complete Project Plan HTML document for Noroff (Norwegian vocational college).
-PROGRAM: ${programName}
-TODAY: ${today}
-SOURCE (from mandate): ${src}
-Create a project plan with these sections:
-1. Cover: program name, project manager placeholder, date
-2. Project team and roles table (Name, Role, Responsibilities) with standard Noroff roles
-3. Timeline overview table: Milestone, Deadline, Status - covering all 8 process steps
-4. Status points: one section per milestone with activities, deadlines, responsible person
-Style: Arial font, tables border-collapse:collapse, th background #D5E8F0, borders 1px solid #ccc, padding 8px.
-Mark human input fields: <span style="color:#CC0000;font-style:italic">[TO BE FILLED IN]</span>
-Output ONLY HTML body content, no DOCTYPE or html/head/body tags.`;
-    const planHTML = await callAI(prompt, 3000);
-    const clean = planHTML.replace(/^```html\s*/i,'').replace(/```\s*$/i,'').trim();
-    const editor = document.getElementById('plan-editor');
-    editor.innerHTML = clean;
-    autosaveDocument('plan', clean);
-    document.getElementById('plan-doc-section').classList.add('visible');
-    document.getElementById('plan-run-btn').style.display = 'none';
-    document.getElementById('plan-mandate-note').style.display = 'none';
-    editor.scrollIntoView({behavior:'smooth',block:'start'});
-  } catch(err) {
-    errEl.textContent = err.message;
-    errEl.classList.add('visible');
-  }
-  statusEl.classList.remove('visible');
-  btn.disabled = false;
-}
-
-function downloadPlan() {
-  const programName = document.getElementById('p-program-name').value.trim() || 'Project_Plan';
-  const editor = document.getElementById('plan-editor');
-  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Project Plan</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${editor.innerHTML}</div></div></body></html>`;
-  const blob = new Blob([fullHTML],{type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = programName.replace(/\s+/g,'_')+'_Plan.html'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-function addPlanToDocuments() {
-  const programName = document.getElementById('p-program-name').value.trim() || 'Project Plan';
-  const editor = document.getElementById('plan-editor');
-  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Plan</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Project Plan</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${editor.innerHTML}</div></div></body></html>`;
-  const blob = new Blob([fullHTML],{type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const today = new Date().toLocaleDateString('en-GB');
-  const container = document.getElementById('generated-docs');
-  const existing = container.querySelector('[data-name="plan"]');
-  if (existing) existing.remove();
-  const card = document.createElement('div');
-  card.className = 'generated-doc-card';
-  card.setAttribute('data-name','plan');
-  card.innerHTML = `<i class="ti ti-calendar-stats generated-doc-icon" style="color:#D85A30"></i><div style="flex:1"><div class="generated-doc-label">${programName} -- Project Plan</div><div class="generated-doc-sub" style="color:#D85A30">Generated ${today} - Draft</div></div><button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation();downloadFromCard('${url}','${programName}_Plan')">Download</button>`;
-  card.onclick = () => {
-    const sec = document.getElementById('plan-doc-section');
-    sec.classList.toggle('visible');
-    if (sec.classList.contains('visible')) document.getElementById('plan-editor').scrollIntoView({behavior:'smooth',block:'start'});
-  };
-  document.getElementById('plan-doc-section').classList.remove('visible');
-  container.appendChild(card);
-  card.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-function downloadMandate() {
-  const programName = document.getElementById('m-program-name').value.trim() || 'Project_Mandate';
-  const editor = document.getElementById('mandate-editor');
-  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Project Mandate</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${editor.innerHTML}</div></div></body></html>`;
-  const blob = new Blob([fullHTML], {type: 'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = programName.replace(/\s+/g,'_') + '.html';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function addSummaryToDocuments() {
-  const programName = 'Program Summary';
-  const editor = document.getElementById('summary-editor');
-  const today = new Date().toLocaleDateString('en-GB');
-  const container = document.getElementById('generated-docs');
-  const label = 'Program Summary — ' + today;
-  const existing = container.querySelector('[data-name="summary"]');
-  if (existing) existing.remove();
-  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Program Summary</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Program Summary</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${editor.innerHTML}</div></div></body></html>`;
-  const blob = new Blob([fullHTML], {type: 'text/html'});
-  const url = URL.createObjectURL(blob);
-  const card = document.createElement('div');
-  card.className = 'generated-doc-card';
-  card.setAttribute('data-name', 'summary');
-  card.innerHTML = `
-    <i class="ti ti-file-description generated-doc-icon" style="color:#D85A30"></i>
-    <div style="flex:1">
-      <div class="generated-doc-label">${label}</div>
-      <div class="generated-doc-sub" style="color:#D85A30">Generated from Miro board · Draft summary</div>
-    </div>
-    <button class="generated-doc-download" style="border-color:#D85A30;color:#D85A30" onclick="event.stopPropagation(); downloadFromCard('${url}', 'Program_Summary')">Download</button>`;
-  document.getElementById('summary-doc-section').classList.remove('visible');
-  card.onclick = () => {
-    const sec = document.getElementById('summary-doc-section');
-    sec.classList.toggle('visible');
-    if (sec.classList.contains('visible')) {
-      document.getElementById('summary-editor').scrollIntoView({behavior:'smooth', block:'start'});
-    }
-  };
-  container.appendChild(card);
-  card.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function addToDocuments() {
-  const programName = document.getElementById('m-program-name').value.trim() || 'Project Mandate';
-  const editor = document.getElementById('mandate-editor');
-  const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Project Mandate</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;max-width:860px;margin:0 auto;padding:0;color:#1a1a1a;background:#1a1a1a}
-.doc-wrap{background:#fff;margin:32px auto;border-radius:12px;overflow:hidden;max-width:860px}
-.doc-header{background:#1a1a1a;padding:28px 36px 24px}
-.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.doc-logo{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
-.doc-date{font-size:11px;color:#666}
-.doc-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
-.doc-subtitle{font-size:12px;color:#888}
-.doc-body{padding:32px 36px 40px}
-h1{font-size:20px;font-weight:500;color:#1a1a1a;margin:28px 0 8px;padding-bottom:8px;border-bottom:2px solid #D85A30}
-h1:first-child{margin-top:0}
-h2{font-size:14px;font-weight:600;color:#D85A30;text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px}
-h3{font-size:13px;font-weight:600;color:#444;margin:14px 0 4px}
-p{margin:6px 0 10px;line-height:1.7;color:#333}
-ul,ol{padding-left:20px;margin:6px 0 10px}
-li{margin-bottom:5px;line-height:1.6;color:#333}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
-th{background:#1a1a1a;color:#fff;padding:9px 12px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;color:#333}
-tr:last-child td{border-bottom:none}
-tr:nth-child(even) td{background:#fafafa}
-.section-divider{height:1px;background:#f0f0f0;margin:20px 0}
-span[style*="color:#CC0000"]{color:#D85A30!important;font-style:italic}
-@media print{body{background:#fff}.doc-wrap{margin:0;border-radius:0}.doc-header{background:#1a1a1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="doc-wrap"><div class="doc-header"><div class="doc-header-top"><span class="doc-logo">Noroff Vocational College</span><span class="doc-date">${new Date().toLocaleDateString('en-GB')}</span></div><div class="doc-title">Project Mandate</div><div class="doc-subtitle">${programName}</div></div><div class="doc-body">${editor.innerHTML}</div></div></body></html>`;
-  const blob = new Blob([fullHTML], {type: 'text/html'});
-  const url = URL.createObjectURL(blob);
-  const today = new Date().toLocaleDateString('en-GB');
-  const container = document.getElementById('generated-docs');
-  const existing = container.querySelector(`[data-name="${programName}"]`);
-  if (existing) existing.remove();
-  const card = document.createElement('div');
-  card.className = 'generated-doc-card';
-  card.setAttribute('data-name', programName);
-  card.innerHTML = `
-    <i class="ti ti-file-text generated-doc-icon"></i>
-    <div style="flex:1">
-      <div class="generated-doc-label">${programName} — Project Mandate</div>
-      <div class="generated-doc-sub">Generated ${today} · Draft — ready for editing</div>
-    </div>
-    <button class="generated-doc-download" onclick="event.stopPropagation(); downloadFromCard('${url}', '${programName}')">Download</button>`;
-  document.getElementById('mandate-doc-section').classList.remove('visible');
-  card.onclick = () => {
-    const sec = document.getElementById('mandate-doc-section');
-    sec.classList.toggle('visible');
-    if (sec.classList.contains('visible')) {
-      document.getElementById('mandate-editor').scrollIntoView({behavior:'smooth', block:'start'});
-    }
-  };
-  container.appendChild(card);
-  card.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function downloadFromCard(url, name) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name.replace(/\s+/g,'_') + '_Mandate.html';
-  a.click();
-}
-
-async function saveToDashboard() {
-  const programName = document.getElementById('p-program-name').value.trim() || 'Unnamed Program';
-  const editor = document.getElementById('plan-editor');
-  if (!editor || !editor.innerHTML.trim()) {
-    alert('Please generate a project plan first.');
-    return;
-  }
-
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
-
-  try {
-    const projectId = 'proj_' + Date.now();
-    const today = new Date().toISOString().split('T')[0];
-
-    const projectData = {
-      id: projectId,
-      name: programName,
-      created: today,
-      currentStep: 3,
-      status: 'on-track',
-      owner: '[TO BE FILLED IN]',
-      deadline: '[TO BE FILLED IN]',
-      summary: generatedSummary ? generatedSummary.replace(/<[^>]*>/g,'').substring(0, 300) : '',
-      milestones: [
-        {name:'Strategy & ideation', done:true, date:'', owner:''},
-        {name:'Project mandate', done:true, date:'', owner:''},
-        {name:'Project plan', done:true, date:'', owner:''},
-        {name:'Industry workshops', done:false, active:true, date:'', owner:''},
-        {name:'Learning outcomes', done:false, date:'', owner:''},
-        {name:'Course development', done:false, date:'', owner:''},
-        {name:'Quality assurance', done:false, date:'', owner:''},
-        {name:'LOKUT application', done:false, date:'', owner:''},
-      ]
-    };
-
-    // Update in main programs store
-    if (currentProgramId && programs[currentProgramId]) {
-      programs[currentProgramId].currentStep = cur + 1;
-      programs[currentProgramId].status = 'on-track';
-    }
-    await savePrograms();
-
-    btn.textContent = 'Saved to dashboard!';
-    btn.style.background = '#2d6a2d';
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = 'Save to dashboard';
-      btn.style.background = '#1a1a1a';
-    }, 3000);
-
-  } catch(err) {
-    btn.disabled = false;
-    btn.textContent = 'Save to dashboard';
-    alert('Could not save: ' + err.message);
-  }
-}
-
-loadPrograms().then(() => { renderDashboard(); });
-</script>
-</div><!-- end .container -->
-</div><!-- end #view-guide -->
-
-<!-- ===== CREATION MODAL ===== -->
-<div class="modal-overlay" id="create-modal">
-  <div class="modal-box" style="max-width:560px">
-
-    <!-- Step indicator -->
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">
-      <div id="modal-step-1-dot" style="width:24px;height:24px;border-radius:50%;background:#D85A30;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
-      <div id="modal-step-1-label" style="font-size:12px;font-weight:600;color:#D85A30">Strategic context</div>
-      <div style="flex:1;height:1px;background:#e0e0e0;margin:0 4px"></div>
-      <div id="modal-step-2-dot" style="width:24px;height:24px;border-radius:50%;background:#e0e0e0;color:#aaa;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
-      <div id="modal-step-2-label" style="font-size:12px;color:#aaa">Program summary</div>
-    </div>
-
-    <!-- STEP 1 -->
-    <div id="modal-step-1">
-      <h2 style="font-size:16px;font-weight:600;color:#1a1814;margin-bottom:4px">Create new program</h2>
-      <p style="font-size:12px;color:#888;margin-bottom:20px;line-height:1.5">Fill in the strategic context. This is set by the Head of Development and visible to the whole project team.</p>
-      <div class="modal-field">
-        <label>Program name *</label>
-        <input type="text" id="cm-name" placeholder="e.g. Film Production — Online Studies">
-      </div>
-      <div class="modal-field">
-        <label>Strategic rationale</label>
-        <textarea id="cm-rationale" placeholder="Why was this program approved? What need or opportunity does it address?"></textarea>
-        <div class="hint">2–4 sentences. Visible to the whole project team.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="modal-field">
-          <label>Approved by</label>
-          <input type="text" id="cm-approved-by" placeholder="e.g. Head of Development">
-        </div>
-        <div class="modal-field">
-          <label>Approval date</label>
-          <input type="text" id="cm-approved-date" placeholder="e.g. May 2026">
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
-        <button class="modal-submit" onclick="goToModalStep2()">Next → Program summary</button>
-      </div>
-    </div>
-
-    <!-- STEP 2 -->
-    <div id="modal-step-2" style="display:none">
-      <h2 style="font-size:16px;font-weight:600;color:#1a1814;margin-bottom:4px">Program summary</h2>
-      <p style="font-size:12px;color:#888;margin-bottom:16px;line-height:1.5">Generate a program summary from your Miro ideation board, or write one manually. This summary is used to generate the project mandate.</p>
-
-      <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin-bottom:12px">
-        <div style="background:#f8f8f8;padding:8px 12px;border-bottom:1px solid #e0e0e0;font-size:11px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Generate from Miro board
-        </div>
-        <div style="padding:12px">
-          <button onclick="runModalSummary()" id="modal-miro-btn" style="width:100%;padding:9px;background:#D85A30;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Read Miro board and generate summary
-          </button>
-          <div id="modal-miro-status" style="display:none;align-items:center;gap:8px;font-size:11px;color:#888;padding:6px 0">
-            <div style="width:12px;height:12px;border:2px solid #e0e0e0;border-top-color:#D85A30;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
-            <span id="modal-miro-status-text">Reading Miro board...</span>
-          </div>
-          <div id="modal-miro-error" style="font-size:11px;color:#cc3333;margin-top:6px;display:none"></div>
-        </div>
-      </div>
-
-      <div class="modal-field">
-        <label>Program summary <span style="font-weight:400;color:#aaa">(edit or write manually)</span></label>
-        <textarea id="cm-summary" style="min-height:140px" placeholder="Describe the program — target audience, rationale, scope, industry relevance. This will be used to generate the project mandate."></textarea>
-        <div class="hint">Generated from Miro or written manually. Required for mandate generation.</div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="modal-cancel" onclick="backToModalStep1()">← Back</button>
-        <button style="padding:8px 16px;border:1px solid #e0e0e0;border-radius:7px;background:transparent;font-size:13px;cursor:pointer;font-family:inherit;color:#555" onclick="submitCreateModal(false)">Skip summary for now</button>
-        <button class="modal-submit" onclick="submitCreateModal(true)">Create program</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-</body>
-</html>
+    card.setAttribute('data-name', type);
+    card.innerHTML = `<i class="ti ${icon} generated-doc-icon"></i><div style="flex:1"><div class="generated-doc-label">${label}</div><div class="generated-doc-sub">Saved · Draft</div></div><button class="generated-doc-download" onclick="event.st
