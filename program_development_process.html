@@ -599,12 +599,82 @@ let generatedSummary = '';
 let generatedMandate = '';
 let currentProgramId = null;
 let programs = {};
+let _dark = false;
+let cur = 0;
 
-// ── Miro board helpers ──
+const TOTAL_STEPS = 15;
+
+const phases = [
+  { label:'Strategy & Planning',    num:'Phase 1', steps:[0,1,2],            color:'var(--red)' },
+  { label:'Study Plan Development', num:'Phase 2', steps:[3,4,5,6,7,8],      color:'#1D7A4A' },
+  { label:'Approval',               num:'Phase 3', steps:[9,10,11,12,13,14], color:'#378ADD' },
+];
+
+const steps = [
+  { num:'1',  title:'Project strategy',             phase:0, intro:'Define the strategic rationale for the program and get approval from the VOC board to proceed.', roles:['Head of Development','Director of Strategy','Senior Advisor'], activities:['Review strategic context and market need','Define program concept and scope','Prepare VOC board presentation','Secure VOC board decision to proceed'], responsible:'Head of Development', deliverables:['VOC board decision — idea approved to proceed'], docs:[], miro:false },
+  { num:'2',  title:'Project mandate',              phase:0, intro:'Produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.', roles:['Head of Development','Project Manager','Director of Strategy','Industry Partners'], activities:['Define purpose, scope and milestones','Conduct risk assessment','Set development budget','Identify and approach industry partners'], responsible:'Head of Development + Project Manager', deliverables:['Project mandate approved by Rector','Industry partner agreements signed'], docs:[], miro:false },
+  { num:'3',  title:'Project plan',                 phase:0, intro:'Develop a detailed project plan with clear activities, timeline and responsibilities. Onboard industry partners and assemble the full project group.', roles:['Project Manager','Project group','Industry Partners'], activities:['Define all project activities and timeline','Clarify responsibilities and expectations','Industry partner kick-off and onboarding'], responsible:'Project Manager', deliverables:['Project plan approved by Head of Development','Industry partners onboarded'], docs:[], miro:false },
+  { num:'4',  title:'Industry workshops',           phase:1, intro:'Collaborative workshops with industry partners shape the programme structure, topics, and learning outcomes.', roles:['Project Manager','Industry Partners','Subject Matter Experts','Pedagogic Advisor'], activities:['Plan and prepare workshops','Run workshop sessions with industry partners','Capture industry input and feedback','Document workshop outcomes'], responsible:'Project Manager', deliverables:['Workshop summaries','Industry feedback documented'], docs:[], miro:true },
+  { num:'5',  title:'Study programme design',       phase:1, intro:'Design the overall programme structure based on workshop outcomes — courses, credits, structure, and overall scope.', roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor'], activities:['Define programme structure and course overview','Determine credit distribution','Draft programme description','Review with project team'], responsible:'Curriculum Manager', deliverables:['Programme design document'], docs:[], miro:false },
+  { num:'6',  title:'Learning outcome design',      phase:1, intro:'Define and finalise the overall programme learning outcomes and course-level learning outcomes.', roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Industry Partners'], activities:['Draft overall programme learning outcomes','Draft course-level learning outcomes','Industry partner review and approval'], responsible:'Curriculum Manager', deliverables:['Overall learning outcomes document','Industry approval of outcomes'], docs:[], miro:false },
+  { num:'7',  title:'Quality assurance by industry',phase:1, intro:'The reference group and industry partners review the programme design and learning outcomes and provide formal feedback.', roles:['Reference group','Industry Partners','Head of Development'], activities:['Share programme design and LOs with reference group','Collect and review feedback','Adjust programme based on input','Confirm sign-off'], responsible:'Head of Development', deliverables:['Reference group feedback','Industry QA sign-off'], docs:[], miro:false },
+  { num:'8',  title:'Learning design',              phase:1, intro:'Develop the full learning design — topics, learning activities, assessments, and tools for each course.', roles:['Curriculum Manager','Learning Designer','Subject Matter Expert'], activities:['Define topics and learning activities per course','Design assessments','Specify tools and software requirements','Finalise course descriptions'], responsible:'Curriculum Manager', deliverables:['Learning design document','Completed course descriptions'], docs:[], miro:false },
+  { num:'9',  title:'Application and documentation',phase:1, intro:'Prepare the full application package and all supporting documentation required for submission.', roles:['Head of Development','Project Manager','Academic responsible'], activities:['Compile all required documents','Review and quality check application package','Prepare supporting documentation','Final internal sign-off'], responsible:'Head of Development', deliverables:['Complete application package ready for submission'], docs:[], miro:false },
+  { num:'10', title:'Handover to LOKUT',            phase:2, intro:'Submit the study plan and application package to LOKUT for formal review.', roles:['Head of Development','LOKUT'], activities:['Submit application to LOKUT','Confirm receipt and registration','Prepare for review process'], responsible:'Head of Development', deliverables:['LOKUT confirms receipt of application'], docs:[], miro:false },
+  { num:'11', title:'Study plan review by LOKUT',   phase:2, intro:'LOKUT reviews the study plan against laws and regulations and provides feedback.', roles:['LOKUT','Academic responsible','Head of Development'], activities:['Respond to LOKUT queries','Provide additional documentation if requested','Review LOKUT feedback'], responsible:'Head of Development', deliverables:['LOKUT review complete'], docs:[], miro:false },
+  { num:'12', title:'Statement',                    phase:2, intro:'Prepare and submit the formal statement in response to the LOKUT review.', roles:['Head of Development','Academic responsible'], activities:['Draft formal statement','Internal review and approval','Submit statement to LOKUT'], responsible:'Head of Development', deliverables:['Statement submitted'], docs:[], miro:false },
+  { num:'13', title:'Blueprint',                    phase:2, intro:'Finalise the blueprint — the definitive study plan document that will be approved by the board.', roles:['Head of Development','Academic responsible','Curriculum Manager'], activities:['Finalise all programme documentation','Produce blueprint document','Internal approval of blueprint'], responsible:'Head of Development', deliverables:['Blueprint approved internally'], docs:[], miro:false },
+  { num:'14', title:'Study plan approval by board', phase:2, intro:'The vocational school board reviews and approves the study plan.', roles:['Vocational school board','Head of Development'], activities:['Present study plan to board','Board review and deliberation','Board decision'], responsible:'Head of Development', deliverables:['Board approval of study plan'], docs:[], miro:false },
+  { num:'15', title:'Doc. handover',                phase:2, intro:'Final handover of all programme documentation to the relevant parties.', roles:['Project Manager','Head of Development'], activities:['Compile final documentation package','Hand over to relevant departments','Close project'], responsible:'Project Manager', deliverables:['All documents handed over','Project closed'], docs:[], miro:false },
+];
+
+const stepInstructions = [
+  'Review the strategic rationale for this programme. Prepare the project concept and VOC board presentation.',
+  'Use the programme summary to draft a Project Mandate. Get it approved by the Rector before moving on.',
+  'Develop a detailed project plan. Onboard industry partners and assemble the project group.',
+  'Run industry workshops to shape the programme structure, topics, and approach.',
+  'Design the overall programme structure — courses, credits, and scope — based on workshop outcomes.',
+  'Define and finalise programme-level and course-level learning outcomes. Get industry approval.',
+  'Share the programme design with the reference group and industry partners for formal quality review.',
+  'Develop the full learning design — topics, activities, assessments, and tools for each course.',
+  'Compile the full application package and all documentation. Complete final internal sign-off.',
+  'Submit the study plan and application package to LOKUT.',
+  'Manage the LOKUT review process. Respond to queries and provide additional documentation as needed.',
+  'Prepare and submit the formal statement in response to the LOKUT review.',
+  'Produce the final blueprint document for board approval.',
+  'Present the study plan to the vocational school board for formal approval.',
+  'Hand over all final documentation and close the project.',
+];
+
+const dashSteps = [
+  { num:1,  name:'Project strategy',       sub:'Jun 20', color:'var(--red)', line:'#F0997B', people:['Head of Development','Director of Strategy'], docs:['Project strategy brief'], gate:'VOC board approves strategy' },
+  { num:2,  name:'Project mandate',        sub:'Aug 1',  color:'var(--red)', line:'#F0997B', people:['Head of Development','Project Manager'], docs:['Project mandate'], gate:'Mandate approved by Rector' },
+  { num:3,  name:'Project plan',           sub:'Aug 20', color:'var(--red)', line:'#C8D9CD', people:['Project Manager','Project group'], docs:['Project plan'], gate:'Plan approved by Head of Development' },
+  { num:4,  name:'Industry workshops',     sub:'Sep 11', color:'#1D7A4A',   line:'#C8D9CD', people:['Project Manager','Industry partners'], docs:['Workshop summary'], gate:'Workshop outcomes documented' },
+  { num:5,  name:'Prog. design',           sub:'Sep 18', color:'#1D7A4A',   line:'#C8D9CD', people:['Curriculum Manager','SMEs'], docs:['Programme design'], gate:'Programme design approved' },
+  { num:6,  name:'LO design',              sub:'Oct 9',  color:'#1D7A4A',   line:'#C8D9CD', people:['Curriculum Manager','Industry partners'], docs:['Learning outcomes'], gate:'Learning outcomes approved by industry' },
+  { num:7,  name:'QA by industry',         sub:'Oct 16', color:'#1D7A4A',   line:'#C8D9CD', people:['Reference group','Industry partners'], docs:['QA feedback'], gate:'Industry QA sign-off' },
+  { num:8,  name:'Learning design',        sub:'Oct 30', color:'#1D7A4A',   line:'#C8D9CD', people:['Learning designer','Curriculum Manager'], docs:['Learning design'], gate:'Learning design complete' },
+  { num:9,  name:'App. & docs',            sub:'Oct 30', color:'#1D7A4A',   line:'#85B7EB', people:['Head of Development','Project Manager'], docs:['Application package'], gate:'Application package ready' },
+  { num:10, name:'Handover to LOKUT',      sub:'Nov 2',  color:'#378ADD',   line:'#85B7EB', people:['Head of Development','LOKUT'], docs:['Handover document'], gate:'LOKUT confirms receipt' },
+  { num:11, name:'LOKUT review',           sub:'Nov 16', color:'#378ADD',   line:'#85B7EB', people:['LOKUT','Academic responsible'], docs:['Review report'], gate:'Review complete' },
+  { num:12, name:'Statement',              sub:'Nov 16', color:'#378ADD',   line:'#85B7EB', people:['Head of Development'], docs:['Statement document'], gate:'Statement submitted' },
+  { num:13, name:'Blueprint',              sub:'Nov 30', color:'#378ADD',   line:'#85B7EB', people:['Head of Development','Academic responsible'], docs:['Blueprint'], gate:'Blueprint approved' },
+  { num:14, name:'Board approval',         sub:'Dec 4',  color:'#378ADD',   line:'#85B7EB', people:['Vocational school board'], docs:['Board decision'], gate:'Board approves study plan' },
+  { num:15, name:'Doc. handover',          sub:'Dec 1',  color:'#378ADD',   line:null,      people:['Project Manager'], docs:['Final documentation'], gate:'All documents handed over' },
+];
+let dashActiveStep = null;
+
+function toggleTheme() {
+  _dark = !_dark;
+  document.documentElement.setAttribute('data-theme', _dark ? 'dark' : '');
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = _dark ? '● Dark' : '○ Light';
+}
+
 function getMiroBoardId(program) {
   if (!program || !program.miroBoard) return null;
-  const url = program.miroBoard;
-  const m = url.match(/board\/([^/?#]+)/);
+  const m = program.miroBoard.match(/board\/([^/?#]+)/);
   return m ? m[1] : null;
 }
 
@@ -616,57 +686,41 @@ function hideMiroLinkForm() {
   document.getElementById('miro-link-form').classList.remove('visible');
   document.getElementById('miro-url-input').value = '';
 }
-
 async function saveMiroBoard() {
   const url = document.getElementById('miro-url-input').value.trim();
-  if (!url || !url.includes('miro.com')) {
-    alert('Please paste a valid Miro board URL.');
-    return;
-  }
+  if (!url || !url.includes('miro.com')) { alert('Please paste a valid Miro board URL.'); return; }
   if (!currentProgramId) return;
   programs[currentProgramId].miroBoard = url;
   await savePrograms();
   renderMiroSection();
   hideMiroLinkForm();
 }
-
 async function unlinkMiroBoard() {
   if (!currentProgramId) return;
   programs[currentProgramId].miroBoard = '';
   await savePrograms();
   renderMiroSection();
 }
-
 function renderMiroSection() {
   const p = currentProgramId && programs[currentProgramId];
-  const step = steps[cur];
-  if (!step || !step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
+  const s = steps[cur];
+  if (!s || !s.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
   document.getElementById('miro-section').style.display = 'block';
-
   const linked = document.getElementById('miro-linked-view');
   const unlinked = document.getElementById('miro-unlinked-view');
-
   if (p && p.miroBoard) {
-    linked.style.display = 'block';
-    unlinked.style.display = 'none';
+    linked.style.display = 'block'; unlinked.style.display = 'none';
     document.getElementById('miro-open-btn').href = p.miroBoard;
-    const isStep4 = cur === 3;
-    document.getElementById('miro-btn-title').textContent = isStep4 ? 'Open workshop board in Miro' : 'Open Miro board';
-    document.getElementById('miro-btn-sub').textContent = isStep4 ? 'Industry partner workshop workspace' : 'Strategy & idea development workspace';
   } else {
-    linked.style.display = 'none';
-    unlinked.style.display = 'block';
-    hideMiroLinkForm();
+    linked.style.display = 'none'; unlinked.style.display = 'block';
   }
 }
 
-// ── Dashboard ──
 function showDashboard() {
   document.getElementById('view-dashboard').classList.add('active');
   document.getElementById('view-guide').classList.remove('active');
   renderDashboard();
 }
-
 function showGuide(programId) {
   currentProgramId = programId;
   document.getElementById('view-dashboard').classList.remove('active');
@@ -682,15 +736,12 @@ function showGuide(programId) {
     document.getElementById('strategic-context').style.display = 'none';
   }
   cur = (p && p.currentStep) ? p.currentStep - 1 : 0;
-  clearDocuments();
-  restoreDocuments();
   render();
 }
 
 function dashNewProgram() {
   ['cm-name','cm-rationale','cm-approved-by','cm-approved-date','cm-summary'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('modal-miro-error').style.display = 'none';
   document.getElementById('modal-miro-status').style.display = 'none';
@@ -725,7 +776,6 @@ function backToModalStep1() {
   document.getElementById('modal-step-2-dot').style.color = '#aaa';
   document.getElementById('modal-step-2-label').style.color = '#aaa';
 }
-
 function submitCreateModal() {
   const name = document.getElementById('cm-name').value.trim();
   if (!name) return;
@@ -736,43 +786,21 @@ function submitCreateModal() {
     approvedBy: document.getElementById('cm-approved-by').value.trim() || 'To be confirmed',
     approvedDate: document.getElementById('cm-approved-date').value.trim() || 'To be confirmed',
     created: new Date().toISOString().split('T')[0],
-    summary: document.getElementById('cm-summary').value.trim() || '',
-    mandate: '', plan: '', miroBoard: '',
-    currentStep: 1, status: 'on-track'
+    summary: document.getElementById('cm-summary') ? document.getElementById('cm-summary').value.trim() : '',
+    mandate: '', plan: '', miroBoard: '', currentStep: 1, status: 'on-track'
   };
   currentProgramId = id;
-  generatedSummary = programs[id].summary;
   savePrograms();
   closeCreateModal();
   showGuide(id);
 }
-
 async function deleteProgram(id) {
   const p = programs[id];
-  if (!p || !confirm(`Delete "${p.name}"?\n\nThis cannot be undone.`)) return;
+  if (!p || !confirm('Delete "' + p.name + '"?\n\nThis cannot be undone.')) return;
   delete programs[id];
   await savePrograms();
   renderDashboard();
 }
-
-const dashSteps = [
-  { num:1,  name:'Project strategy',      sub:'Jun 20',  color:'var(--red)', line:'#F0997B', people:['Head of Development','Director of Strategy'], docs:['Project strategy brief'], gate:'VOC board approves strategy' },
-  { num:2,  name:'Project mandate',       sub:'Aug 1',   color:'var(--red)', line:'#F0997B', people:['Head of Development','Project Manager'], docs:['Project mandate'], gate:'Mandate approved by Rector' },
-  { num:3,  name:'Project plan',          sub:'Aug 20',  color:'var(--red)', line:'#C8D9CD', people:['Project Manager','Project group'], docs:['Project plan'], gate:'Plan approved by Head of Development' },
-  { num:4,  name:'Industry workshops',    sub:'Sep 11',  color:'#1D7A4A', line:'#C8D9CD', people:['Project Manager','Industry partners'], docs:['Workshop summary'], gate:'Workshop outcomes documented' },
-  { num:5,  name:'Study programme design',sub:'Sep 18',  color:'#1D7A4A', line:'#C8D9CD', people:['Curriculum Manager','SMEs'], docs:['Programme design'], gate:'Programme design approved' },
-  { num:6,  name:'Learning outcome design',sub:'Oct 9',  color:'#1D7A4A', line:'#C8D9CD', people:['Curriculum Manager','Industry partners'], docs:['Learning outcomes'], gate:'Learning outcomes approved by industry' },
-  { num:7,  name:'QA by industry',        sub:'Oct 16',  color:'#1D7A4A', line:'#C8D9CD', people:['Reference group','Industry partners'], docs:['QA feedback'], gate:'Industry QA sign-off' },
-  { num:8,  name:'Learning design',       sub:'Oct 30',  color:'#1D7A4A', line:'#C8D9CD', people:['Learning designer','Curriculum Manager'], docs:['Learning design'], gate:'Learning design complete' },
-  { num:9,  name:'Application & docs',    sub:'Oct 30',  color:'#1D7A4A', line:'#85B7EB', people:['Head of Development','Project Manager'], docs:['Application package'], gate:'Application package ready' },
-  { num:10, name:'Handover to LOKUT',     sub:'Nov 2',   color:'#378ADD', line:'#85B7EB', people:['Head of Development','LOKUT'], docs:['Handover document'], gate:'LOKUT confirms receipt' },
-  { num:11, name:'LOKUT review',          sub:'Nov 16',  color:'#378ADD', line:'#85B7EB', people:['LOKUT','Academic responsible'], docs:['Review report'], gate:'Review complete' },
-  { num:12, name:'Statement',             sub:'Nov 16',  color:'#378ADD', line:'#85B7EB', people:['Head of Development'], docs:['Statement document'], gate:'Statement submitted' },
-  { num:13, name:'Blueprint',             sub:'Nov 30',  color:'#378ADD', line:'#85B7EB', people:['Head of Development','Academic responsible'], docs:['Blueprint'], gate:'Blueprint approved' },
-  { num:14, name:'Board approval',        sub:'Dec 4',   color:'#378ADD', line:'#85B7EB', people:['Vocational school board'], docs:['Board decision'], gate:'Board approves study plan' },
-  { num:15, name:'Doc. handover',         sub:'Dec 1',   color:'#378ADD', line:null, people:['Project Manager'], docs:['Final documentation'], gate:'All documents handed over' },
-];
-let dashActiveStep = null;
 
 function buildDashTimeline() {
   const track = document.getElementById('dash-step-track');
@@ -785,36 +813,24 @@ function buildDashTimeline() {
       track.appendChild(conn);
     }
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:76px';
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:60px';
     const isActive = dashActiveStep === i;
-    wrap.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:${s.color};color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;${isActive?'outline:3px solid #1a1a1a;outline-offset:2px':''};transition:transform .15s">${s.num}</div><div style="font-size:10px;font-weight:${isActive?'600':'500'};color:#1a1a1a;margin-top:5px;text-align:center">${s.name}</div><div style="font-size:9px;color:#888;text-align:center">${s.sub}</div>`;
-    wrap.onmouseenter = () => wrap.querySelector('div').style.transform = 'scale(1.15)';
-    wrap.onmouseleave = () => wrap.querySelector('div').style.transform = '';
+    wrap.innerHTML = `<div style="width:22px;height:22px;border-radius:50%;background:${s.color};color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;${isActive?'outline:3px solid #1a1a1a;outline-offset:2px':''}">${s.num}</div><div style="font-size:9px;font-weight:500;color:#1a1a1a;margin-top:4px;text-align:center">${s.name}</div><div style="font-size:8px;color:#888;text-align:center">${s.sub}</div>`;
     wrap.onclick = () => { dashActiveStep = dashActiveStep === i ? null : i; buildDashTimeline(); showDashStepDetail(i); };
     track.appendChild(wrap);
   });
 }
-
 function showDashStepDetail(i) {
   const detail = document.getElementById('dash-step-detail');
   if (dashActiveStep === null) { detail.style.display = 'none'; return; }
   const s = dashSteps[i];
   document.getElementById('dsd-title').textContent = `Step ${s.num} — ${s.name}`;
-  const aiTools = ['AI mandate generator','AI plan generator','AI workshop summary','AI LO generator','AI course generator','Partner brief generator'];
-  document.getElementById('dsd-tools').innerHTML = s.tools.map(t => {
-    const isAI = aiTools.some(a => t.includes(a.split(' ')[1]||a));
-    const isMiro = t.includes('Miro');
-    const bg = isMiro ? '#FDF1EE' : isAI ? '#FAECE7' : '#f5f5f5';
-    const border = isMiro ? '#F0997B' : isAI ? 'var(--red)' : '#e0e0e0';
-    const color = isMiro ? '#712B13' : isAI ? '#993C1D' : '#555';
-    return `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:${bg};border:1px solid ${border};color:${color}">${t}</span>`;
-  }).join('');
+  document.getElementById('dsd-tools').innerHTML = '';
   document.getElementById('dsd-people').innerHTML = s.people.map(p => `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#f5f5f5;border:1px solid #e0e0e0;color:#555">${p}</span>`).join('');
   document.getElementById('dsd-docs').innerHTML = s.docs.map(d => `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#EEF5FC;border:1px solid #85B7EB;color:#0C447C">${d}</span>`).join('');
   document.getElementById('dsd-gate').textContent = s.gate;
   detail.style.display = 'block';
 }
-
 function toggleWelcome() {
   const more = document.getElementById('welcome-more');
   const chev = document.getElementById('welcome-chev');
@@ -836,415 +852,10 @@ function renderDashboard() {
   document.getElementById('ds-active-sub').textContent = risk.length > 0 ? risk.length + ' at risk' : active.length > 0 ? 'All on track' : 'No programs yet';
   document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
   const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
-
   function renderCards(list, containerId) {
     const el = document.getElementById(containerId);
     if (!list.length) {
-      el.innerHTML = containerId === 'dash-active'
-        ? '<div class="dash-empty"><p><strong>No active programs yet</strong><br>Click "Create new program" to get started.</p></div>'
-        : '<p style="color:#666;font-size:12px;padding:4px 0">None yet.</p>';
-      return;
-    }
-    el.innerHTML = '';
-    list.forEach(p => {
-      const step = p.currentStep || 1;
-      const pct = Math.round(step / TOTAL_STEPS * 100);
-      const statusColor = p.status === 'at-risk' ? '#BA7517' : 'var(--red)';
-      const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
-      const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
-      const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
-      const phaseDefs = [{n:3},{n:6},{n:6}];
-      const segs = phaseDefs.map((ph,pi) => {
-        const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
-        const d = Math.max(0,Math.min(step-start,ph.n));
-        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?phaseColors[pi]:'var(--rule)'}"></div>`;
-      }).join('');
-      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','QA','L. design','App. docs','LOKUT','LOKUT review','Statement','Blueprint','Board','Handover'];
-      const dots = shortLabels.map((s,i) => {
-        const d = i<step, a = i===step-1;
-        const phColor = i<3 ? 'var(--red)' : i<9 ? '#1D7A4A' : '#378ADD';
-        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`;
-      }).join('');
-
-      // Miro button
-      const hasMiro = p.miroBoard && p.miroBoard.includes('miro.com');
-      const miroBtn = hasMiro
-        ? `<a class="miro-card-btn" href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FFD02F"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#050038"/></svg> Open Miro</a>`
-        : `<button class="miro-card-btn unlinked" onclick="event.stopPropagation();linkMiroFromDash('${p.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#e0e0e0"/><path d="M16.5 6h-3l2.5 4-3.5 1 3 7 2.5-4.5L20 15l-3.5-9zM7.5 6l3.5 9-2.5-1.5L11 18l-3-7-3.5-1 2.5-4z" fill="#999"/></svg> Link Miro board</button>`;
-
-      const card = document.createElement('div');
-      card.className = 'dash-prog-card';
-      card.innerHTML = `
-        <div class="dash-prog-header">
-          <div class="dash-prog-dot" style="background:${statusColor}"></div>
-          <span class="dash-prog-name">${p.name}</span>
-          <span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor}">${badgeText}</span>
-          <span style="font-size:11px;color:#888"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span>
-          <span class="dash-prog-pct">${pct}%</span>
-        </div>
-        <div class="dash-prog-wrap">
-          <div class="dash-prog-track">${segs}</div>
-          <div style="display:flex;margin-top:6px">${dots}</div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:#888">${pct}% complete</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap">
-          <button style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--red);border-radius:6px;color:var(--red);background:transparent;cursor:pointer;font-family:inherit" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>
-          ${miroBtn}
-          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent;color:#aaa;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px" onmouseover="this.style.borderColor='#cc3333';this.style.color='#cc3333'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#aaa'"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button>
-        </div>`;
-      el.appendChild(card);
-    });
-  }
-  renderCards(active, 'dash-active');
-  renderCards(done, 'dash-done');
-}
-
-async function linkMiroFromDash(programId) {
-  const url = prompt('Paste the Miro board URL for this program:');
-  if (!url || !url.includes('miro.com')) return;
-  programs[programId].miroBoard = url;
-  await savePrograms();
-  renderDashboard();
-}
-
-async function loadPrograms() {
-  try {
-    const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
-    const data = await res.json();
-    programs = data.value ? JSON.parse(data.value) : {};
-  } catch(e) { programs = {}; }
-  renderDashboard();
-}
-
-async function savePrograms() {
-  await fetch(`${PROXY}/?action=kv-put&key=programs`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(programs)
-  });
-}
-
-// ── Documents ──
-function clearDocuments() {
-  generatedSummary = '';
-  generatedMandate = '';
-  ['summary-editor','mandate-editor','plan-editor'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
-  ['summary-doc-section','mandate-doc-section','plan-doc-section'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('visible'); });
-  document.getElementById('generated-docs').innerHTML = '';
-}
-
-function restoreDocuments() {
-  if (!currentProgramId || !programs[currentProgramId]) return;
-  const p = programs[currentProgramId];
-  if (p.summary) {
-    generatedSummary = p.summary;
-    const editor = document.getElementById('summary-editor');
-    if (editor) { editor.innerHTML = p.summary; document.getElementById('summary-doc-section').classList.add('visible'); }
-  }
-  if (p.mandate) {
-    generatedMandate = p.mandate;
-    const editor = document.getElementById('mandate-editor');
-    if (editor) { editor.innerHTML = p.mandate; document.getElementById('mandate-doc-section').classList.add('visible'); document.getElementById('mandate-run-btn').style.display = 'none'; }
-  }
-  if (p.plan) {
-    const editor = document.getElementById('plan-editor');
-    if (editor) { editor.innerHTML = p.plan; document.getElementById('plan-doc-section').classList.add('visible'); document.getElementById('plan-run-btn').style.display = 'none'; }
-  }
-  rebuildDocCards(p);
-}
-
-function rebuildDocCards(p) {
-  const container = document.getElementById('generated-docs');
-  container.innerHTML = '';
-}
-
-
-const steps = [
-  {
-    num:'1', title:'Project strategy', phase:0,
-    intro:'Define the strategic rationale for the program and get approval from the VOC board to proceed.',
-    roles:['Head of Development','Director of Strategy','Senior Advisor'],
-    activities:['Review strategic context and market need','Define program concept and scope','Prepare VOC board presentation','Secure VOC board decision to proceed'],
-    responsible:'Head of Development',
-    deliverables:['VOC board decision — idea approved to proceed'],
-    docs:[], miro:false
-  },
-  {
-    num:'2', title:'Project mandate', phase:0,
-    intro:'Produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
-    roles:['Head of Development','Project Manager','Director of Strategy','Industry Partners'],
-    activities:['Define purpose, scope and milestones','Conduct risk assessment','Set development budget','Identify and approach industry partners'],
-    responsible:'Head of Development + Project Manager',
-    deliverables:['Project mandate approved by Rector','Industry partner agreements signed'],
-    docs:[], miro:false
-  },
-  {
-    num:'3', title:'Project plan', phase:0,
-    intro:'Develop a detailed project plan with clear activities, timeline and responsibilities. Onboard industry partners and assemble the full project group.',
-    roles:['Project Manager','Project group','Industry Partners'],
-    activities:['Define all project activities and timeline','Clarify responsibilities and expectations','Industry partner kick-off and onboarding'],
-    responsible:'Project Manager',
-    deliverables:['Project plan approved by Head of Development','Industry partners onboarded'],
-    docs:[], miro:false
-  },
-  {
-    num:'4', title:'Industry workshops', phase:1,
-    intro:'Collaborative workshops with industry partners shape the programme structure, topics, and learning outcomes.',
-    roles:['Project Manager','Industry Partners','Subject Matter Experts','Pedagogic Advisor'],
-    activities:['Plan and prepare workshops','Run workshop sessions with industry partners','Capture industry input and feedback','Document workshop outcomes'],
-    responsible:'Project Manager',
-    deliverables:['Workshop summaries','Industry feedback documented'],
-    docs:[], miro:true
-  },
-  {
-    num:'5', title:'Study programme design', phase:1,
-    intro:'Design the overall programme structure based on workshop outcomes — courses, credits, structure, and overall scope.',
-    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor'],
-    activities:['Define programme structure and course overview','Determine credit distribution','Draft programme description','Review with project team'],
-    responsible:'Curriculum Manager',
-    deliverables:['Programme design document'],
-    docs:[], miro:false
-  },
-  {
-    num:'6', title:'Learning outcome design', phase:1,
-    intro:'Define and finalise the overall programme learning outcomes and course-level learning outcomes.',
-    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Industry Partners'],
-    activities:['Draft overall programme learning outcomes','Draft course-level learning outcomes','Industry partner review and approval'],
-    responsible:'Curriculum Manager',
-    deliverables:['Overall learning outcomes document','Industry approval of outcomes'],
-    docs:[], miro:false
-  },
-  {
-    num:'7', title:'Quality assurance by industry', phase:1,
-    intro:'The reference group and industry partners review the programme design and learning outcomes and provide formal feedback.',
-    roles:['Reference group','Industry Partners','Head of Development'],
-    activities:['Share programme design and LOs with reference group','Collect and review feedback','Adjust programme based on input','Confirm sign-off'],
-    responsible:'Head of Development',
-    deliverables:['Reference group feedback','Industry QA sign-off'],
-    docs:[], miro:false
-  },
-  {
-    num:'8', title:'Learning design', phase:1,
-    intro:'Develop the full learning design — topics, learning activities, assessments, and tools for each course.',
-    roles:['Curriculum Manager','Learning Designer','Subject Matter Expert'],
-    activities:['Define topics and learning activities per course','Design assessments','Specify tools and software requirements','Finalise course descriptions'],
-    responsible:'Curriculum Manager',
-    deliverables:['Learning design document','Completed course descriptions'],
-    docs:[], miro:false
-  },
-  {
-    num:'9', title:'Application and documentation', phase:1,
-    intro:'Prepare the full application package and all supporting documentation required for submission.',
-    roles:['Head of Development','Project Manager','Academic responsible'],
-    activities:['Compile all required documents','Review and quality check application package','Prepare supporting documentation','Final internal sign-off'],
-    responsible:'Head of Development',
-    deliverables:['Complete application package ready for submission'],
-    docs:[], miro:false
-  },
-  {
-    num:'10', title:'Handover to LOKUT', phase:2,
-    intro:'Submit the study plan and application package to LOKUT for formal review.',
-    roles:['Head of Development','LOKUT'],
-    activities:['Submit application to LOKUT','Confirm receipt and registration','Prepare for review process'],
-    responsible:'Head of Development',
-    deliverables:['LOKUT confirms receipt of application'],
-    docs:[], miro:false
-  },
-  {
-    num:'11', title:'Study plan review by LOKUT', phase:2,
-    intro:'LOKUT reviews the study plan against laws and regulations and provides feedback.',
-    roles:['LOKUT','Academic responsible','Head of Development'],
-    activities:['Respond to LOKUT queries','Provide additional documentation if requested','Review LOKUT feedback'],
-    responsible:'Head of Development',
-    deliverables:['LOKUT review complete'],
-    docs:[], miro:false
-  },
-  {
-    num:'12', title:'Statement', phase:2,
-    intro:'Prepare and submit the formal statement in response to the LOKUT review.',
-    roles:['Head of Development','Academic responsible'],
-    activities:['Draft formal statement','Internal review and approval','Submit statement to LOKUT'],
-    responsible:'Head of Development',
-    deliverables:['Statement submitted'],
-    docs:[], miro:false
-  },
-  {
-    num:'13', title:'Blueprint', phase:2,
-    intro:'Finalise the blueprint — the definitive study plan document that will be approved by the board.',
-    roles:['Head of Development','Academic responsible','Curriculum Manager'],
-    activities:['Finalise all programme documentation','Produce blueprint document','Internal approval of blueprint'],
-    responsible:'Head of Development',
-    deliverables:['Blueprint approved internally'],
-    docs:[], miro:false
-  },
-  {
-    num:'14', title:'Study plan approval by board', phase:2,
-    intro:'The vocational school board reviews and approves the study plan.',
-    roles:['Vocational school board','Head of Development'],
-    activities:['Present study plan to board','Board review and deliberation','Board decision'],
-    responsible:'Head of Development',
-    deliverables:['Board approval of study plan'],
-    docs:[], miro:false
-  },
-  {
-    num:'15', title:'Doc. handover', phase:2,
-    intro:'Final handover of all programme documentation to the relevant parties.',
-    roles:['Project Manager','Head of Development'],
-    activities:['Compile final documentation package','Hand over to relevant departments','Close project'],
-    responsible:'Project Manager',
-    deliverables:['All documents handed over','Project closed'],
-    docs:[], miro:false
-  }
-];
-
-const stepInstructions = [
-  'Review the strategic rationale for this programme. Prepare the project concept and VOC board presentation.',
-  'Use the programme summary to draft a Project Mandate. Get it approved by the Rector before moving on.',
-  'Develop a detailed project plan. Onboard industry partners and assemble the project group.',
-  'Run industry workshops to shape the programme structure, topics, and approach.',
-  'Design the overall programme structure — courses, credits, and scope — based on workshop outcomes.',
-  'Define and finalise programme-level and course-level learning outcomes. Get industry approval.',
-  'Share the programme design with the reference group and industry partners for formal quality review.',
-  'Develop the full learning design — topics, activities, assessments, and tools for each course.',
-  'Compile the full application package and all documentation. Complete final internal sign-off.',
-  'Submit the study plan and application package to LOKUT.',
-  'Manage the LOKUT review process. Respond to queries and provide additional documentation as needed.',
-  'Prepare and submit the formal statement in response to the LOKUT review.',
-  'Produce the final blueprint document for board approval.',
-  'Present the study plan to the vocational school board for formal approval.',
-  'Hand over all final documentation and close the project.',
-];
-
-let cur = 0;
-let _dark = false;
-function toggleTheme() {
-  _dark = !_dark;
-  document.documentElement.setAttribute('data-theme', _dark ? 'dark' : '');
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = _dark ? '● Dark' : '○ Light';
-}
-
-const TOTAL_STEPS = 15;
-
-const phases = [
-  { label:'Strategy & Planning',    num:'Phase 1', steps:[0,1,2],            color:'var(--red)' },
-  { label:'Study Plan Development', num:'Phase 2', steps:[3,4,5,6,7,8],      color:'#1D7A4A' },
-  { label:'Approval',               num:'Phase 3', steps:[9,10,11,12,13,14], color:'#378ADD' },
-];
-
-function showDashboard() {
-  document.getElementById('view-dashboard').classList.add('active');
-  document.getElementById('view-guide').classList.remove('active');
-  renderDashboard();
-}
-
-function showGuide(programId) {
-  currentProgramId = programId;
-  document.getElementById('view-dashboard').classList.remove('active');
-  document.getElementById('view-guide').classList.add('active');
-  const p = programs[programId];
-  document.getElementById('guide-prog-name').textContent = p ? p.name : '';
-  if (p && (p.rationale || p.approvedBy)) {
-    document.getElementById('sc-rationale').textContent = p.rationale || '—';
-    document.getElementById('sc-approved-by').textContent = p.approvedBy || '—';
-    document.getElementById('sc-approved-date').textContent = p.approvedDate || '—';
-    document.getElementById('strategic-context').style.display = 'block';
-  } else {
-    document.getElementById('strategic-context').style.display = 'none';
-  }
-  cur = (p && p.currentStep) ? p.currentStep - 1 : 0;
-  render();
-}
-
-function dashNewProgram() {
-  ['cm-name','cm-rationale','cm-approved-by','cm-approved-date','cm-summary'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('modal-step-1').style.display = 'block';
-  document.getElementById('modal-step-2').style.display = 'none';
-  document.getElementById('create-modal').classList.add('open');
-  setTimeout(() => document.getElementById('cm-name').focus(), 100);
-}
-
-function closeCreateModal() { document.getElementById('create-modal').classList.remove('open'); }
-
-function goToModalStep2() {
-  if (!document.getElementById('cm-name').value.trim()) { document.getElementById('cm-name').focus(); return; }
-  document.getElementById('modal-step-1').style.display = 'none';
-  document.getElementById('modal-step-2').style.display = 'block';
-}
-
-function backToModalStep1() {
-  document.getElementById('modal-step-1').style.display = 'block';
-  document.getElementById('modal-step-2').style.display = 'none';
-}
-
-function submitCreateModal() {
-  const name = document.getElementById('cm-name').value.trim();
-  if (!name) return;
-  const id = 'prog_' + Date.now();
-  programs[id] = {
-    id, name,
-    rationale: document.getElementById('cm-rationale').value.trim() || 'To be confirmed',
-    approvedBy: document.getElementById('cm-approved-by').value.trim() || 'To be confirmed',
-    approvedDate: document.getElementById('cm-approved-date').value.trim() || 'To be confirmed',
-    created: new Date().toISOString().split('T')[0],
-    summary: document.getElementById('cm-summary') ? document.getElementById('cm-summary').value.trim() : '',
-    mandate: '', plan: '', miroBoard: '',
-    currentStep: 1, status: 'on-track'
-  };
-  currentProgramId = id;
-  savePrograms();
-  closeCreateModal();
-  showGuide(id);
-}
-
-async function deleteProgram(id) {
-  const p = programs[id];
-  if (!p || !confirm('Delete "' + p.name + '"?\n\nThis cannot be undone.')) return;
-  delete programs[id];
-  await savePrograms();
-  renderDashboard();
-}
-
-async function linkMiroBoard(programId) {
-  const url = prompt('Paste the Miro board URL for this program:');
-  if (!url || !url.includes('miro.com')) return;
-  programs[programId].miroBoard = url;
-  await savePrograms();
-  renderDashboard();
-}
-
-function toggleWelcome() {
-  const more = document.getElementById('welcome-more');
-  const chev = document.getElementById('welcome-chev');
-  const isOpen = more.style.display !== 'none';
-  more.style.display = isOpen ? 'none' : 'block';
-  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
-}
-
-function renderDashboard() {
-  const progs = Object.values(programs);
-  const active = progs.filter(p => p.status !== 'done');
-  const done = progs.filter(p => p.status === 'done');
-  const risk = progs.filter(p => p.status === 'at-risk');
-
-  document.getElementById('ds-active').textContent = active.length;
-  document.getElementById('ds-done').textContent = done.length;
-  document.getElementById('ds-risk').textContent = risk.length;
-  document.getElementById('ds-total').textContent = progs.length;
-  document.getElementById('ds-active-sub').textContent = risk.length > 0 ? risk.length + ' at risk' : active.length > 0 ? 'All on track' : 'No programs yet';
-  document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
-
-  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
-
-  function renderCards(list, containerId) {
-    const el = document.getElementById(containerId);
-    if (!list.length) {
-      el.innerHTML = containerId === 'dash-active'
-        ? '<div class="dash-empty"><p><strong>No active programs yet</strong><br>Click "Create new program" to get started.</p></div>'
-        : '<p style="color:var(--ink-3);font-size:12px;padding:4px 0">None yet.</p>';
+      el.innerHTML = containerId === 'dash-active' ? '<div class="dash-empty"><p><strong>No active programs yet</strong><br>Click "Create new program" to get started.</p></div>' : '<p style="color:var(--ink-3);font-size:12px;padding:4px 0">None yet.</p>';
       return;
     }
     el.innerHTML = '';
@@ -1255,160 +866,89 @@ function renderDashboard() {
       const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
       const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
       const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
-
       const phaseDefs = [{n:3,c:'var(--red)'},{n:6,c:'#1D7A4A'},{n:6,c:'#378ADD'}];
-      const segs = phaseDefs.map((ph,pi) => {
-        const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
-        const d = Math.max(0,Math.min(step-start,ph.n));
-        return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?ph.c:'var(--rule)'}"></div>`;
-      }).join('');
-
-      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Prog.','LO','Ind.QA','L.design','App.','LOKUT','Review','Statement','Blueprint','Board','Handover'];
-      const dots = shortLabels.map((s,i) => {
-        const d = i<step, a = i===step-1;
-        const phColor = i<3 ? 'var(--red)' : i<9 ? '#1D7A4A' : '#378ADD';
-        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`;
-      }).join('');
-
+      const segs = phaseDefs.map((ph,pi) => { const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0); const d = Math.max(0,Math.min(step-start,ph.n)); return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?ph.c:'var(--rule)'}"></div>`; }).join('');
+      const shortLabels = ['S','M','P','W','Pd','LO','QA','Ld','A','L','R','St','B','Bd','H'];
+      const dots = shortLabels.map((s,i) => { const d = i<step-1, a = i===step-1; const phColor = i<3?'var(--red)':i<9?'#1D7A4A':'#378ADD'; return `<div style="flex:1;display:flex;justify-content:center"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`; }).join('');
       const hasMiro = p.miroBoard && p.miroBoard.includes('miro.com');
-      const miroBtn = hasMiro
-        ? `<a href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid #FFD02F;border-radius:var(--r);color:#635e00;background:rgba(255,208,47,0.08);text-decoration:none">Open Miro</a>`
-        : `<button onclick="event.stopPropagation();linkMiroBoard('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit">+ Link Miro</button>`;
-
+      const miroBtn = hasMiro ? `<a href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid #FFD02F;border-radius:var(--r);color:#635e00;background:rgba(255,208,47,0.08);text-decoration:none">Open Miro</a>` : `<button onclick="event.stopPropagation();linkMiroBoard('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit">+ Link Miro</button>`;
       const card = document.createElement('div');
       card.className = 'dash-prog-card';
-      card.innerHTML = `
-        <div class="dash-prog-header">
-          <div class="dash-prog-dot" style="background:${statusColor}"></div>
-          <span class="dash-prog-name">${p.name}</span>
-          <span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span>
-          <span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span>
-          <span class="dash-prog-pct">${pct}%</span>
-        </div>
-        <div class="dash-prog-wrap">
-          <div class="dash-prog-track">${segs}</div>
-          <div style="display:flex;margin-top:6px">${dots}</div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px">
-            <span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span>
-            <span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap">
-          <button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>
-          ${miroBtn}
-          <button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button>
-        </div>`;
+      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
       el.appendChild(card);
     });
   }
-
   renderCards(active, 'dash-active');
   renderCards(done, 'dash-done');
 }
 
+async function linkMiroBoard(programId) {
+  const url = prompt('Paste the Miro board URL for this program:');
+  if (!url || !url.includes('miro.com')) return;
+  programs[programId].miroBoard = url;
+  await savePrograms();
+  renderDashboard();
+}
+
+function clearDocuments() {
+  generatedSummary = ''; generatedMandate = '';
+  ['summary-editor','mandate-editor','plan-editor'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  ['summary-doc-section','mandate-doc-section','plan-doc-section'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('visible'); });
+  document.getElementById('generated-docs').innerHTML = '';
+}
+function restoreDocuments() {
+  if (!currentProgramId || !programs[currentProgramId]) return;
+  const p = programs[currentProgramId];
+  if (p.summary) { generatedSummary = p.summary; const editor = document.getElementById('summary-editor'); if (editor) { editor.innerHTML = p.summary; document.getElementById('summary-doc-section').classList.add('visible'); } }
+  if (p.mandate) { generatedMandate = p.mandate; const editor = document.getElementById('mandate-editor'); if (editor) { editor.innerHTML = p.mandate; document.getElementById('mandate-doc-section').classList.add('visible'); } }
+  if (p.plan) { const editor = document.getElementById('plan-editor'); if (editor) { editor.innerHTML = p.plan; document.getElementById('plan-doc-section').classList.add('visible'); } }
+}
+function rebuildDocCards(p) { document.getElementById('generated-docs').innerHTML = ''; }
+function toggleInstruction() {
+  document.getElementById('step-instruction-body').classList.toggle('open');
+  document.getElementById('step-instruction-chev').classList.toggle('open');
+}
 function go(d) { cur = Math.max(0, Math.min(steps.length-1, cur+d)); updateStep(); render(); }
 function goto(i) { cur = i; render(); }
-
 async function updateStep() {
   if (!currentProgramId) return;
   programs[currentProgramId].currentStep = cur + 1;
   await savePrograms();
 }
 
-function toggleInstruction() {
-  document.getElementById('step-instruction-body').classList.toggle('open');
-  document.getElementById('step-instruction-chev').classList.toggle('open');
-}
-
-function renderMiroSection() {
-  const p = currentProgramId && programs[currentProgramId];
-  const step = steps[cur];
-  if (!step || !step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
-  document.getElementById('miro-section').style.display = 'block';
-  const linked = document.getElementById('miro-linked-view');
-  const unlinked = document.getElementById('miro-unlinked-view');
-  if (p && p.miroBoard) {
-    linked.style.display = 'block';
-    unlinked.style.display = 'none';
-    document.getElementById('miro-open-btn').href = p.miroBoard;
-  } else {
-    linked.style.display = 'none';
-    unlinked.style.display = 'block';
-  }
-}
-
-function showMiroLinkForm() {
-  document.getElementById('miro-link-form').classList.add('visible');
-  document.getElementById('miro-url-input').focus();
-}
-function hideMiroLinkForm() {
-  document.getElementById('miro-link-form').classList.remove('visible');
-  document.getElementById('miro-url-input').value = '';
-}
-async function saveMiroBoard() {
-  const url = document.getElementById('miro-url-input').value.trim();
-  if (!url || !url.includes('miro.com')) { alert('Please paste a valid Miro board URL.'); return; }
-  if (!currentProgramId) return;
-  programs[currentProgramId].miroBoard = url;
-  await savePrograms();
-  renderMiroSection();
-  hideMiroLinkForm();
-}
-async function unlinkMiroBoard() {
-  if (!currentProgramId) return;
-  programs[currentProgramId].miroBoard = '';
-  await savePrograms();
-  renderMiroSection();
-}
-
 function render() {
   const s = steps[cur];
   const ph = phases[s.phase];
-  document.getElementById('step-counter').textContent = `${ph.num} · ${ph.label} · Step ${cur+1} of ${TOTAL_STEPS}`;
+  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
+  const shortStepLabels = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','Ind. QA','L. design','App. docs','LOKUT','Review','Statement','Blueprint','Board','Handover'];
+  document.getElementById('step-counter').textContent = ph.num + ' · ' + ph.label + ' · Step ' + (cur+1) + ' of ' + TOTAL_STEPS;
   document.getElementById('step-title').textContent = s.title;
   document.getElementById('step-intro').textContent = s.intro;
   const instrEl = document.getElementById('step-instruction-body');
   if (instrEl) { instrEl.textContent = stepInstructions[cur] || ''; instrEl.classList.remove('open'); }
   const instrChev = document.getElementById('step-instruction-chev');
   if (instrChev) instrChev.classList.remove('open');
-  document.getElementById('step-roles').innerHTML = `<span style="font-size:13px;color:var(--ink-2);line-height:1.8">${s.roles.join(', ')}</span>`;
-  document.getElementById('step-activities').innerHTML = s.activities.map(a=>`<li>${a}</li>`).join('');
+  document.getElementById('step-roles').innerHTML = '<span style="font-size:13px;color:var(--ink-2);line-height:1.8">' + s.roles.join(', ') + '</span>';
+  document.getElementById('step-activities').innerHTML = s.activities.map(a=>'<li>'+a+'</li>').join('');
   const respEl = document.getElementById('step-responsible');
-  if (respEl) respEl.innerHTML = `<span style="font-size:13px;color:var(--ink-2)">${s.responsible}</span>`;
-  document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>`<div class="deliverable">${d}</div>`).join('');
-  document.getElementById('step-docs').innerHTML = (s.docs||[]).map(d=>`<a class="doc-row" href="${d.href}" target="_blank" rel="noopener"><i class="ti ${d.icon}" style="font-size:16px;color:#3b82f6"></i><div><div style="font-size:13px;color:var(--ink)">${d.label}</div><div style="font-size:10px;color:var(--ink-3)">${d.sub}</div></div><i class="ti ti-external-link" style="font-size:12px;color:var(--ink-4)"></i></a>`).join('');
-
+  if (respEl) respEl.innerHTML = '<span style="font-size:13px;color:var(--ink-2)">' + s.responsible + '</span>';
+  document.getElementById('step-deliverables').innerHTML = s.deliverables.map(d=>'<div class="deliverable">'+d+'</div>').join('');
+  document.getElementById('step-docs').innerHTML = '';
   renderMiroSection();
-
-  // Hide all tool sections
-  ['summary-tool-section','mandate-tool-section','plan-tool-section','workshop-tool-section','parallel-section'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-
-  // Nav
+  ['summary-tool-section','mandate-tool-section','plan-tool-section','workshop-tool-section','parallel-section'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   document.getElementById('btn-prev').disabled = cur === 0;
   document.getElementById('btn-next').disabled = cur === steps.length - 1;
-  document.getElementById('pip-bar').innerHTML = `<span style="font-size:11px;color:var(--ink-3)">${cur+1} / ${TOTAL_STEPS}</span>`;
-
-  // Phase bar + stepper
-  const phaseColors = ['var(--red)','#1D7A4A','#378ADD'];
-  const shortStepLabels = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','Ind. QA','L. design','App. docs','LOKUT','Review','Statement','Blueprint','Board','Handover'];
-
+  document.getElementById('pip-bar').innerHTML = '<span style="font-size:11px;color:var(--ink-3)">' + (cur+1) + ' / ' + TOTAL_STEPS + '</span>';
   let phaseHTML = '<div style="display:flex;gap:4px;margin-bottom:8px">';
   phases.forEach((ph, pi) => {
     const isActive = ph.steps.includes(cur);
     const isDone = ph.steps.every(s => s < cur);
-    const bg = isActive ? phaseColors[pi] : isDone ? phaseColors[pi] + 'aa' : '#efefef';
-    const textColor = (isActive || isDone) ? '#fff' : '#aaa';
-    const border = (isActive || isDone) ? 'none' : '1px solid var(--rule)';
-    phaseHTML += `<div style="flex:${ph.steps.length};background:${bg};color:${textColor};border:${border};border-radius:var(--r);padding:5px 8px;text-align:center;cursor:pointer" onclick="goto(${ph.steps[0]})">
-      <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.8">${ph.num}</div>
-      <div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ph.label}</div>
-    </div>`;
+    const bg = isActive ? phaseColors[pi] : isDone ? phaseColors[pi]+'aa' : '#efefef';
+    const textColor = (isActive||isDone) ? '#fff' : '#aaa';
+    const border = (isActive||isDone) ? 'none' : '1px solid var(--rule)';
+    phaseHTML += '<div style="flex:'+ph.steps.length+';background:'+bg+';color:'+textColor+';border:'+border+';border-radius:var(--r);padding:5px 8px;text-align:center;cursor:pointer" onclick="goto('+ph.steps[0]+')"><div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.8">'+ph.num+'</div><div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ph.label+'</div></div>';
   });
   phaseHTML += '</div>';
-
   let dotsHTML = '<div style="display:flex;align-items:flex-start;margin-bottom:20px;overflow-x:auto;padding-bottom:4px">';
   steps.forEach((st, i) => {
     const isLast = i === steps.length - 1;
@@ -1416,14 +956,14 @@ function render() {
     const phColor = phaseColors[st.phase];
     const dotBg = active ? phColor : done ? phColor : 'var(--rule)';
     const labelColor = active ? phColor : 'var(--ink-4)';
-    const fontWeight = active ? '600' : '400';
-    dotsHTML += `<div style="display:flex;align-items:center;${!isLast?'flex:1':''}min-width:0">`;
-    dotsHTML += `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:36px" onclick="goto(${i})">`;
-    dotsHTML += `<div style="width:8px;height:8px;border-radius:50%;background:${dotBg};${active?`box-shadow:0 0 0 2px ${phColor}33`:''}"></div>`;
-    dotsHTML += `<span style="font-size:8px;color:${labelColor};font-weight:${fontWeight};margin-top:3px;text-align:center;white-space:nowrap;overflow:hidden;max-width:36px;text-overflow:ellipsis">${shortStepLabels[i]}</span>`;
-    dotsHTML += `</div>`;
-    if (!isLast) dotsHTML += `<div style="flex:1;height:1px;background:${done?phColor:'var(--rule)'};min-width:4px;margin-bottom:14px"></div>`;
-    dotsHTML += `</div>`;
+    dotsHTML += '<div style="display:flex;align-items:center;'+(isLast?'':'flex:1;')+'min-width:0">';
+    dotsHTML += '<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:36px" onclick="goto('+i+')">';
+    dotsHTML += '<div style="width:8px;height:8px;border-radius:50%;background:'+dotBg+';'+(active?'box-shadow:0 0 0 2px '+phColor+'33':'')+'">';
+    dotsHTML += '</div>';
+    dotsHTML += '<span style="font-size:8px;color:'+labelColor+';font-weight:'+(active?'600':'400')+';margin-top:3px;text-align:center;white-space:nowrap;overflow:hidden;max-width:36px;text-overflow:ellipsis">'+shortStepLabels[i]+'</span>';
+    dotsHTML += '</div>';
+    if (!isLast) dotsHTML += '<div style="flex:1;height:1px;background:'+(done?phColor:'var(--rule)')+';min-width:4px;margin-bottom:14px"></div>';
+    dotsHTML += '</div>';
   });
   dotsHTML += '</div>';
   document.getElementById('dots-bar').innerHTML = phaseHTML + dotsHTML;
@@ -1431,15 +971,14 @@ function render() {
 
 async function loadPrograms() {
   try {
-    const res = await fetch(`${PROXY}/?action=kv-get&key=programs`);
+    const res = await fetch(PROXY + '/?action=kv-get&key=programs');
     const data = await res.json();
     programs = data.value ? JSON.parse(data.value) : {};
   } catch(e) { programs = {}; }
   renderDashboard();
 }
-
 async function savePrograms() {
-  await fetch(`${PROXY}/?action=kv-put&key=programs`, {
+  await fetch(PROXY + '/?action=kv-put&key=programs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(programs)
@@ -1447,6 +986,7 @@ async function savePrograms() {
 }
 
 loadPrograms();
+
 </script>
 </body>
 </html>
