@@ -92,8 +92,8 @@
 
 <div class="phase-legend">
   <div class="legend-item"><div class="legend-dot" style="background:var(--phase-1)"></div>Phase 1 — Strategy & Planning</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-2)"></div>Phase 2 — Program Development</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-3)"></div>Phase 3 — Accreditation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-2)"></div>Phase 2 — Study Plan Development</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--phase-3)"></div>Phase 3 — Approval</div>
 </div>
 
 <div class="ns-label" style="margin-bottom:10px">Active programs</div>
@@ -109,9 +109,9 @@
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
 const REFRESH_INTERVAL = 60000;
-const STEP_LABELS = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
+const STEP_LABELS = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','Ind. QA','L. design','App. docs','LOKUT','Review','Statement','Blueprint','Board','Handover'];
 const PHASE_COLORS = ['#FF2F02','#1D7A4A','#378ADD'];
-const STEP_PHASES = [0,0,0,1,1,1,1,2];
+const STEP_PHASES = [0,0,0,1,1,1,1,1,1,2,2,2,2,2,2];
 
 let dark = false;
 function toggleTheme() {
@@ -143,10 +143,10 @@ function badgeText(status) {
 
 function makeCard(p) {
   const step = p.currentStep || 1;
-  const pct = Math.round(step / 8 * 100);
+  const pct = Math.round(step / 15 * 100);
   const dotColor = p.status === 'at-risk' ? '#FF2F02' : p.status === 'done' ? '#1D7A4A' : '#FF2F02';
 
-  const phaseDefs = [{n:3,c:'#FF2F02'},{n:4,c:'#1D7A4A'},{n:1,c:'#378ADD'}];
+  const phaseDefs = [{n:3,c:'#FF2F02'},{n:6,c:'#1D7A4A'},{n:6,c:'#378ADD'}];
   const segs = phaseDefs.map((ph, pi) => {
     const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
     const filled = Math.max(0, Math.min(step - start, ph.n));
@@ -179,7 +179,7 @@ function makeCard(p) {
       <div class="ns-prog-track">${segs}</div>
       <div class="ns-step-row">${dots}</div>
       <div class="ns-prog-footer">
-        <span>Step ${step} of 8 — ${STEP_LABELS[step-1]}</span>
+        <span>Step ${step} of 15 — ${STEP_LABELS[step-1]}</span>
         <span>${pct}% complete</span>
       </div>
     </div>`;

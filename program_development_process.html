@@ -211,14 +211,14 @@
     <!-- Process overview -->
     <div class="dash-getting-started">
       <div class="dash-gs-header" onclick="toggleWelcome()">
-        <span class="dash-gs-title"><i class="ti ti-timeline" style="font-size:14px;color:var(--red)"></i> Process overview — 8 steps to NOKUT accreditation</span>
+        <span class="dash-gs-title"><i class="ti ti-timeline" style="font-size:14px;color:var(--red)"></i> Process overview — 15 steps to NOKUT accreditation</span>
         <i class="ti ti-chevron-down" id="welcome-chev" style="font-size:14px;color:#999;transition:transform .2s"></i>
       </div>
       <div id="welcome-more" style="display:none;padding:16px 16px 12px;overflow-x:auto">
         <div style="display:flex;gap:3px;margin-bottom:6px;min-width:700px">
-          <div style="flex:3;background:#FAECE7;color:#712B13;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 1 — Strategy &amp; Planning</div>
-          <div style="flex:4;background:#E1F5EE;color:#085041;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 2 — Program Development</div>
-          <div style="flex:1;background:#E6F1FB;color:#0C447C;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 3 — Accreditation</div>
+          <div style="flex:3;background:#FFE8E3;color:#7a1500;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 1 — Strategy &amp; Planning</div>
+          <div style="flex:6;background:#E6EFE9;color:#2a3d2e;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 2 — Study Plan Development</div>
+          <div style="flex:6;background:#E6F1FB;color:#0C447C;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-radius:5px 5px 0 0;text-align:center">Phase 3 — Approval</div>
         </div>
         <div style="display:flex;align-items:flex-start;min-width:700px;padding:8px 0 4px" id="dash-step-track"></div>
         <div id="dash-step-detail" style="margin-top:12px;border-top:1px solid #f0f0f0;padding-top:12px;display:none">
@@ -640,7 +640,7 @@ async function unlinkMiroBoard() {
 function renderMiroSection() {
   const p = currentProgramId && programs[currentProgramId];
   const step = steps[cur];
-  if (!step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
+  if (!step || !step.miro) { document.getElementById('miro-section').style.display = 'none'; return; }
   document.getElementById('miro-section').style.display = 'block';
 
   const linked = document.getElementById('miro-linked-view');
@@ -756,14 +756,21 @@ async function deleteProgram(id) {
 }
 
 const dashSteps = [
-  { num:1, name:'Project design', sub:'VOC board decision', color:'var(--red)', line:'#F0997B', tools:['Strategic context review','VOC board preparation'], people:['Head of Development','Director of Strategy','Senior Advisor'], docs:['Project design brief'], gate:'VOC board approves idea to proceed' },
-  { num:2, name:'Project mandate', sub:'Rector approval', color:'var(--red)', line:'#F0997B', tools:['AI mandate generator','Program summary','Risk assessment'], people:['Head of Development','Project Manager'], docs:['Project mandate','Risk register'], gate:'Mandate approved by Rector' },
-  { num:3, name:'Project plan', sub:'Plan approved', color:'var(--red)', line:'#5DCAA5', tools:['AI plan generator','Partner onboarding brief'], people:['Project Manager','Project group','Industry partners'], docs:['Project plan','Partner agreements'], gate:'Plan approved by Head of Development' },
-  { num:4, name:'Industry workshops', sub:'2 workshops in Miro', color:'#1D9E75', line:'#5DCAA5', tools:['Miro workshop board','AI workshop summary','Partner brief generator'], people:['Project Manager','Industry partners','SMEs'], docs:['Workshop summaries','Partner brief'], gate:'Course overview approved by partners' },
-  { num:5, name:'Learning outcomes', sub:'Industry approved', color:'#1D9E75', line:'#5DCAA5', tools:['AI LO generator','Industry review'], people:['Curriculum Manager','SME','Industry partners'], docs:['Program LOs','Course-level LOs'], gate:'Learning outcomes approved by industry' },
-  { num:6, name:'Course development', sub:'Study plan ready', color:'#1D9E75', line:'#5DCAA5', tools:['Miro learning design','AI course generator'], people:['Curriculum Manager','Learning designer'], docs:['Study plan','Course descriptions'], gate:'Study plan ready for QA' },
-  { num:7, name:'Quality assurance', sub:'QA sign-off', color:'#1D9E75', line:'#85B7EB', tools:['QA checklist','Reference group feedback'], people:['Head of Development','Reference group'], docs:['QA sign-off','Adjusted study plan'], gate:'QA complete · ready for NOKUT' },
-  { num:8, name:'NOKUT application', sub:'Accreditation decision', color:'#378ADD', line:null, tools:['NOKUT portal','Board recommendation'], people:['Head of Development','Academic responsible'], docs:['NOKUT application','Board recommendation'], gate:'Vocational school board final decision' },
+  { num:1,  name:'Project strategy',      sub:'Jun 20',  color:'var(--red)', line:'#F0997B', people:['Head of Development','Director of Strategy'], docs:['Project strategy brief'], gate:'VOC board approves strategy' },
+  { num:2,  name:'Project mandate',       sub:'Aug 1',   color:'var(--red)', line:'#F0997B', people:['Head of Development','Project Manager'], docs:['Project mandate'], gate:'Mandate approved by Rector' },
+  { num:3,  name:'Project plan',          sub:'Aug 20',  color:'var(--red)', line:'#C8D9CD', people:['Project Manager','Project group'], docs:['Project plan'], gate:'Plan approved by Head of Development' },
+  { num:4,  name:'Industry workshops',    sub:'Sep 11',  color:'#1D7A4A', line:'#C8D9CD', people:['Project Manager','Industry partners'], docs:['Workshop summary'], gate:'Workshop outcomes documented' },
+  { num:5,  name:'Study programme design',sub:'Sep 18',  color:'#1D7A4A', line:'#C8D9CD', people:['Curriculum Manager','SMEs'], docs:['Programme design'], gate:'Programme design approved' },
+  { num:6,  name:'Learning outcome design',sub:'Oct 9',  color:'#1D7A4A', line:'#C8D9CD', people:['Curriculum Manager','Industry partners'], docs:['Learning outcomes'], gate:'Learning outcomes approved by industry' },
+  { num:7,  name:'QA by industry',        sub:'Oct 16',  color:'#1D7A4A', line:'#C8D9CD', people:['Reference group','Industry partners'], docs:['QA feedback'], gate:'Industry QA sign-off' },
+  { num:8,  name:'Learning design',       sub:'Oct 30',  color:'#1D7A4A', line:'#C8D9CD', people:['Learning designer','Curriculum Manager'], docs:['Learning design'], gate:'Learning design complete' },
+  { num:9,  name:'Application & docs',    sub:'Oct 30',  color:'#1D7A4A', line:'#85B7EB', people:['Head of Development','Project Manager'], docs:['Application package'], gate:'Application package ready' },
+  { num:10, name:'Handover to LOKUT',     sub:'Nov 2',   color:'#378ADD', line:'#85B7EB', people:['Head of Development','LOKUT'], docs:['Handover document'], gate:'LOKUT confirms receipt' },
+  { num:11, name:'LOKUT review',          sub:'Nov 16',  color:'#378ADD', line:'#85B7EB', people:['LOKUT','Academic responsible'], docs:['Review report'], gate:'Review complete' },
+  { num:12, name:'Statement',             sub:'Nov 16',  color:'#378ADD', line:'#85B7EB', people:['Head of Development'], docs:['Statement document'], gate:'Statement submitted' },
+  { num:13, name:'Blueprint',             sub:'Nov 30',  color:'#378ADD', line:'#85B7EB', people:['Head of Development','Academic responsible'], docs:['Blueprint'], gate:'Blueprint approved' },
+  { num:14, name:'Board approval',        sub:'Dec 4',   color:'#378ADD', line:'#85B7EB', people:['Vocational school board'], docs:['Board decision'], gate:'Board approves study plan' },
+  { num:15, name:'Doc. handover',         sub:'Dec 1',   color:'#378ADD', line:null, people:['Project Manager'], docs:['Final documentation'], gate:'All documents handed over' },
 ];
 let dashActiveStep = null;
 
@@ -774,7 +781,7 @@ function buildDashTimeline() {
   dashSteps.forEach((s, i) => {
     if (i > 0) {
       const conn = document.createElement('div');
-      conn.style.cssText = `flex:1;height:2px;background:${dashSteps[i-1].line};margin-top:12px`;
+      conn.style.cssText = `flex:1;height:2px;background:${dashSteps[i-1].line || 'var(--rule)'};margin-top:12px`;
       track.appendChild(conn);
     }
     const wrap = document.createElement('div');
@@ -841,21 +848,22 @@ function renderDashboard() {
     el.innerHTML = '';
     list.forEach(p => {
       const step = p.currentStep || 1;
-      const pct = Math.round(step / 8 * 100);
+      const pct = Math.round(step / TOTAL_STEPS * 100);
       const statusColor = p.status === 'at-risk' ? '#BA7517' : 'var(--red)';
       const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
       const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
       const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
-      const phaseDefs = [{n:3},{n:4},{n:1}];
+      const phaseDefs = [{n:3},{n:6},{n:6}];
       const segs = phaseDefs.map((ph,pi) => {
         const start = phaseDefs.slice(0,pi).reduce((a,b)=>a+b.n,0);
         const d = Math.max(0,Math.min(step-start,ph.n));
         return `<div class="dash-prog-seg" style="flex:${ph.n};background:${d>0?phaseColors[pi]:'var(--rule)'}"></div>`;
       }).join('');
-      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Outcomes','Course Dev','QA','LOKUT'];
+      const shortLabels = ['Strategy','Mandate','Plan','Workshops','Prog. design','LO design','QA','L. design','App. docs','LOKUT','LOKUT review','Statement','Blueprint','Board','Handover'];
       const dots = shortLabels.map((s,i) => {
         const d = i<step, a = i===step-1;
-        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:50%;background:${d||a?'var(--red)':'var(--rule)'};opacity:${!d&&!a?0.3:1}"></div><div style="font-size:8px;color:var(--ink-4)">${s.split(' ')[0]}</div></div>`;
+        const phColor = i<3 ? 'var(--red)' : i<9 ? '#1D7A4A' : '#378ADD';
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`;
       }).join('');
 
       // Miro button
@@ -877,7 +885,7 @@ function renderDashboard() {
         <div class="dash-prog-wrap">
           <div class="dash-prog-track">${segs}</div>
           <div style="display:flex;margin-top:6px">${dots}</div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:#888">Step ${step} of 8</span><span style="font-size:10px;color:#888">${pct}% complete</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:#888">${pct}% complete</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap">
           <button style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--red);border-radius:6px;color:var(--red);background:transparent;cursor:pointer;font-family:inherit" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>
@@ -955,4 +963,169 @@ function rebuildDocCards(p) {
     const card = document.createElement('div');
     card.className = 'generated-doc-card';
     card.setAttribute('data-name', type);
-    card.innerHTML = `<i class="ti ${icon} generated-doc-icon"></i><div style="flex:1"><div class="generated-doc-label">${label}</div><div class="generated-doc-sub">Saved · Draft</div></div><button class="generated-doc-download" onclick="event.st
+    card.innerHTML = `<i class="ti ${icon} generated-doc-icon"></i><div style="flex:1"><div class="generated-doc-label">${label}</div><div class="generated-doc-sub">Saved · Draft</div></div><button class="generated-doc-download" onclick="event.sconst TOTAL_STEPS = 15;
+
+const phases = [
+  { label:'Strategy & Planning',    num:'Phase 1', steps:[0,1,2],            color:'var(--red)' },
+  { label:'Study Plan Development', num:'Phase 2', steps:[3,4,5,6,7,8],      color:'#1D7A4A' },
+  { label:'Approval',               num:'Phase 3', steps:[9,10,11,12,13,14], color:'#378ADD' },
+];
+
+const steps = [
+  {
+    num:'1', title:'Project strategy', phase:0,
+    intro:'Define the strategic rationale for the program and get approval from the VOC board to proceed.',
+    roles:['Head of Development','Director of Strategy','Senior Advisor'],
+    activities:['Review strategic context and market need','Define program concept and scope','Prepare VOC board presentation','Secure VOC board decision to proceed'],
+    responsible:'Head of Development',
+    deliverables:['VOC board decision — idea approved to proceed'],
+    docs:[], miro:false
+  },
+  {
+    num:'2', title:'Project mandate', phase:0,
+    intro:'Produce the project mandate — the formal document that authorises the project and defines its scope, organisation, and budget.',
+    roles:['Head of Development','Project Manager','Director of Strategy','Industry Partners'],
+    activities:['Define purpose, scope and milestones','Conduct risk assessment','Set development budget','Identify and approach industry partners'],
+    responsible:'Head of Development + Project Manager',
+    deliverables:['Project mandate approved by Rector','Industry partner agreements signed'],
+    docs:[], miro:false
+  },
+  {
+    num:'3', title:'Project plan', phase:0,
+    intro:'Develop a detailed project plan with clear activities, timeline and responsibilities. Onboard industry partners and assemble the full project group.',
+    roles:['Project Manager','Project group','Industry Partners'],
+    activities:['Define all project activities and timeline','Clarify responsibilities and expectations','Industry partner kick-off and onboarding'],
+    responsible:'Project Manager',
+    deliverables:['Project plan approved by Head of Development','Industry partners onboarded'],
+    docs:[], miro:false
+  },
+  {
+    num:'4', title:'Industry workshops', phase:1,
+    intro:'Collaborative workshops with industry partners shape the programme structure, topics, and learning outcomes.',
+    roles:['Project Manager','Industry Partners','Subject Matter Experts','Pedagogic Advisor'],
+    activities:['Plan and prepare workshops','Run workshop sessions with industry partners','Capture industry input and feedback','Document workshop outcomes'],
+    responsible:'Project Manager',
+    deliverables:['Workshop summaries','Industry feedback documented'],
+    docs:[], miro:true
+  },
+  {
+    num:'5', title:'Study programme design', phase:1,
+    intro:'Design the overall programme structure based on workshop outcomes — courses, credits, structure, and overall scope.',
+    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor'],
+    activities:['Define programme structure and course overview','Determine credit distribution','Draft programme description','Review with project team'],
+    responsible:'Curriculum Manager',
+    deliverables:['Programme design document'],
+    docs:[], miro:false
+  },
+  {
+    num:'6', title:'Learning outcome design', phase:1,
+    intro:'Define and finalise the overall programme learning outcomes and course-level learning outcomes.',
+    roles:['Curriculum Manager','Subject Matter Expert','Pedagogic Advisor','Industry Partners'],
+    activities:['Draft overall programme learning outcomes','Draft course-level learning outcomes','Industry partner review and approval'],
+    responsible:'Curriculum Manager',
+    deliverables:['Overall learning outcomes document','Industry approval of outcomes'],
+    docs:[], miro:false
+  },
+  {
+    num:'7', title:'Quality assurance by industry', phase:1,
+    intro:'The reference group and industry partners review the programme design and learning outcomes and provide formal feedback.',
+    roles:['Reference group','Industry Partners','Head of Development'],
+    activities:['Share programme design and LOs with reference group','Collect and review feedback','Adjust programme based on input','Confirm sign-off'],
+    responsible:'Head of Development',
+    deliverables:['Reference group feedback','Industry QA sign-off'],
+    docs:[], miro:false
+  },
+  {
+    num:'8', title:'Learning design', phase:1,
+    intro:'Develop the full learning design — topics, learning activities, assessments, and tools for each course.',
+    roles:['Curriculum Manager','Learning Designer','Subject Matter Expert'],
+    activities:['Define topics and learning activities per course','Design assessments','Specify tools and software requirements','Finalise course descriptions'],
+    responsible:'Curriculum Manager',
+    deliverables:['Learning design document','Completed course descriptions'],
+    docs:[], miro:false
+  },
+  {
+    num:'9', title:'Application and documentation', phase:1,
+    intro:'Prepare the full application package and all supporting documentation required for submission.',
+    roles:['Head of Development','Project Manager','Academic responsible'],
+    activities:['Compile all required documents','Review and quality check application package','Prepare supporting documentation','Final internal sign-off'],
+    responsible:'Head of Development',
+    deliverables:['Complete application package ready for submission'],
+    docs:[], miro:false
+  },
+  {
+    num:'10', title:'Handover to LOKUT', phase:2,
+    intro:'Submit the study plan and application package to LOKUT for formal review.',
+    roles:['Head of Development','LOKUT'],
+    activities:['Submit application to LOKUT','Confirm receipt and registration','Prepare for review process'],
+    responsible:'Head of Development',
+    deliverables:['LOKUT confirms receipt of application'],
+    docs:[], miro:false
+  },
+  {
+    num:'11', title:'Study plan review by LOKUT', phase:2,
+    intro:'LOKUT reviews the study plan against laws and regulations and provides feedback.',
+    roles:['LOKUT','Academic responsible','Head of Development'],
+    activities:['Respond to LOKUT queries','Provide additional documentation if requested','Review LOKUT feedback'],
+    responsible:'Head of Development',
+    deliverables:['LOKUT review complete'],
+    docs:[], miro:false
+  },
+  {
+    num:'12', title:'Statement', phase:2,
+    intro:'Prepare and submit the formal statement in response to the LOKUT review.',
+    roles:['Head of Development','Academic responsible'],
+    activities:['Draft formal statement','Internal review and approval','Submit statement to LOKUT'],
+    responsible:'Head of Development',
+    deliverables:['Statement submitted'],
+    docs:[], miro:false
+  },
+  {
+    num:'13', title:'Blueprint', phase:2,
+    intro:'Finalise the blueprint — the definitive study plan document that will be approved by the board.',
+    roles:['Head of Development','Academic responsible','Curriculum Manager'],
+    activities:['Finalise all programme documentation','Produce blueprint document','Internal approval of blueprint'],
+    responsible:'Head of Development',
+    deliverables:['Blueprint approved internally'],
+    docs:[], miro:false
+  },
+  {
+    num:'14', title:'Study plan approval by board', phase:2,
+    intro:'The vocational school board reviews and approves the study plan.',
+    roles:['Vocational school board','Head of Development'],
+    activities:['Present study plan to board','Board review and deliberation','Board decision'],
+    responsible:'Head of Development',
+    deliverables:['Board approval of study plan'],
+    docs:[], miro:false
+  },
+  {
+    num:'15', title:'Doc. handover', phase:2,
+    intro:'Final handover of all programme documentation to the relevant parties.',
+    roles:['Project Manager','Head of Development'],
+    activities:['Compile final documentation package','Hand over to relevant departments','Close project'],
+    responsible:'Project Manager',
+    deliverables:['All documents handed over','Project closed'],
+    docs:[], miro:false
+  }
+];
+
+const stepInstructions = [
+  'Review the strategic rationale for this programme. Prepare the project concept and VOC board presentation.',
+  'Use the programme summary to draft a Project Mandate. Get it approved by the Rector before moving on.',
+  'Develop a detailed project plan. Onboard industry partners and assemble the project group.',
+  'Run industry workshops to shape the programme structure, topics, and approach.',
+  'Design the overall programme structure — courses, credits, and scope — based on workshop outcomes.',
+  'Define and finalise programme-level and course-level learning outcomes. Get industry approval.',
+  'Share the programme design with the reference group and industry partners for formal quality review.',
+  'Develop the full learning design — topics, activities, assessments, and tools for each course.',
+  'Compile the full application package and all documentation. Complete final internal sign-off.',
+  'Submit the study plan and application package to LOKUT.',
+  'Manage the LOKUT review process. Respond to queries and provide additional documentation as needed.',
+  'Prepare and submit the formal statement in response to the LOKUT review.',
+  'Produce the final blueprint document for board approval.',
+  'Present the study plan to the vocational school board for formal approval.',
+  'Hand over all final documentation and close the project.',
+];
+
+let cur = 0;
+t
