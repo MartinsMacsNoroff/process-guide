@@ -1214,7 +1214,7 @@ function submitCreateModal() {
 
 async function deleteProgram(id) {
   const p = programs[id];
-  if (!p || !confirm(`Delete "${p.name}"?\n\nThis cannot be undone.`)) return;
+  if (!p || !confirm('Delete "' + p.name + '"?\n\nThis cannot be undone.')) return;
   delete programs[id];
   await savePrograms();
   renderDashboard();
