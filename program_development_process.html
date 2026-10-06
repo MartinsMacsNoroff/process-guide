@@ -961,7 +961,7 @@ function renderDashboard() {
     list.forEach(p => {
       const step = p.currentStep || 1;
       const pct = Math.round(step / TOTAL_STEPS * 100);
-      const statusColor = p.status === 'at-risk' ? '#FF2F02' : '#FF2F02';
+      const statusColor = p.status === 'done' ? '#1D7A4A' : p.status === 'at-risk' ? '#C77700' : '#FF2F02';
       const badgeBg = p.status === 'done' ? 'var(--tint-positive)' : p.status === 'at-risk' ? 'var(--tint-attention)' : 'var(--tint-positive)';
       const badgeColor = p.status === 'done' ? 'var(--ink-2)' : p.status === 'at-risk' ? 'var(--red-dark)' : 'var(--ink-2)';
       const badgeText = p.status === 'done' ? 'Completed' : p.status === 'at-risk' ? 'At risk' : 'On track';
@@ -971,9 +971,20 @@ function renderDashboard() {
       const dots = shortLabels.map((s,i) => { const d = i<step-1, a = i===step-1; const phColor = i<3?'var(--red)':i<9?'#1D7A4A':'#378ADD'; return `<div style="flex:1;display:flex;justify-content:center"><div style="width:6px;height:6px;border-radius:50%;background:${d||a?phColor:'var(--rule)'}"></div></div>`; }).join('');
       const hasMiro = p.miroBoard && p.miroBoard.includes('miro.com');
       const miroBtn = hasMiro ? `<a href="${p.miroBoard}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid #FFD02F;border-radius:var(--r);color:#635e00;background:rgba(255,208,47,0.08);text-decoration:none">Open Miro</a>` : `<button onclick="event.stopPropagation();linkMiroBoard('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit">+ Link Miro</button>`;
+      // Status controls. Completion is recorded, not inferred: reaching the last
+      // step means the programme is on it, not that it has finished it.
+      const atEnd = step >= TOTAL_STEPS;
+      const sBtn = (label, icon, call, accent) =>
+        `<button onclick="event.stopPropagation();${call}" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid ${accent || 'var(--rule)'};border-radius:var(--r);color:${accent || 'var(--ink-3)'};background:transparent;cursor:pointer;font-family:inherit"><i class="ti ti-${icon}" style="font-size:12px"></i> ${label}</button>`;
+      const statusBtns = p.status === 'done'
+        ? sBtn('Reopen', 'arrow-back-up', `setStatus('${p.id}','on-track')`)
+        : sBtn('Mark complete', 'check', `setStatus('${p.id}','done')`, atEnd ? '#1D7A4A' : null) +
+          (p.status === 'at-risk'
+            ? sBtn('Clear risk', 'alert-triangle', `setStatus('${p.id}','on-track')`, 'var(--red-dark)')
+            : sBtn('Flag at risk', 'alert-triangle', `setStatus('${p.id}','at-risk')`));
       const card = document.createElement('div');
       card.className = 'dash-prog-card';
-      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
+      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}${statusBtns}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
       el.appendChild(card);
     });
   }
@@ -1013,6 +1024,16 @@ async function updateStep() {
   if (!currentProgramId) return;
   programs[currentProgramId].currentStep = cur + 1;
   await savePrograms();
+}
+
+// Records an explicit programme status. Without this the dashboard's Completed
+// and At risk lists can never fill, because nothing else writes the field.
+async function setStatus(programId, status) {
+  const p = programs[programId];
+  if (!p || !['on-track', 'at-risk', 'done'].includes(status)) return;
+  p.status = status;
+  await savePrograms();
+  renderDashboard();
 }
 
 function render() {
