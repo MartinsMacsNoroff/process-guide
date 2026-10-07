@@ -653,9 +653,18 @@
         <div class="modal-field"><label>Approved by</label><input type="text" id="cm-approved-by" placeholder="e.g. Head of Development"></div>
         <div class="modal-field"><label>Approval date</label><input type="text" id="cm-approved-date" placeholder="e.g. May 2026"></div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="modal-field"><label>Credits</label><input type="text" id="cm-credits" placeholder="e.g. 60, or 60 + 120"></div>
+        <div class="modal-field"><label>Project responsible</label><input type="text" id="cm-owner" list="cm-owner-list" placeholder="e.g. Martins Macs"><datalist id="cm-owner-list"><option value="Martins Macs"></option><option value="Tom Drange"></option></datalist></div>
+      </div>
+      <div class="modal-field"><label>Title note</label><input type="text" id="cm-title-note" placeholder="e.g. Working title"><div class="hint">Shown beside the programme name on the timeline. Leave blank once the name is settled.</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="modal-field"><label>Study catalogue link</label><input type="text" id="cm-catalogue" placeholder="https://..."></div>
+        <div class="modal-field"><label>Teams folder link</label><input type="text" id="cm-teams" placeholder="https://..."></div>
+      </div>
       <div class="modal-actions">
         <button class="modal-cancel" onclick="closeCreateModal()">Cancel</button>
-        <button class="modal-submit" onclick="goToModalStep2()">Next → Program summary</button>
+        <button class="modal-submit" id="cm-primary" onclick="cmPrimary()">Next → Program summary</button>
       </div>
     </div>
     <div id="modal-step-2" style="display:none">
@@ -855,7 +864,69 @@ function dashNewProgram() {
   document.getElementById('create-modal').classList.add('open');
   setTimeout(() => document.getElementById('cm-name').focus(), 100);
 }
-function closeCreateModal() { document.getElementById('create-modal').classList.remove('open'); }
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('open');
+  editingProgramId = null;
+  const h = document.querySelector('#modal-step-1 h2');
+  if (h) h.textContent = 'Create new program';
+  const btn = document.getElementById('cm-primary');
+  if (btn) btn.textContent = 'Next → Program summary';
+}
+// The create modal doubles as an edit form, so the programmes that already
+// exist can gain these fields without being deleted and recreated.
+let editingProgramId = null;
+
+function cmVal(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function cmSet(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+
+function readDetailFields() {
+  return {
+    credits: cmVal('cm-credits'),
+    owner: cmVal('cm-owner'),
+    titleNote: cmVal('cm-title-note'),
+    catalogueUrl: cmVal('cm-catalogue'),
+    teamsUrl: cmVal('cm-teams'),
+  };
+}
+
+function openEditModal(id) {
+  const p = programs[id];
+  if (!p) return;
+  editingProgramId = id;
+  cmSet('cm-name', p.name);
+  cmSet('cm-rationale', p.rationale);
+  cmSet('cm-approved-by', p.approvedBy);
+  cmSet('cm-approved-date', p.approvedDate);
+  cmSet('cm-credits', p.credits);
+  cmSet('cm-owner', p.owner);
+  cmSet('cm-title-note', p.titleNote);
+  cmSet('cm-catalogue', p.catalogueUrl);
+  cmSet('cm-teams', p.teamsUrl);
+
+  document.getElementById('modal-step-1').style.display = 'block';
+  document.getElementById('modal-step-2').style.display = 'none';
+  const h = document.querySelector('#modal-step-1 h2');
+  if (h) h.textContent = 'Edit programme details';
+  const btn = document.getElementById('cm-primary');
+  if (btn) btn.textContent = 'Save';
+  document.getElementById('create-modal').classList.add('open');
+}
+
+async function saveEditModal() {
+  const p = programs[editingProgramId];
+  if (!p) return;
+  const name = cmVal('cm-name');
+  if (!name) { document.getElementById('cm-name').focus(); return; }
+  Object.assign(p, { name, rationale: cmVal('cm-rationale'),
+    approvedBy: cmVal('cm-approved-by'), approvedDate: cmVal('cm-approved-date') }, readDetailFields());
+  await savePrograms();
+  closeCreateModal();
+  renderDashboard();
+}
+
+// One button, two jobs, so there is only ever one form to keep in step.
+function cmPrimary() { return editingProgramId ? saveEditModal() : goToModalStep2(); }
+
 function goToModalStep2() {
   if (!document.getElementById('cm-name').value.trim()) { document.getElementById('cm-name').focus(); return; }
   document.getElementById('modal-step-1').style.display = 'none';
@@ -886,7 +957,8 @@ function submitCreateModal() {
     approvedDate: document.getElementById('cm-approved-date').value.trim() || 'To be confirmed',
     created: new Date().toISOString().split('T')[0],
     summary: document.getElementById('cm-summary') ? document.getElementById('cm-summary').value.trim() : '',
-    mandate: '', plan: '', miroBoard: '', currentStep: 1, status: 'on-track'
+    mandate: '', plan: '', miroBoard: '', currentStep: 1, status: 'on-track',
+    ...readDetailFields()
   };
   currentProgramId = id;
   savePrograms();
@@ -984,7 +1056,7 @@ function renderDashboard() {
             : sBtn('Flag at risk', 'alert-triangle', `setStatus('${p.id}','at-risk')`));
       const card = document.createElement('div');
       card.className = 'dash-prog-card';
-      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}${statusBtns}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
+      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}<button onclick="event.stopPropagation();openEditModal('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit"><i class="ti ti-pencil" style="font-size:12px"></i> Edit details</button>${statusBtns}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
       el.appendChild(card);
     });
   }
