@@ -701,6 +701,32 @@
   </div>
 </div>
 
+<!-- ===== DATES MODAL ===== -->
+<div class="modal-overlay" id="dates-modal">
+  <div class="modal-box" style="max-width:600px">
+    <h2 id="dm-title">Dates</h2>
+    <p>One date per step: when that step should be finished. A step runs from the previous dated step to its own date. Leave any of them blank.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:start">
+      <div class="modal-field"><label>Start date</label><input type="date" id="dm-start"></div>
+      <div class="modal-field"><label>Board decision</label><input type="date" id="dm-board"></div>
+      <div class="modal-field"><label style="visibility:hidden">Fill</label>
+        <button id="dm-fill" onclick="dmFill()" style="padding:9px 14px;border:1px solid var(--rule);border-radius:7px;background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--ink-2);white-space:nowrap">Fill the steps</button>
+      </div>
+    </div>
+    <div id="dm-msg" style="font-size:11.5px;color:var(--red);min-height:16px;margin:-6px 0 6px"></div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);margin:0 0 10px;cursor:pointer">
+      <input type="checkbox" id="dm-approx" style="width:14px;height:14px;accent-color:var(--red)">
+      These dates are approximate
+    </label>
+    <div id="dm-rows" style="max-height:40vh;overflow-y:auto;border-top:1px solid #eee"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="dmClear()">Clear all</button>
+      <button class="modal-cancel" onclick="closeDatesModal()">Cancel</button>
+      <button class="modal-submit" onclick="saveDatesModal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const PROXY = 'https://miro-proxy.martins-macs.workers.dev';
 let generatedSummary = '';
@@ -927,6 +953,106 @@ async function saveEditModal() {
 // One button, two jobs, so there is only ever one form to keep in step.
 function cmPrimary() { return editingProgramId ? saveEditModal() : goToModalStep2(); }
 
+/* ---------- per step dates ---------- */
+let datesProgramId = null;
+
+// The same weightings the timeline's schedule generator uses, so a plan filled
+// in here and one laid out there agree rather than drifting apart.
+const STEP_WEEKS = { 1:4, 2:6, 3:4, 4:6, 5:8, 6:6, 7:4, 8:8, 9:5, 10:2, 11:10, 12:3, 13:4, 14:4, 15:2 };
+const DM_DAY = 86400000;
+
+function dmIso(ms) { return new Date(ms).toISOString().slice(0, 10); }
+function dmSay(text, ok) {
+  const el = document.getElementById('dm-msg');
+  if (!el) return;
+  el.textContent = text || '';
+  el.style.color = ok ? 'var(--ink-3)' : 'var(--red)';
+}
+function dmInputs() { return Array.from(document.querySelectorAll('#dm-rows input[data-step]')); }
+
+function openDatesModal(id) {
+  const p = programs[id];
+  if (!p) return;
+  datesProgramId = id;
+  const saved = p.stepDates || {};
+  document.getElementById('dm-title').textContent = 'Dates — ' + p.name;
+  document.getElementById('dm-start').value = p.startDate || '';
+  document.getElementById('dm-approx').checked = Boolean(p.datesApproximate);
+  // Step 14 is the board decision, so the anchor field shows what is already set.
+  document.getElementById('dm-board').value = saved['14'] || '';
+  dmSay('');
+  document.getElementById('dm-rows').innerHTML = dashSteps.map(function (s) {
+    return '<div style="display:grid;grid-template-columns:26px 1fr 148px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f2f2f2">' +
+      '<span style="font-size:11px;color:#bbb;font-variant-numeric:tabular-nums">' + s.num + '</span>' +
+      '<span style="font-size:12px;color:#333">' + s.name + '</span>' +
+      '<input type="date" data-step="' + s.num + '" value="' + (saved[s.num] || '') + '" ' +
+      'style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;font-family:inherit;background:#fafafa;color:#1a1a1a;outline:none">' +
+      '</div>';
+  }).join('');
+  document.getElementById('dates-modal').classList.add('open');
+}
+
+function closeDatesModal() {
+  document.getElementById('dates-modal').classList.remove('open');
+  datesProgramId = null;
+}
+
+function dmClear() { dmInputs().forEach(function (i) { i.value = ''; }); dmSay(''); }
+
+// Spread the fifteen steps between two anchors in proportion to the weightings,
+// so a plausible plan costs two dates rather than fifteen. Everything it writes
+// stays editable: this is a starting point, not a decision.
+function dmFill() {
+  const start = document.getElementById('dm-start').value;
+  const board = document.getElementById('dm-board').value;
+  if (!start || !board) { dmSay('Set both a start date and a board decision date first.'); return; }
+  const t0 = Date.parse(start), t1 = Date.parse(board);
+  if (!(t1 > t0)) { dmSay('The board decision has to come after the start date.'); return; }
+
+  let total = 0;
+  for (let n = 1; n <= 14; n++) total += STEP_WEEKS[n];
+  const out = {};
+  let acc = 0;
+  for (let n = 1; n <= 14; n++) {
+    acc += STEP_WEEKS[n];
+    out[n] = dmIso(t0 + (t1 - t0) * (acc / total));
+  }
+  // Handover follows the board rather than sitting before it.
+  out[15] = dmIso(t1 + STEP_WEEKS[15] * 7 * DM_DAY);
+
+  dmInputs().forEach(function (i) { i.value = out[i.getAttribute('data-step')] || ''; });
+  // Spread dates are estimates, so the board should say so rather than let
+  // them pass as a real plan. Untick it once the plan is firm.
+  document.getElementById('dm-approx').checked = true;
+  dmSay('Filled from the two anchors and marked approximate. Adjust any step you actually know.', true);
+}
+
+async function saveDatesModal() {
+  const p = programs[datesProgramId];
+  if (!p) return;
+  const out = {};
+  dmInputs().forEach(function (i) { if (i.value) out[i.getAttribute('data-step')] = i.value; });
+
+  // A later step cannot finish before an earlier one. Without this the timeline
+  // would draw a step running backwards and nobody would know why.
+  const filled = Object.keys(out).map(Number).sort(function (a, b) { return a - b; });
+  for (let i = 1; i < filled.length; i++) {
+    if (out[filled[i]] < out[filled[i - 1]]) {
+      dmSay('Step ' + filled[i] + ' is dated before step ' + filled[i - 1] + '. Fix that first.');
+      return;
+    }
+  }
+
+  p.stepDates = out;
+  const start = document.getElementById('dm-start').value;
+  p.startDate = start || null;
+  p.datesApproximate = document.getElementById('dm-approx').checked;
+  await savePrograms();
+  closeDatesModal();
+  renderDashboard();
+}
+
+
 function goToModalStep2() {
   if (!document.getElementById('cm-name').value.trim()) { document.getElementById('cm-name').focus(); return; }
   document.getElementById('modal-step-1').style.display = 'none';
@@ -1054,9 +1180,13 @@ function renderDashboard() {
           (p.status === 'at-risk'
             ? sBtn('Clear risk', 'alert-triangle', `setStatus('${p.id}','on-track')`, 'var(--red-dark)')
             : sBtn('Flag at risk', 'alert-triangle', `setStatus('${p.id}','at-risk')`));
+      // How many of the fifteen steps carry a date, so the button says whether
+      // there is anything behind it without having to be opened.
+      const datedSteps = Object.keys(p.stepDates || {}).length;
+      const datesBtn = sBtn(datedSteps ? `Dates (${datedSteps})` : 'Dates', 'calendar-event', `openDatesModal('${p.id}')`);
       const card = document.createElement('div');
       card.className = 'dash-prog-card';
-      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}<button onclick="event.stopPropagation();openEditModal('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit"><i class="ti ti-pencil" style="font-size:12px"></i> Edit details</button>${statusBtns}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
+      card.innerHTML = `<div class="dash-prog-header"><div class="dash-prog-dot" style="background:${statusColor}"></div><span class="dash-prog-name">${p.name}</span><span class="dash-prog-badge" style="background:${badgeBg};color:${badgeColor};border-radius:var(--r-sm)">${badgeText}</span><span style="font-size:11px;color:var(--ink-3)"><i class="ti ti-calendar" style="font-size:11px"></i> ${p.created||'—'}</span><span class="dash-prog-pct">${pct}%</span></div><div class="dash-prog-wrap"><div class="dash-prog-track">${segs}</div><div style="display:flex;margin-top:6px">${dots}</div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:10px;color:var(--ink-3)">Step ${step} of ${TOTAL_STEPS}</span><span style="font-size:10px;color:var(--ink-3)">${pct}% complete</span></div></div><div style="display:flex;align-items:center;gap:8px;margin:0 18px 14px;flex-wrap:wrap"><button class="dash-open-btn" onclick="showGuide('${p.id}')"><i class="ti ti-arrow-right" style="font-size:12px"></i> Open program</button>${miroBtn}<button onclick="event.stopPropagation();openEditModal('${p.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r);color:var(--ink-3);background:transparent;cursor:pointer;font-family:inherit"><i class="ti ti-pencil" style="font-size:12px"></i> Edit details</button>${datesBtn}${statusBtns}<button onclick="deleteProgram('${p.id}')" style="font-size:11px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink-3);cursor:pointer;font-family:inherit"><i class="ti ti-trash" style="font-size:12px"></i> Delete</button></div>`;
       el.appendChild(card);
     });
   }
