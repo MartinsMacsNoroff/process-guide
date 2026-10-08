@@ -658,6 +658,7 @@
         <div class="modal-field"><label>Project responsible</label><input type="text" id="cm-owner" list="cm-owner-list" placeholder="e.g. Martins Macs"><datalist id="cm-owner-list"><option value="Martins Macs"></option><option value="Tom Drange"></option></datalist></div>
       </div>
       <div class="modal-field"><label>Title note</label><input type="text" id="cm-title-note" placeholder="e.g. Working title"><div class="hint">Shown beside the programme name on the timeline. Leave blank once the name is settled.</div></div>
+      <div class="modal-field"><label>Project</label><input type="text" id="cm-project" list="cm-project-list" placeholder="e.g. NSA/NIS"><datalist id="cm-project-list"></datalist><div class="hint">Only when this study plan is one of several in a single project. Programmes sharing a project name are grouped together on the timeline. Pick an existing name from the list rather than retyping it.</div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="modal-field"><label>Study catalogue link</label><input type="text" id="cm-catalogue" placeholder="https://..."></div>
         <div class="modal-field"><label>Teams folder link</label><input type="text" id="cm-teams" placeholder="https://..."></div>
@@ -893,6 +894,7 @@ function dashNewProgram() {
   setTimeout(() => document.getElementById('cm-name').focus(), 100);
 }
 function closeCreateModal() {
+  cmSet('cm-project', '');
   document.getElementById('create-modal').classList.remove('open');
   editingProgramId = null;
   const h = document.querySelector('#modal-step-1 h2');
@@ -912,6 +914,7 @@ function readDetailFields() {
     credits: cmVal('cm-credits'),
     owner: cmVal('cm-owner'),
     titleNote: cmVal('cm-title-note'),
+    project: cmVal('cm-project'),
     catalogueUrl: cmVal('cm-catalogue'),
     teamsUrl: cmVal('cm-teams'),
   };
@@ -928,6 +931,18 @@ function openEditModal(id) {
   cmSet('cm-credits', p.credits);
   cmSet('cm-owner', p.owner);
   cmSet('cm-title-note', p.titleNote);
+  cmSet('cm-project', p.project);
+  // Built from what is already in use, so the names converge instead of
+  // drifting into near duplicates that split a bundle without saying so.
+  var seen = {};
+  Object.keys(programs).forEach(function (k) {
+    var name = (programs[k].project || '').trim();
+    if (name) seen[name] = true;
+  });
+  var list = document.getElementById('cm-project-list');
+  if (list) list.innerHTML = Object.keys(seen).sort().map(function (n) {
+    return '<option value="' + n.replace(/"/g, '&quot;') + '"></option>';
+  }).join('');
   cmSet('cm-catalogue', p.catalogueUrl);
   cmSet('cm-teams', p.teamsUrl);
 
