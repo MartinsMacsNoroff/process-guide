@@ -706,14 +706,16 @@
   <div class="modal-box" style="max-width:600px">
     <h2 id="dm-title">Dates</h2>
     <p>One date per step: when that step should be finished. A step runs from the previous dated step to its own date. Leave any of them blank.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:start">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="modal-field"><label>Start date</label><input type="date" id="dm-start"></div>
       <div class="modal-field"><label>Board decision</label><input type="date" id="dm-board"></div>
-      <div class="modal-field"><label style="visibility:hidden">Fill</label>
-        <button id="dm-fill" onclick="dmFill()" style="padding:9px 14px;border:1px solid var(--rule);border-radius:7px;background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--ink-2);white-space:nowrap">Fill the steps</button>
-      </div>
+      <div class="modal-field"><label>Handover</label><input type="date" id="dm-handover"></div>
     </div>
-    <div id="dm-msg" style="font-size:11.5px;color:var(--red);min-height:16px;margin:-6px 0 6px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:-6px 0 10px">
+      <span style="font-size:11px;color:var(--ink-3)">These three feed "Fill the steps" only. What gets saved is the list below.</span>
+      <button id="dm-fill" onclick="dmFill()" style="padding:9px 14px;border:1px solid var(--rule);border-radius:7px;background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--ink-2);white-space:nowrap;flex:none">Fill the steps</button>
+    </div>
+    <div id="dm-msg" style="font-size:11.5px;color:var(--red);min-height:16px;margin:-2px 0 6px"></div>
     <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);margin:0 0 10px;cursor:pointer">
       <input type="checkbox" id="dm-approx" style="width:14px;height:14px;accent-color:var(--red)">
       These dates are approximate
@@ -960,6 +962,10 @@ let datesProgramId = null;
 // in here and one laid out there agree rather than drifting apart.
 const STEP_WEEKS = { 1:4, 2:6, 3:4, 4:6, 5:8, 6:6, 7:4, 8:8, 9:5, 10:2, 11:10, 12:3, 13:4, 14:4, 15:2 };
 const DM_DAY = 86400000;
+// Both project plans hand over three days after the board decides. Used only
+// as the default when the handover field is left empty, and written back into
+// the field so it is visible rather than applied behind your back.
+const HANDOVER_DAYS = 3;
 
 function dmIso(ms) { return new Date(ms).toISOString().slice(0, 10); }
 function dmSay(text, ok) {
@@ -977,6 +983,7 @@ function openDatesModal(id) {
   const saved = p.stepDates || {};
   document.getElementById('dm-title').textContent = 'Dates — ' + p.name;
   document.getElementById('dm-start').value = p.startDate || '';
+  document.getElementById('dm-handover').value = saved['15'] || '';
   document.getElementById('dm-approx').checked = Boolean(p.datesApproximate);
   // Step 14 is the board decision, so the anchor field shows what is already set.
   document.getElementById('dm-board').value = saved['14'] || '';
@@ -1005,9 +1012,14 @@ function dmClear() { dmInputs().forEach(function (i) { i.value = ''; }); dmSay('
 function dmFill() {
   const start = document.getElementById('dm-start').value;
   const board = document.getElementById('dm-board').value;
-  if (!start || !board) { dmSay('Set both a start date and a board decision date first.'); return; }
+  const handoverField = document.getElementById('dm-handover');
+  if (!start || !board) { dmSay('Set a start date and a board decision date first.'); return; }
   const t0 = Date.parse(start), t1 = Date.parse(board);
   if (!(t1 > t0)) { dmSay('The board decision has to come after the start date.'); return; }
+
+  let handover = handoverField.value;
+  if (!handover) { handover = dmIso(t1 + HANDOVER_DAYS * DM_DAY); handoverField.value = handover; }
+  if (Date.parse(handover) < t1) { dmSay('Handover cannot be before the board decision.'); return; }
 
   let total = 0;
   for (let n = 1; n <= 14; n++) total += STEP_WEEKS[n];
@@ -1017,14 +1029,13 @@ function dmFill() {
     acc += STEP_WEEKS[n];
     out[n] = dmIso(t0 + (t1 - t0) * (acc / total));
   }
-  // Handover follows the board rather than sitting before it.
-  out[15] = dmIso(t1 + STEP_WEEKS[15] * 7 * DM_DAY);
+  out[15] = handover;
 
   dmInputs().forEach(function (i) { i.value = out[i.getAttribute('data-step')] || ''; });
   // Spread dates are estimates, so the board should say so rather than let
   // them pass as a real plan. Untick it once the plan is firm.
   document.getElementById('dm-approx').checked = true;
-  dmSay('Filled from the two anchors and marked approximate. Adjust any step you actually know.', true);
+  dmSay('Filled from the three anchors and marked approximate. Adjust any step you actually know.', true);
 }
 
 async function saveDatesModal() {
